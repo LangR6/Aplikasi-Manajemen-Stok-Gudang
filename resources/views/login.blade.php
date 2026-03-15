@@ -18,7 +18,7 @@
     <div class="login-container">
 
         <div class="left-box">
-            <img src="{{ asset('images/STOK GUDANG LOGO.png') }}" class="logo">
+            <img src="{{ asset('images/logo.png') }}" class="logo">
         </div>
 
         <div class="right-box">
