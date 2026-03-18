@@ -9,6 +9,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif;}
+
+         body {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .outline-box {
+        border: 2px solid #8f8f8f;
+        border-radius: 14px;
+        background: white;
+    }
+
+    .panel-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .thin-line {
+        border-color: #9a9a9a;
+    }
+
+    .modal-bg {
+        background: rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(1px);
+    }
     </style>
 </head>
 
@@ -28,7 +53,7 @@
 
                 <!-- BERANDA -->
                 <li>
-                    <a href="#"
+                    <a href="{{ route('dashboard') }}"
                         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 hover:translate-x-1 transition group
                         {{ request()->is('/') ? 'bg-orange-50 border-l-4 border-orange-500 font-medium text-orange-600' : '' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
