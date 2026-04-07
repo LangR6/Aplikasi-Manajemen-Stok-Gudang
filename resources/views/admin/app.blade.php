@@ -10,11 +10,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </script>
 
     <style>
         body {
             font-family: 'Poppins', sans-serif;
         }
+
     </style>
 </head>
 
@@ -77,7 +79,7 @@
 
                 <!-- KATEGORI -->
                 <li>
-                    <a href="#"
+                    <a href="{{ route('kelola_kategori') }}"
                         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 hover:translate-x-1 transition group
                         {{ request()->is('kategori*') ? 'bg-orange-50 border-l-4 border-orange-500 font-medium text-orange-600' : '' }}">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -112,16 +114,16 @@
         <div class="ml-56 w-full">
 
             <!-- NAVBAR -->
-            <div class="sticky top-0 z-50 bg-white flex justify-between items-center px-6 py-4 shadow-md">
+            <div class="sticky top-0 z-100 bg-white flex justify-between items-center px-6 py-4 shadow-md">
                 <h1 class="text-xl font-semibold">@yield('title')</h1>
-                <a href="{{ route('profile') }}" class="flex items-center gap-3 hover:opacity-75 transition">
+                <div class="flex items-center gap-3">
                     <span class="text-gray-700">Admin 1</span>
                     <div class="w-9 h-9 border rounded-full bg-amber-600"></div>
-                </a>
+                </div>
             </div>
 
             <!-- CONTENT -->
-            <div class="p-6">
+            <div class="p-4">
                 @yield('content')
             </div>
         </div>
