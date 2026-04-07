@@ -18,7 +18,7 @@ Route::get('/kelola_barang', [KelolaBarangController::class, 'index'])->name('ke
 
 Route::get('/kategori', [KelolaKategoriController::class, 'index'])->name('kelola_kategori');
 
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // RIWAYAT
 Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat');
