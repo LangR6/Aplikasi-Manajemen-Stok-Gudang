@@ -8,6 +8,7 @@ use App\Http\Controllers\KelolaBarangController;
 use App\Http\Controllers\KelolaKategoriController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RiwayatController; // Riwayat
+use App\Http\Controllers\SupplierController;
 
 Route::get('/login', [LoginController::class, 'login']);
 
@@ -34,3 +35,5 @@ Route::post('/supplier/store', function (Request $request) {
 
     return redirect()->route('dashboard')->with('success', 'Supplier berhasil ditambahkan.');
 })->name('supplier.store');
+
+Route::get('/kelola_supplier', [SupplierController::class, 'index'])->name('kelola_supplier');

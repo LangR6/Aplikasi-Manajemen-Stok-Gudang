@@ -10,13 +10,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    </script>
+
 
     <style>
         body {
             font-family: 'Poppins', sans-serif;
         }
-
     </style>
 </head>
 
@@ -50,7 +49,7 @@
 
                 <!-- SUPPLIER -->
                 <li>
-                    <a href="#"
+                    <a href="{{ route('kelola_supplier') }}"
                         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 hover:translate-x-1 transition group
                         {{ request()->is('kelola_supplier*') ? 'bg-orange-50 border-l-4 border-orange-500 font-medium text-orange-600' : '' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
