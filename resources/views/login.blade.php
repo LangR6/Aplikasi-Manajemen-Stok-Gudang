@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Login - Manajemen Stok Gudang</title>
@@ -13,6 +14,7 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-100 flex items-center justify-center h-screen">
     <div class="bg-white w-[850px] h-[420px] rounded-md flex p-8 shadow-lg">
         <!-- Left -->
@@ -25,7 +27,8 @@
                 MASUK
             </h1>
             <p class="text-sm text-center text-orange-500 tracking-widest font-bold m-0">MANAJEMEN STOK GUDANG</p>
-            <form method="POST" action="/login" class="space-y-4 mt-4">
+            <form method="POST" action="{{ route('loginaction') }}" class="space-y-4 mt-4">
+                @method('POST')
                 @csrf
                 <div>
                     <label class="block">Nama Pengguna</label>
@@ -45,4 +48,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -9,8 +9,10 @@ use App\Http\Controllers\KelolaKategoriController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RiwayatController; // Riwayat
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/login', [LoginController::class, 'login']);
+Route::post('/loginaction', [LoginController::class, 'loginAction'])->name('loginaction');
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
@@ -24,6 +26,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 // RIWAYAT
 Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat');
 Route::get('/riwayat/export', [RiwayatController::class, 'exportExcel'])->name('riwayat.export');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::post('/supplier/store', function (Request $request) {
     $request->validate([

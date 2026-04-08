@@ -1,4 +1,4 @@
-@extends('admin.app')
+@extends('app')
 
 @section('title', 'Kelola Kategori')
 

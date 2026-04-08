@@ -14,7 +14,7 @@ class RiwayatController extends Controller
             // ['tanggal' => '2026-05-12', 'jenis' => 'Masuk', 'nama_barang' => 'Semen', 'nama_supplier' => 'CV Sumber Jaya', 'jumlah' => 100],
         ]);
 
-        return view('admin.riwayat', compact('riwayat'));
+        return view('riwayat', compact('riwayat'));
     }
 
     public function exportExcel(Request $request)

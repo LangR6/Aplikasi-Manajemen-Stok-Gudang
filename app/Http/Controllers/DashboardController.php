@@ -122,7 +122,7 @@ class DashboardController extends Controller
         $stokMenipis = 8;
         $stokHabis = 3;
 
-        return view('admin.dashboard', compact(
+        return view('dashboard', compact(
             'suppliers',
             'barangMasukTerbaru',
             'barangKeluarTerbaru',

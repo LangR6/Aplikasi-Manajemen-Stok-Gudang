@@ -1,4 +1,4 @@
-@extends('admin.app')
+@extends('app')
 
 @section('title', 'Kelola Barang')
 
@@ -217,7 +217,7 @@
                                     Barang</label>
                                 <input id="modalNamaBarang" type="text" placeholder="Nama Barang" readonly
                                     class="bg-gray-100 border border-gray-200 text-gray-500 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed" />
-                            </div>  
+                            </div>
                             <div>
                                 <label
                                     class="block mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Kategori</label>

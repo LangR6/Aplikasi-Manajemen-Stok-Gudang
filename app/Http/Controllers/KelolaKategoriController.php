@@ -8,6 +8,6 @@ class KelolaKategoriController extends Controller
 {
     public function index()
     {
-        return view('admin.kelola_kategori');
+        return view('kelola_kategori');
     }
 }
