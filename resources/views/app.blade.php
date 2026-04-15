@@ -135,7 +135,7 @@
         <div class="ml-56 w-[100%-14rem]">
 
             <!-- NAVBAR -->
-            <div class="sticky top-0 z-50 bg-white flex justify-between items-center px-6 py-4 shadow-md">
+            <div class="sticky top-0 z-30 bg-white flex justify-between items-center px-6 py-4 shadow-md">
                 <h1 class="text-xl font-semibold">@yield('title')</h1>
                 <a href="{{ route('profile') }}" class="flex items-center gap-3 hover:opacity-75 transition">
                     <span class="text-gray-700">Admin 1</span>
@@ -151,7 +151,7 @@
     </div>
 
 
-
+    @stack('styles')
     @stack('modals')
     @stack('scripts')
 </body>
