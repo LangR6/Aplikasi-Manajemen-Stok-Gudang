@@ -3,10 +3,12 @@
 @section('title', 'Kelola Supplier')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-3">
 
-    <!-- Top Action -->
-    <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+    {{-- TOOLBAR --}}
+    <div class="flex flex-wrap items-center gap-3">
+
+        {{-- SEARCH --}}
         <div class="relative flex-1">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 20 20">
@@ -17,141 +19,191 @@
 
             <input type="text"
                 placeholder="Cari nama supplier..."
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5">
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                           focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
         </div>
 
-        <button type="button"
-            onclick="openSupplierModal()"
-            class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2">
-
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 18 18">
-                <path stroke="currentColor" stroke-width="2"
+        {{-- TAMBAH --}}
+        <button type="button" onclick="openSupplierModal()"
+            class="flex items-center gap-2 bg-[#F66B0E] hover:bg-orange-600
+                       active:scale-[.98] text-white text-sm font-medium px-6 py-2.5
+                       rounded-lg transition-all whitespace-nowrap">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 18 18">
+                <path stroke="currentColor" stroke-width="2.2"
                     d="M9 1v16M1 9h16" />
             </svg>
-
             Tambah Supplier
         </button>
     </div>
 
-    <!-- Table Card -->
-    <div class="bg-white border border-gray-200 rounded-[24px] shadow-sm overflow-hidden">
-        <div class="px-6 py-5 border-b border-gray-200">
-            <h2 class="text-[24px] font-semibold text-gray-800">Daftar Supplier</h2>
+    {{-- TABLE --}}
+    <div class="border border-gray-300 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left table-fixed min-w-[900px]">
+                <colgroup>
+                    <col class="w-16">
+                    <col class="w-[24%]">
+                    <col class="w-[18%]">
+                    <col class="w-[28%]">
+                    <col class="w-[14%]">
+                    <col class="w-[16%]">
+                </colgroup>
+
+                <thead class="bg-[#205375] border-b border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wide">No</th>
+                        <th class="px-4 py-3 text-xs font-medium text-white uppercase tracking-wide">Nama Supplier</th>
+                        <th class="px-4 py-3 text-xs font-medium text-white uppercase tracking-wide">Kontak</th>
+                        <th class="px-4 py-3 text-xs font-medium text-white uppercase tracking-wide">Email</th>
+                        <th class="px-4 py-3 text-xs font-medium text-white uppercase tracking-wide">Kota</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wide">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse($suppliers as $index => $supplier)
+                    <tr class="border-b border-gray-100 {{ $loop->even ? '' : 'bg-gray-50/60' }}">
+                        <td class="px-4 py-3 text-center text-sm text-gray-800 font-medium">
+                            {{ $suppliers->firstItem() + $index }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm font-medium text-gray-800">
+                            {{ $supplier['nama_supplier'] }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-gray-700">
+                            {{ $supplier['kontak'] }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-gray-700 break-words">
+                            {{ $supplier['email'] }}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-gray-700">
+                            {{ $supplier['kota'] }}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <div class="flex items-center justify-center gap-2">
+                                <button type="button"
+                                    class="px-3 py-1 rounded-md text-sm font-medium border border-gray-300
+                                                   text-gray-700 bg-transparent hover:bg-gray-100
+                                                   active:scale-[.98] hover:-translate-y-px transition-all">
+                                    Edit
+                                </button>
+
+                                <button type="button"
+                                    class="px-3 py-1 rounded-md text-sm font-medium border border-red-200
+                                                   text-red-600 bg-red-50 hover:bg-red-100
+                                                   active:scale-[.98] hover:-translate-y-px transition-all">
+                                    Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-4 py-12 text-center text-gray-400 text-sm">
+                            Belum ada data supplier
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
-        <div class="px-6 py-5">
-            @if(count($suppliers) > 0)
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="border-b border-gray-200 text-left">
-                            <th class="py-3 text-[18px] font-semibold text-gray-700 w-[8%]">No</th>
-                            <th class="py-3 text-[18px] font-semibold text-gray-700 w-[28%]">Nama Supplier</th>
-                            <th class="py-3 text-[18px] font-semibold text-gray-700 w-[20%]">Kontak</th>
-                            <th class="py-3 text-[18px] font-semibold text-gray-700 w-[26%]">Email</th>
-                            <th class="py-3 text-[18px] font-semibold text-gray-700 w-[12%]">Kota</th>
-                            <th class="py-3 text-[18px] font-semibold text-gray-700 w-[16%]">Aksi</th>
-                        </tr>
-                    </thead>
+        {{-- FOOTER INFO --}}
+        <div class="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between gap-2">
+            <span class="text-sm text-gray-400">
+                Menampilkan {{ $suppliers->firstItem() }}–{{ $suppliers->lastItem() }} dari {{ $suppliers->total() }} supplier
+            </span>
 
-                    <tbody>
-                        @foreach($suppliers as $index => $supplier)
-                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-all duration-200">
-                            <td class="py-4 text-[16px] text-gray-700">{{ $index + 1 }}</td>
-                            <td class="py-4 pr-4 text-[16px] text-gray-700">{{ $supplier['nama_supplier'] }}</td>
-                            <td class="py-4 pr-4 text-[16px] text-gray-700">{{ $supplier['kontak'] }}</td>
-                            <td class="py-4 pr-4 text-[16px] text-gray-700 break-words">{{ $supplier['email'] }}</td>
-                            <td class="py-4 pr-4 text-[16px] text-gray-700">{{ $supplier['kota'] }}</td>
-                            <td class="py-4">
-                                <div class="flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        class="px-4 py-2 rounded-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all duration-300">
-                                        Edit
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="px-4 py-2 rounded-[12px] bg-red-500 text-white hover:bg-red-600 transition-all duration-300">
-                                        Hapus
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @else
-            <div class="h-[300px] flex items-center justify-center text-gray-400 text-[18px]">
-                Belum ada data supplier
-            </div>
-            @endif
+            {{ $suppliers->links() }}
         </div>
     </div>
+
 </div>
 @endsection
 
 @push('modals')
-<div id="supplierModal" class="fixed inset-0 hidden items-center justify-center bg-black/30 backdrop-blur-[2px] z-50 px-4">
-    <div class="w-full max-w-[620px] bg-white rounded-[28px] border border-gray-200 shadow-2xl overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h3 class="text-[22px] font-semibold text-gray-800">Tambah Supplier</h3>
-            <button type="button" onclick="closeSupplierModal()" class="text-[28px] text-gray-500 leading-none">&times;</button>
+<div id="supplierModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+    <div class="modal-backdrop absolute inset-0 bg-black/0 transition-all duration-200"></div>
+
+    <div
+        class="modal-box relative bg-white rounded-2xl w-full max-w-xl
+                   transform scale-95 opacity-0 transition-all duration-200 origin-top">
+
+        {{-- HEADER --}}
+        <div class="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-[#F66B0E]">
+            <div class="flex items-center gap-2.5">
+                <h3 class="text-sm font-semibold text-white">Tambah Supplier</h3>
+            </div>
+
+            <button type="button" onclick="closeSupplierModal()"
+                class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
         </div>
 
-        <form action="#" method="POST" class="p-6">
+        <form action="#" method="POST" class="px-5 py-5 space-y-4">
             @csrf
 
-            <div class="mb-4">
-                <label class="block text-[14px] font-medium text-gray-700 mb-2">Nama Supplier</label>
-                <input
-                    type="text"
-                    name="nama_supplier"
-                    placeholder="Masukkan nama supplier..."
-                    class="w-full h-[50px] border border-gray-300 rounded-[14px] px-4 outline-none focus:ring-2 focus:ring-orange-200">
+            <div>
+                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                    Nama Supplier
+                </label>
+                <input type="text" name="nama_supplier" placeholder="Contoh: CV Sumber Jaya..."
+                    class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
+                               rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
+                               focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[14px] font-medium text-gray-700 mb-2">No. Kontak</label>
-                    <input
-                        type="text"
-                        name="kontak"
-                        placeholder="Masukkan kontak supplier..."
-                        class="w-full h-[50px] border border-gray-300 rounded-[14px] px-4 outline-none focus:ring-2 focus:ring-orange-200">
+                    <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                        No. Kontak
+                    </label>
+                    <input type="text" name="kontak" placeholder="Contoh: 0812-3456-7890"
+                        class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
+                                   rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
+                                   focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
                 </div>
 
                 <div>
-                    <label class="block text-[14px] font-medium text-gray-700 mb-2">Kota</label>
-                    <input
-                        type="text"
-                        name="kota"
-                        placeholder="Masukkan kota supplier..."
-                        class="w-full h-[50px] border border-gray-300 rounded-[14px] px-4 outline-none focus:ring-2 focus:ring-orange-200">
+                    <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                        Kota
+                    </label>
+                    <input type="text" name="kota" placeholder="Contoh: Bandung"
+                        class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
+                                   rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
+                                   focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
                 </div>
             </div>
 
-            <div class="mb-6">
-                <label class="block text-[14px] font-medium text-gray-700 mb-2">Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Masukkan email supplier..."
-                    class="w-full h-[50px] border border-gray-300 rounded-[14px] px-4 outline-none focus:ring-2 focus:ring-orange-200">
+            <div>
+                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                    Email
+                </label>
+                <input type="email" name="email" placeholder="Contoh: supplier@email.com"
+                    class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
+                               rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
+                               focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
             </div>
 
-            <div class="flex gap-3">
-                <button
-                    type="submit"
-                    class="flex-1 h-[50px] rounded-[14px] bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-all duration-300">
-                    Simpan
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                <button type="button" onclick="closeSupplierModal()"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200
+                               rounded-lg hover:bg-gray-50 active:scale-[.98] transition-all">
+                    Batal
                 </button>
 
-                <button
-                    type="button"
-                    onclick="closeSupplierModal()"
-                    class="w-[140px] h-[50px] rounded-[14px] border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-all duration-300">
-                    Batal
+                <button type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-[#F66B0E] hover:bg-orange-600
+                               rounded-lg active:scale-[.98] hover:-translate-y-px transition-all">
+                    Simpan
                 </button>
             </div>
         </form>
@@ -159,32 +211,70 @@
 </div>
 @endpush
 
+@push('styles')
+<style>
+    .modal-overlay.is-open .modal-backdrop {
+        background: rgba(0, 0, 0, .35) !important;
+        backdrop-filter: blur(2px) !important;
+        -webkit-backdrop-filter: blur(2px) !important;
+    }
+
+    .modal-overlay.is-open .modal-box {
+        transform: scale(1) !important;
+        opacity: 1 !important;
+    }
+
+    .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
     function lockBodyScroll() {
+        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
         document.body.classList.add('overflow-hidden');
+        document.body.style.paddingRight = scrollBarWidth + 'px';
     }
 
     function unlockBodyScroll() {
         document.body.classList.remove('overflow-hidden');
+        document.body.style.paddingRight = '';
     }
 
     function openSupplierModal() {
-        const modal = document.getElementById('supplierModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            lockBodyScroll();
-        }
+        const ov = document.getElementById('supplierModal');
+        if (!ov) return;
+
+        ov.classList.remove('hidden');
+        void ov.offsetWidth;
+        ov.classList.add('is-open');
+        lockBodyScroll();
     }
 
     function closeSupplierModal() {
-        const modal = document.getElementById('supplierModal');
-        if (modal) {
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-            unlockBodyScroll();
-        }
+        const ov = document.getElementById('supplierModal');
+        if (!ov) return;
+
+        ov.classList.remove('is-open');
+        setTimeout(function() {
+            ov.classList.add('hidden');
+        }, 200);
+
+        unlockBodyScroll();
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const ov = document.getElementById('supplierModal');
+        if (!ov) return;
+
+        const backdrop = ov.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.addEventListener('click', function() {
+                closeSupplierModal();
+            });
+        }
+    });
 </script>
 @endpush
