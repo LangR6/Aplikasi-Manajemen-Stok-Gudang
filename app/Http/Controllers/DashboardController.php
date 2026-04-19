@@ -116,6 +116,110 @@ class DashboardController extends Controller
             ],
         ];
 
+        $daftarBarangMasuk = [
+            [
+                'nama_barang' => 'Hoodie',
+                'kategori' => 'Pakaian',
+                'jumlah' => 50,
+                'tanggal' => '12 Mei 2026',
+                'supplier' => 'CV Sumber Jaya',
+            ],
+            [
+                'nama_barang' => 'Kaos Oversize',
+                'kategori' => 'Pakaian',
+                'jumlah' => 30,
+                'tanggal' => '10 Mei 2026',
+                'supplier' => 'PT Maju Terus',
+            ],
+            [
+                'nama_barang' => 'Jaket Denim',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '08 Mei 2026',
+                'supplier' => 'UD Makmur',
+            ],
+            [
+                'nama_barang' => 'Jaket Denim',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '08 Mei 2026',
+                'supplier' => 'UD Makmur',
+            ],
+            [
+                'nama_barang' => 'Jaket Denim',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '08 Mei 2026',
+                'supplier' => 'UD Makmur',
+            ],
+            [
+                'nama_barang' => 'Jaket Denim',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '08 Mei 2026',
+                'supplier' => 'UD Makmur',
+            ],
+        ];
+
+        $daftarBarangKeluar = [
+            [
+                'nama_barang' => 'Topi',
+                'kategori' => 'Aksesoris',
+                'jumlah' => 10,
+                'tanggal' => '12 Mei 2026',
+                'tujuan' => 'Toko Cabang A',
+                'catatan' => 'Pengiriman rutin',
+            ],
+            [
+                'nama_barang' => 'Kaos Polos',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '11 Mei 2026',
+                'tujuan' => 'Toko Cabang B',
+                'catatan' => '-',
+            ],
+            [
+                'nama_barang' => 'Kaos Polos',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '11 Mei 2026',
+                'tujuan' => 'Toko Cabang B',
+                'catatan' => '-',
+            ],
+            [
+                'nama_barang' => 'Kaos Polos',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '11 Mei 2026',
+                'tujuan' => 'Toko Cabang B',
+                'catatan' => '-',
+            ],
+            [
+                'nama_barang' => 'Kaos Polos',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '11 Mei 2026',
+                'tujuan' => 'Toko Cabang B',
+                'catatan' => '-',
+            ],
+             [
+                'nama_barang' => 'Kaos Polos',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '11 Mei 2026',
+                'tujuan' => 'Toko Cabang B',
+                'catatan' => '-',
+            ],
+            [
+                'nama_barang' => 'Kaos Polos',
+                'kategori' => 'Pakaian',
+                'jumlah' => 20,
+                'tanggal' => '11 Mei 2026',
+                'tujuan' => 'Toko Cabang B',
+                'catatan' => '-',
+            ],
+        ];
+
         $totalBarangMasuk = 55;
         $totalBarangKeluar = 30;
         $totalBarang = 120;
@@ -132,7 +236,9 @@ class DashboardController extends Controller
             'stokMenipis',
             'stokHabis',
             'daftarStokMenipis',
-            'daftarStokHabis'
+            'daftarStokHabis',
+            'daftarBarangMasuk',
+            'daftarBarangKeluar'
         ));
     }
 }

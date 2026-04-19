@@ -58,7 +58,7 @@
         </div>
 
         <!-- GRID BARANG -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-5 xl:grid-cols-5 gap-6">
 
             @foreach ([['nama' => 'Topi', 'stok' => 8, 'kategori' => 'Aksesoris'], ['nama' => 'Topi', 'stok' => 8, 'kategori' => 'Aksesoris'], ['nama' => 'Topi', 'stok' => 8, 'kategori' => 'Aksesoris'], ['nama' => 'Topi', 'stok' => 8, 'kategori' => 'Aksesoris'], ['nama' => 'Topi', 'stok' => 8, 'kategori' => 'Aksesoris'], ['nama' => 'Sweater', 'stok' => 5, 'kategori' => 'Atasan'], ['nama' => 'Sweater', 'stok' => 5, 'kategori' => 'Atasan'], ['nama' => 'Sweater', 'stok' => 5, 'kategori' => 'Atasan'], ['nama' => 'Sweater', 'stok' => 5, 'kategori' => 'Atasan'], ['nama' => 'Sweater', 'stok' => 5, 'kategori' => 'Atasan'], ['nama' => 'Celana', 'stok' => 0, 'kategori' => 'Bawahan'], ['nama' => 'Celana', 'stok' => 0, 'kategori' => 'Bawahan'], ['nama' => 'Celana', 'stok' => 0, 'kategori' => 'Bawahan'], ['nama' => 'Celana', 'stok' => 0, 'kategori' => 'Bawahan'], ['nama' => 'Celana', 'stok' => 0, 'kategori' => 'Bawahan']] as $barang)
                 <div class="card-barang relative bg-white rounded-xl shadow-sm hover:shadow-lg transition p-4 flex flex-col items-center border"
@@ -80,7 +80,7 @@
 
                     <!-- GAMBAR -->
                     <div class="w-36 h-36 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                        <span class="text-gray-400 text-sm">gambar</span>
+                        <img src="{{ asset('images/logo1.png') }}" class="w-20">
                     </div>
 
                     <!-- NAMA -->
