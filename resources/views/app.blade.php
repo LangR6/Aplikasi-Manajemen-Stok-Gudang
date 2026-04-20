@@ -8,7 +8,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
@@ -97,7 +97,6 @@
                 </a>
             </li>
 
-            @if (session('role') === 'admin')
                 <li>
                     <a href="{{ route('riwayat') }}"
                         class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-all duration-200
@@ -112,7 +111,6 @@
                         Riwayat
                     </a>
                 </li>
-            @endif
         </ul>
 
         <!-- Logout Button -->

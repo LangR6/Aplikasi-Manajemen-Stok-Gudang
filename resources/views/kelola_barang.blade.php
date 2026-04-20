@@ -46,15 +46,17 @@
             </div>
 
             <!-- TOMBOL TAMBAH -->
-            <button type="button" onclick="openModal('tambah', null)"
-                class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2 ms-4">
-                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 1v16M1 9h16" />
-                </svg>
-                Tambah Barang
-            </button>
+            @if (@session('role') === 'admin')
+                <button type="button" onclick="openModal('tambah', null)"
+                    class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2 ms-4">
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 18 18">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 1v16M1 9h16" />
+                    </svg>
+                    Tambah Barang
+                </button>
+            @endif
         </div>
 
         <!-- GRID BARANG -->
@@ -66,17 +68,19 @@
                     data-stok="{{ $barang['stok'] }}">
 
                     <!-- MENU AKSI -->
+                    @if (session('role') === 'admin')
                     <div class="absolute top-2 right-2">
-                        <button onclick="toggleMenu(this)" class="text-gray-400 hover:text-gray-700 text-lg">
-                            ⋮
-                        </button>
-                        <div class="hidden absolute right-0 mt-2 w-28 bg-white border rounded-lg shadow-md z-10 menu-aksi">
-                            <button onclick="openEditModal('{{ $barang['nama'] }}', '{{ $barang['kategori'] }}')"
+                            <button onclick="toggleMenu(this)" class="text-gray-400 hover:text-gray-700 text-lg">
+                                ⋮
+                            </button>
+                            <div class="hidden absolute right-0 mt-2 w-28 bg-white border rounded-lg shadow-md z-10 menu-aksi">
+                                <button onclick="openEditModal('{{ $barang['nama'] }}', '{{ $barang['kategori'] }}')"
                                 class="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm">✏️ Edit</button>
-                            <button class="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm text-red-500">🗑
-                                Hapus</button>
-                        </div>
-                    </div>
+                                <button class="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm text-red-500">🗑
+                                    Hapus</button>
+                                </div>
+                            </div>
+                            @endif
 
                     <!-- GAMBAR -->
                     <div class="w-36 h-36 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
@@ -102,18 +106,20 @@
                     </p>
 
                     <!-- TOMBOL MASUK / KELUAR -->
-                    <div class="flex gap-3">
-                        <button onclick="openModal('keluar', '{{ $barang['nama'] }}', '{{ $barang['kategori'] }}')"
-                            title="Barang Keluar"
-                            class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition text-xl font-bold">
-                            −
-                        </button>
-                        <button onclick="openModal('masuk', '{{ $barang['nama'] }}', '{{ $barang['kategori'] }}')"
-                            title="Barang Masuk"
-                            class="w-10 h-10 bg-green-500 text-white rounded-lg flex items-center justify-center hover:bg-green-600 transition text-xl font-bold">
-                            +
-                        </button>
-                    </div>
+                    @if (session('role') === 'admin')
+                        <div class="flex gap-3">
+                            <button onclick="openModal('keluar', '{{ $barang['nama'] }}', '{{ $barang['kategori'] }}')"
+                                title="Barang Keluar"
+                                class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition text-xl font-bold">
+                                −
+                            </button>
+                            <button onclick="openModal('masuk', '{{ $barang['nama'] }}', '{{ $barang['kategori'] }}')"
+                                title="Barang Masuk"
+                                class="w-10 h-10 bg-green-500 text-white rounded-lg flex items-center justify-center hover:bg-green-600 transition text-xl font-bold">
+                                +
+                            </button>
+                        </div>
+                    @endif
 
                 </div>
             @endforeach
@@ -353,82 +359,82 @@
     </div>
 
     {{-- MODAL EDIT BARANG --}}
-    <div id="modalEditBarang" tabindex="-1" aria-hidden="true"
-        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        <div class="relative p-4 w-full max-w-md max-h-full">
+    @if (session('role') === 'admin')
+        <div id="modalEditBarang" tabindex="-1" aria-hidden="true"
+            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative p-4 w-full max-w-md max-h-full">
 
-            <!-- Modal content -->
-            <div class="relative bg-white rounded-2xl shadow-xl">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-2xl shadow-xl">
 
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between p-4 md:p-5 rounded-t-2xl bg-orange-500">
-                    <h3 class="text-lg font-semibold text-white">
-                        Edit Barang
-                    </h3>
-                    <button type="button" onclick="closeEditModal()"
-                        class="text-white/70 bg-transparent hover:text-white rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                        </svg>
-                        <span class="sr-only">Tutup modal</span>
-                    </button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="p-4 md:p-5 space-y-4">
-
-                    <!-- Nama Barang -->
-                    <div>
-                        <label for="editNamaBarang"
-                            class="block mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                            Nama Barang
-                        </label>
-                        <input id="editNamaBarang" type="text" placeholder="Nama barang"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" />
-                    </div>
-
-                    <!-- Kategori -->
-                    <div>
-                        <label for="editKategori"
-                            class="block mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                            Kategori
-                        </label>
-                        <select id="editKategori"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5">
-                            <option value="Atasan">Atasan</option>
-                            <option value="Bawahan">Bawahan</option>
-                            <option value="Aksesoris">Aksesoris</option>
-                        </select>
-                    </div>
-
-                    <!-- Error Alert (Flowbite Alert Component) -->
-                    <div id="editErrorAlert"
-                        class="hidden flex items-center p-3 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
-                        <svg class="shrink-0 inline w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-                        </svg>
-                        <span id="editErrorText">Terjadi kesalahan.</span>
-                    </div>
-
-                    <!-- Footer Actions -->
-                    <div class="flex items-center justify-end gap-3 pt-1">
-                        <button onclick="closeEditModal()" type="button"
-                            class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:z-10 focus:ring-4 focus:ring-gray-100">
-                            Batal
-                        </button>
-                        <button type="button" onclick="handleSimpanEdit()"
-                            class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                            Simpan
-                        </button>
-                    </div>
-
-                </div>
-            </div>
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-4 md:p-5 rounded-t-2xl bg-orange-500">
+            <h3 class="text-lg font-semibold text-white">
+                Edit Barang
+            </h3>
+            <button type="button" onclick="closeEditModal()"
+                class="text-white/70 bg-transparent hover:text-white rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+                <span class="sr-only">Tutup modal</span>
+            </button>
         </div>
+
+        <!-- Modal Body -->
+        <div class="p-4 md:p-5 space-y-4">
+
+            <!-- Nama Barang -->
+            <div>
+                <label for="editNamaBarang" class="block mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Nama Barang
+                </label>
+                <input id="editNamaBarang" type="text" placeholder="Nama barang"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" />
+            </div>
+
+            <!-- Kategori -->
+            <div>
+                <label for="editKategori" class="block mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Kategori
+                </label>
+                <select id="editKategori"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5">
+                    <option value="Atasan">Atasan</option>
+                    <option value="Bawahan">Bawahan</option>
+                    <option value="Aksesoris">Aksesoris</option>
+                </select>
+            </div>
+
+            <!-- Error Alert (Flowbite Alert Component) -->
+            <div id="editErrorAlert" class="hidden flex items-center p-3 text-sm text-red-800 rounded-lg bg-red-50"
+                role="alert">
+                <svg class="shrink-0 inline w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                </svg>
+                <span id="editErrorText">Terjadi kesalahan.</span>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="flex items-center justify-end gap-3 pt-1">
+                <button onclick="closeEditModal()" type="button"
+                    class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:z-10 focus:ring-4 focus:ring-gray-100">
+                    Batal
+                </button>
+                <button type="button" onclick="handleSimpanEdit()"
+                    class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                    Simpan
+                </button>
+            </div>
+            @endif
+
+        </div>
+    </div>
+    </div>
     </div>
 @endpush
 
@@ -625,10 +631,11 @@
             // TODO: kirim data ke server
             closeEditModal();
         }
-
+        @if (session('role') === 'admin')
         document.getElementById('modalEditBarang').addEventListener('click', function(e) {
             if (e.target === this) closeEditModal();
         });
+        @endif
 
         // FIX: fungsi filterBarang yang hilang
         function filterBarang() {
