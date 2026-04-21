@@ -27,6 +27,19 @@ class DashboardController extends Controller
                 'email' => 'makmur@email.com',
                 'kota' => 'Surabaya',
             ],
+            [
+                'nama_supplier' => 'UD Makmur',
+                'kontak' => '0821-7788-8899',
+                'email' => 'makmur@email.com',
+                'kota' => 'Surabaya',
+            ],
+            [
+                'nama_supplier' => 'UD Makmur',
+                'kontak' => '0821-7788-8899',
+                'email' => 'makmur@email.com',
+                'kota' => 'Surabaya',
+            ],
+            
         ];
 
         $barangMasukTerbaru = [

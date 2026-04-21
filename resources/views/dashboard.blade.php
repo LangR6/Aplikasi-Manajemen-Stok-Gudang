@@ -16,17 +16,25 @@
         onclick="openDaftarBarangMasukModal()">
         <div class="flex items-center justify-between gap-6 h-full">
             <div class="max-w-[80%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-orange-900">Barang Masuk</h2>
-                <div class="mt-8 text-4xl font-bold leading-none text-orange-950">
+                <h2 class="text-[16px] font-semibold text-gray-900">Barang Masuk</h2>
+                <div class="mt-8 text-4xl font-bold leading-none text-gray-900">
                     {{ $totalBarangMasuk }}
                 </div>
             </div>
 
             <!-- Icon Barang Masuk -->
             <div class="shrink-0 opacity-80">
-                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] bg-orange-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 12 3l9 4.5M4.5 9.75V16.5L12 21l7.5-4.5V9.75M12 12l9-4.5M12 12 3 7.5" />
+                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] ">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-16 w-16 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 32 24"
+                        stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 7.5L12 3l9 4.5M4.5 9.75v6.75L12 21l7.5-4.5V9.75M12 12L3 7.5M12 12l9-4.5" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M28 12h-6m0 0l2-2m-2 2l2 2" />
                     </svg>
                 </div>
             </div>
@@ -38,17 +46,25 @@
         onclick="openDaftarBarangKeluarModal()">
         <div class="flex items-center justify-between gap-6 h-full">
             <div class="max-w-[80%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-red-900">Barang Keluar</h2>
-                <div class="mt-8 mt-8 text-4xl font-bold leading-none text-red-950">
+                <h2 class="text-[16px] font-semibold text-gray-900">Barang Keluar</h2>
+                <div class="mt-8 mt-8 text-4xl font-bold leading-none text-gray-900">
                     {{ $totalBarangKeluar }}
                 </div>
             </div>
 
             <!-- Icon Barang Keluar -->
             <div class="shrink-0 opacity-80">
-                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] bg-red-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12H9m0 0 4.5-4.5M9 12l4.5 4.5M5.25 4.5h3A2.25 2.25 0 0 1 10.5 6.75v10.5A2.25 2.25 0 0 1 8.25 19.5h-3" />
+                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] text-gray-900">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-14 w-14 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 28 24"
+                        stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 7.5L12 3l9 4.5M4.5 9.75v6.75L12 21l7.5-4.5V9.75M12 12L3 7.5M12 12l9-4.5" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20 12h5m0 0l-2-2m2 2l-2 2" />
                     </svg>
                 </div>
             </div>
@@ -64,15 +80,15 @@
 
         <div class="flex items-center justify-between gap-6 h-full">
             <div class="max-w-[70%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-sky-900">Total Barang</h2>
-                <div class="mt-8 text-4xl font-bold leading-none text-sky-950">
+                <h2 class="text-[16px] font-semibold text-gray-900">Total Barang</h2>
+                <div class="mt-8 text-4xl font-bold leading-none text-gray-900">
                     {{ $totalBarang }}
                 </div>
             </div>
 
             <div class="shrink-0 opacity-80">
-                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] bg-sky-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <div class="flex h-22 w-22 items-center justify-center rounded-[22px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5 12 3 3.75 7.5 12 12l8.25-4.5ZM3.75 12 12 16.5 20.25 12M3.75 16.5 12 21l8.25-4.5" />
                     </svg>
                 </div>
@@ -92,7 +108,7 @@
             </div>
 
             <div class="shrink-0 opacity-80">
-                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] bg-amber-100">
+                <div class="flex h-22 w-22 items-center justify-center rounded-[22px]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
                     </svg>
@@ -113,8 +129,8 @@
             </div>
 
             <div class="shrink-0 opacity-80">
-                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] bg-rose-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <div class="flex h-22 w-22 items-center justify-center rounded-[22px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-13 w-13 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636 5.636 18.364M5.636 5.636l12.728 12.728M7.5 7.5h9v9h-9z" />
                     </svg>
                 </div>
@@ -128,37 +144,44 @@
     <!-- Data Supplier -->
     <div class="col-span-6">
         <div
-            class="min-h-[390px] overflow-hidden rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
-            <div class="border-b-2 border-[#9a9a9a] px-4 py-3">
-                <h2 class="text-[22px] font-semibold text-[#222]">Data Supplier</h2>
+            class="overflow-hidden rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+                <h2 class="text-[22px] font-semibold text-[#1f2937]">Data Supplier</h2>
             </div>
 
-            <div class="px-4 pt-4">
+            <!-- Table -->
+            <div class="p-4">
                 @if (count($suppliers) > 0)
-                <div class="overflow-x-auto">
+                <div class="overflow-hidden rounded-2xl border border-gray-100 ">
                     <table class="w-full table-fixed border-collapse">
-                        <thead>
-                            <tr class="border-b-2 border-[#9a9a9a] text-left">
-                                <th class="w-[28%] pb-3 text-[18px] font-medium text-[#333]">Nama Supplier</th>
-                                <th class="w-[22%] pb-3 text-[18px] font-medium text-[#333]">Kontak</th>
-                                <th class="w-[30%] pb-3 text-[18px] font-medium text-[#333]">Email</th>
-                                <th class="w-[20%] pb-3 text-[18px] font-medium text-[#333]">Kota</th>
+                        <thead class="bg-[#205375]">
+                            <tr>
+                                <th class="w-[38%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-white">
+                                    Nama Supplier
+                                </th>
+                                <th class="w-[33%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-white">
+                                    Kontak
+                                </th>
+                                <th class="w-[25%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-white">
+                                    Kota
+                                </th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @foreach ($suppliers as $supplier)
-                            <tr class="border-b">
-                                <td class="align-top break-words py-4 pr-4 text-[15px] text-[#222]">
+                            <tr class="border-b border-gray-100 odd:bg-white even:bg-gray-50/60 hover:bg-orange-50/30 transition-all duration-200">
+                                <td class="px-4 py-4 align-middle text-[14px] font-semibold text-gray-800">
                                     {{ $supplier['nama_supplier'] }}
                                 </td>
-                                <td class="align-top break-words py-4 pr-4 text-[15px] text-[#222]">
+
+                                <td class="px-4 py-4 align-middle text-[14px] text-gray-700 whitespace-nowrap">
                                     {{ $supplier['kontak'] }}
                                 </td>
-                                <td class="align-top break-words py-4 pr-4 text-[15px] text-[#222]">
-                                    {{ $supplier['email'] }}
-                                </td>
-                                <td class="align-top break-words py-4 text-[15px] text-[#222]">
+
+                                <td class="px-4 py-4 align-middle text-[14px] text-gray-700 whitespace-nowrap">
                                     {{ $supplier['kota'] }}
                                 </td>
                             </tr>
@@ -167,8 +190,9 @@
                     </table>
                 </div>
                 @else
-                <div class="flex h-[230px] items-center justify-center text-gray-400">
-                    Belum ada data supplier
+                <div class="flex h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 text-center">
+                    <p class="text-sm font-medium text-gray-600">Belum ada data supplier</p>
+                    <p class="mt-1 text-xs text-gray-400">Data supplier akan muncul di sini</p>
                 </div>
                 @endif
             </div>
@@ -177,49 +201,80 @@
 
     <!-- Right Cards -->
     <div class="col-span-6 space-y-4">
-        <div
-            class="overflow-hidden rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
-            <div class="border-b-2 border-[#9a9a9a] px-4 py-3">
-                <h2 class="text-[22px] font-semibold text-[#222]">Barang Masuk Terbaru</h2>
+
+        <!-- Barang Masuk terbaru -->
+        <div class="rounded-[24px] border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all">
+
+            <div class="border-b border-gray-200 px-5 py-4">
+                <h2 class="text-[20px] font-semibold text-gray-900">Barang Masuk Terbaru</h2>
             </div>
 
-            <div class="p-4">
-                <div
-                    class="flex min-h-[120px] items-center justify-between rounded-[20px] border border-gray-200 bg-gray-50 p-5 transition-all duration-300 hover:shadow-md">
-                    <div class="text-[18px] leading-8 text-[#444]">
-                        <div>Nama Barang : {{ $barangMasukTerbaru['nama_barang'] }}</div>
-                        <div>Kategori : {{ $barangMasukTerbaru['kategori'] }}</div>
-                        <div>Tanggal : {{ $barangMasukTerbaru['tanggal'] }}</div>
+            <div class="flex items-center justify-between px-5 py-5">
+
+                <div class="space-y-2 text-[15px] text-gray-800">
+
+                    <div class="grid grid-cols-[100px_10px_auto]">
+                        <span>Nama</span>
+                        <span>:</span>
+                        <span class="font-medium">{{ $barangMasukTerbaru['nama_barang'] }}</span>
                     </div>
 
-                    <button type="button" onclick="openBarangMasukModal()"
-                        class="rounded-[14px] bg-orange-500 px-6 py-2.5 text-[16px] font-medium text-white transition-all duration-300 hover:bg-orange-600 hover:shadow-md">
-                        Lihat
-                    </button>
+                    <div class="grid grid-cols-[100px_10px_auto]">
+                        <span>Kategori</span>
+                        <span>:</span>
+                        <span>{{ $barangMasukTerbaru['kategori'] }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-[100px_10px_auto]">
+                        <span>Tanggal</span>
+                        <span>:</span>
+                        <span>{{ $barangMasukTerbaru['tanggal'] }}</span>
+                    </div>
+
                 </div>
+
+                <button onclick="openBarangMasukModal()"
+                    class="rounded-xl bg-orange-500 px-5 py-2 text-sm font-medium text-white hover:bg-orange-600 transition">
+                    Lihat
+                </button>
             </div>
         </div>
 
-        <div
-            class="overflow-hidden rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
-            <div class="border-b-2 border-[#9a9a9a] px-4 py-3">
-                <h2 class="text-[22px] font-semibold text-[#222]">Barang Keluar Terbaru</h2>
+        <!-- Barang Keluar terbaru -->
+        <div class="rounded-[24px] border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all">
+
+            <div class="border-b border-gray-200 px-5 py-4">
+                <h2 class="text-[20px] font-semibold text-gray-900">Barang Keluar Terbaru</h2>
             </div>
 
-            <div class="p-4">
-                <div
-                    class="flex min-h-[120px] items-center justify-between rounded-[20px] border border-gray-200 bg-gray-50 p-5 transition-all duration-300 hover:shadow-md">
-                    <div class="text-[18px] leading-8 text-[#444]">
-                        <div>Nama Barang : {{ $barangKeluarTerbaru['nama_barang'] }}</div>
-                        <div>Kategori : {{ $barangKeluarTerbaru['kategori'] }}</div>
-                        <div>Tanggal : {{ $barangKeluarTerbaru['tanggal'] }}</div>
+            <div class="flex items-center justify-between px-5 py-5">
+
+                <div class="space-y-2 text-[15px] text-gray-800">
+
+                    <div class="grid grid-cols-[100px_10px_auto]">
+                        <span>Nama</span>
+                        <span>:</span>
+                        <span class="font-medium">{{ $barangKeluarTerbaru['nama_barang'] }}</span>
                     </div>
 
-                    <button type="button" onclick="openBarangKeluarModal()"
-                        class="rounded-[14px] bg-orange-500 px-6 py-2.5 text-[16px] font-medium text-white transition-all duration-300 hover:bg-orange-600 hover:shadow-md">
-                        Lihat
-                    </button>
+                    <div class="grid grid-cols-[100px_10px_auto]">
+                        <span>Kategori</span>
+                        <span>:</span>
+                        <span>{{ $barangKeluarTerbaru['kategori'] }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-[100px_10px_auto]">
+                        <span>Tanggal</span>
+                        <span>:</span>
+                        <span>{{ $barangKeluarTerbaru['tanggal'] }}</span>
+                    </div>
+
                 </div>
+
+                <button onclick="openBarangKeluarModal()"
+                    class="rounded-xl bg-orange-500 px-5 py-2 text-sm font-medium text-white hover:bg-orange-600 transition">
+                    Lihat
+                </button>
             </div>
         </div>
     </div>
@@ -437,13 +492,6 @@
     </div>
 </div>
 
-<!-- Footer -->
-<div class="flex items-center justify-end gap-3 pt-4">
-    <button onclick="closeStokMenipisModal()" type="button"
-        class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:z-10 focus:ring-4 focus:ring-gray-100">
-        Tutup
-    </button>
-</div>
 
 <!-- Modal Stok Barang Habis -->
 <div id="stokHabisModal"
