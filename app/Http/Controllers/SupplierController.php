@@ -120,6 +120,6 @@ class SupplierController extends Controller
             ]
         );
 
-        return view('kelola_supplier', compact('suppliers'));
+        return view('pages.kelola_supplier', compact('suppliers'));
     }
 }

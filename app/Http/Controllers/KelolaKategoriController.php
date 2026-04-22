@@ -33,6 +33,6 @@ class KelolaKategoriController extends Controller
     {
         $data = $this->getData();
 
-        return view('kelola_kategori', compact('data'));
+        return view('pages.kelola_kategori', compact('data'));
     }
 }

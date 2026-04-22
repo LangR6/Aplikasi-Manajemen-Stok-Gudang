@@ -239,7 +239,7 @@ class DashboardController extends Controller
         $stokMenipis = 8;
         $stokHabis = 3;
 
-        return view('dashboard', compact(
+        return view('pages.dashboard', compact(
             'suppliers',
             'barangMasukTerbaru',
             'barangKeluarTerbaru',

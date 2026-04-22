@@ -8,6 +8,6 @@ class KelolaBarangController extends Controller
 {
     public function index()
     {
-        return view('kelola_barang');
+        return view('pages.kelola_barang');
     }
 }
