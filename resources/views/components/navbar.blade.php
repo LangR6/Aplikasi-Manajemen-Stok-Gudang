@@ -11,7 +11,7 @@
             </svg>
         </button>
 
-        <h1 class="truncate text-xl font-semibold text-[#112B3C] sm:text-[17px]">
+        <h1 class="truncate text-xl font-semibold text-[#112B3C] sm:text-[18px]">
             {{ $title }}
         </h1>
     </div>

@@ -54,7 +54,7 @@
         {{-- TABLE --}}
         <div class="border border-gray-300 rounded-xl overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left table-fixed min-w-[480px]">
+                <table class="w-full text-left table-fixed min-w-120">
                     <colgroup>
                         <col class="w-11">
                         <col>
@@ -66,12 +66,12 @@
                             <th class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wide">No</th>
                             <th class="px-4 py-3 text-xs font-medium text-white uppercase tracking-wide">Nama Kategori</th>
                             <th class="px-4 py-3 text-xs font-medium text-white uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wide">Aksi</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wide">Aksi
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="tbody">
                         @foreach ($data as $dataku)
-                            {{-- Putih untuk ganjil (index 0,2,4...), abu untuk genap (index 1,3,5...) --}}
                             <tr class="tbl-row border-b border-gray-100
                                 {{ $loop->even ? '' : 'bg-gray-50/60' }}"
                                 data-name="{{ strtolower($dataku['nama_kategori']) }}"
@@ -104,7 +104,7 @@
                                 <td class="px-4 py-2.5">
                                     <div class="flex items-center justify-center gap-2">
                                         <button type="button"
-                                            onclick="openModal('modalKategori'); setModalKategori('edit', '{{ $dataku['nama_kategori'] }}', {{ $dataku['status'] ? 'true' : 'false' }})"
+                                            onclick="openModal('modalKategori'); setModalKategori('edit', '{{ addslashes($dataku['nama_kategori']) }}', {{ $dataku['status'] ? 'true' : 'false' }})"
                                             class="px-3 py-1 rounded-md text-sm font-medium border border-gray-300
                                            text-gray-700 bg-transparent hover:bg-gray-100
                                            active:scale-[.98] hover:-translate-y-px transition-all">
@@ -158,7 +158,7 @@
 
 @push('modals')
     {{-- ===== MODAL TAMBAH / EDIT ===== --}}
-    <div id="modalKategori" class="modal-overlay hidden fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+    <div id="modalKategori" class="modal-overlay hidden fixed inset-0 z-50 items-center justify-center p-4">
         <div class="modal-backdrop absolute inset-0 bg-black/0 transition-all duration-200"></div>
         <div
             class="modal-box relative bg-white rounded-2xl w-full max-w-md
@@ -167,13 +167,7 @@
             {{-- Header orange --}}
             <div class="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-[#F66B0E]">
                 <div class="flex items-center gap-2.5">
-                    <div id="modalKategoriIcon" class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center">
-                        <svg id="modalKategoriIconSvg" class="w-3 h-3 text-white" fill="none" viewBox="0 0 18 18">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="2.2" d="M9 1v16M1 9h16" />
-                        </svg>
-                    </div>
-                    <h3 id="modalKategoriTitle" class="text-sm font-semibold text-white">Tambah Kategori</h3>
+                    <h3 id="modalKategoriTitle" class="text-[16px] font-semibold text-white">Tambah Kategori</h3>
                 </div>
                 <button onclick="closeModal('modalKategori')"
                     class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center
@@ -197,18 +191,7 @@
                            focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
                 </div>
                 {{-- Alert kosong --}}
-                <div id="alertKategori"
-                    class="hidden items-center gap-2 bg-red-50 border border-red-200
-                           text-red-700 text-sm rounded-lg px-3 py-2.5">
-                    <svg class="w-4 h-4 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8" />
-                        <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor"
-                            stroke-width="1.8" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor"
-                            stroke-width="2" />
-                    </svg>
-                    Nama kategori tidak boleh kosong.
-                </div>
+                <x-input-error id="alertKategori" message="Nama kategori wajib diisi" />
                 <div>
                     <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
                         Status
@@ -219,14 +202,17 @@
                         <div>
                             <p id="statusLabel" class="text-sm font-semibold status-label-aktif">Aktif</p>
                         </div>
-                        <label class="relative w-10 h-5.5 cursor-pointer">
-                            <input type="checkbox" id="statusToggle" class="sr-only peer" checked
+                        <label class="cursor-pointer"
+                            style="display:inline-block;width:40px;height:22px;position:relative;">
+                            <input type="checkbox" id="statusToggle" class="sr-only" checked
                                 onchange="syncLabel('statusToggle','statusLabel'); syncToggleColor(this)">
                             <div id="toggleBg"
-                                class="w-10 h-5.5 bg-gray-200 rounded-full
-                                    after:content-[''] after:absolute after:top-0.75 after:left-0.75
-                                    after:bg-white after:rounded-full after:w-4 after:h-4
-                                    after:transition-all peer-checked:after:translate-x-4.5 transition-colors">
+                                style="width:40px;height:22px;border-radius:11px;background:#d1d5db;
+                                       position:relative;transition:background .2s;">
+                                <div id="toggleThumb"
+                                    style="position:absolute;top:3px;left:3px;width:16px;height:16px;
+                                           border-radius:50%;background:white;transition:transform .2s;">
+                                </div>
                             </div>
                         </label>
                     </div>
@@ -249,7 +235,7 @@
     </div>
 
     {{-- ===== MODAL HAPUS ===== --}}
-    <div id="modalHapus" class="modal-overlay hidden fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+    <div id="modalHapus" class="modal-overlay hidden fixed inset-0 z-50 items-center justify-center p-4">
         <div class="modal-backdrop absolute inset-0 bg-black/0 transition-all duration-200"></div>
         <div
             class="modal-box relative bg-white rounded-2xl w-full max-w-md
@@ -258,15 +244,7 @@
             {{-- Header merah --}}
             <div class="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-red-600">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center">
-                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24">
-                            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" />
-                            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor"
-                                stroke-width="2" />
-                            <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" />
-                        </svg>
-                    </div>
-                    <h3 class="text-sm font-semibold text-white">Konfirmasi Hapus</h3>
+                    <h3 class="text-[16px] font-semibold text-white">Konfirmasi Hapus</h3>
                 </div>
                 <button onclick="closeModal('modalHapus')"
                     class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center
@@ -305,7 +283,7 @@
                        rounded-lg hover:bg-gray-50 active:scale-[.98] transition-all">
                     Batal
                 </button>
-                <button type="button"
+                <button type="button" onclick="hapusKategori()"
                     class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700
                        rounded-lg active:scale-[.98] hover:-translate-y-px transition-all">
                     Hapus
@@ -504,6 +482,7 @@
         function openModal(id) {
             const ov = document.getElementById(id);
             ov.classList.remove('hidden');
+            ov.classList.add('flex');
             void ov.offsetWidth;
             ov.classList.add('is-open');
         }
@@ -527,29 +506,16 @@
             if (aktif === undefined) aktif = true;
 
             const isTambah = mode === 'tambah';
+
             document.getElementById('modalKategoriTitle').textContent =
                 isTambah ? 'Tambah Kategori' : 'Edit Kategori';
 
-            const iconSvg = document.getElementById('modalKategoriIconSvg');
+            document.getElementById('namaKategori').value = isTambah ? '' : nama;
+            document.getElementById('statusToggle').checked = isTambah ? true : aktif;
 
-            if (isTambah) {
-                iconSvg.innerHTML =
-                    '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 1v16M1 9h16"/>';
-                document.getElementById('namaKategori').value = '';
-                document.getElementById('statusToggle').checked = true;
-            } else {
-                iconSvg.innerHTML =
-                    '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 2l3 3-9 9H4v-3L13 2z"/>';
-                document.getElementById('namaKategori').value = nama;
-                document.getElementById('statusToggle').checked = aktif;
-            }
             clearAlert('alertKategori', 'namaKategori');
             syncLabel('statusToggle', 'statusLabel');
             syncToggleColor(document.getElementById('statusToggle'));
-        }
-
-        function setModalHapus(nama) {
-            document.getElementById('hapusNama').textContent = nama;
         }
 
         function syncLabel(cbId, labelId) {
@@ -584,9 +550,29 @@
 
         function syncToggleColor(cb) {
             const bg = document.getElementById('toggleBg');
+            const thumb = document.getElementById('toggleThumb');
             bg.style.backgroundColor = cb.checked ? '#16a34a' : '#d1d5db';
+            thumb.style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
+        }
+
+        let hapusNamaTarget = '';
+
+        function setModalHapus(nama) {
+            hapusNamaTarget = nama;
+            document.getElementById('hapusNama').textContent = nama;
+        }
+
+        function hapusKategori() {
+            const idx = allRows.findIndex(r => r.dataset.name === hapusNamaTarget.toLowerCase());
+            if (idx !== -1) {
+                allRows[idx].remove();
+                allRows.splice(idx, 1);
+            }
+            closeModal('modalHapus');
+            render();
         }
 
         render();
+        syncToggleColor(document.getElementById('statusToggle'));
     </script>
 @endpush
