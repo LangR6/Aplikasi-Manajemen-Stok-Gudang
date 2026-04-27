@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class RiwayatController extends Controller
 {
@@ -48,7 +49,91 @@ class RiwayatController extends Controller
             ],
             (object)[
                 'tanggal' => now()->subDays(3),
-                'nama_barang' => 'Cincin  Kalcer',
+                'nama_barang' => 'Cincin Kalcer',
+                'jumlah' => 3,
+                'kota' => 'Medan',
+                'transaksi' => 'Barang Keluar',
+                'kategori' => 'Aksesoris',
+                'nama_supplier' => 'PT Kalcer Indo',
+                'kontak' => '084455667788',
+                'email' => 'supplier4@mail.com',
+                'keterangan' => 'Pengiriman ke client Medan'
+            ],
+            (object)[
+                'tanggal' => now()->subDays(3),
+                'nama_barang' => 'Cincin Kalcer',
+                'jumlah' => 3,
+                'kota' => 'Medan',
+                'transaksi' => 'Barang Keluar',
+                'kategori' => 'Aksesoris',
+                'nama_supplier' => 'PT Kalcer Indo',
+                'kontak' => '084455667788',
+                'email' => 'supplier4@mail.com',
+                'keterangan' => 'Pengiriman ke client Medan'
+            ],
+            (object)[
+                'tanggal' => now()->subDays(3),
+                'nama_barang' => 'Cincin Kalcer',
+                'jumlah' => 3,
+                'kota' => 'Medan',
+                'transaksi' => 'Barang Keluar',
+                'kategori' => 'Aksesoris',
+                'nama_supplier' => 'PT Kalcer Indo',
+                'kontak' => '084455667788',
+                'email' => 'supplier4@mail.com',
+                'keterangan' => 'Pengiriman ke client Medan'
+            ],
+            (object)[
+                'tanggal' => now()->subDays(3),
+                'nama_barang' => 'Cincin Kalcer',
+                'jumlah' => 3,
+                'kota' => 'Medan',
+                'transaksi' => 'Barang Keluar',
+                'kategori' => 'Aksesoris',
+                'nama_supplier' => 'PT Kalcer Indo',
+                'kontak' => '084455667788',
+                'email' => 'supplier4@mail.com',
+                'keterangan' => 'Pengiriman ke client Medan'
+            ],
+            (object)[
+                'tanggal' => now()->subDays(3),
+                'nama_barang' => 'Cincin Kalcer',
+                'jumlah' => 3,
+                'kota' => 'Medan',
+                'transaksi' => 'Barang Keluar',
+                'kategori' => 'Aksesoris',
+                'nama_supplier' => 'PT Kalcer Indo',
+                'kontak' => '084455667788',
+                'email' => 'supplier4@mail.com',
+                'keterangan' => 'Pengiriman ke client Medan'
+            ],
+            (object)[
+                'tanggal' => now()->subDays(3),
+                'nama_barang' => 'Cincin Kalcer',
+                'jumlah' => 3,
+                'kota' => 'Medan',
+                'transaksi' => 'Barang Keluar',
+                'kategori' => 'Aksesoris',
+                'nama_supplier' => 'PT Kalcer Indo',
+                'kontak' => '084455667788',
+                'email' => 'supplier4@mail.com',
+                'keterangan' => 'Pengiriman ke client Medan'
+            ],
+            (object)[
+                'tanggal' => now()->subDays(3),
+                'nama_barang' => 'Cincin Kalcer',
+                'jumlah' => 3,
+                'kota' => 'Medan',
+                'transaksi' => 'Barang Keluar',
+                'kategori' => 'Aksesoris',
+                'nama_supplier' => 'PT Kalcer Indo',
+                'kontak' => '084455667788',
+                'email' => 'supplier4@mail.com',
+                'keterangan' => 'Pengiriman ke client Medan'
+            ],
+            (object)[
+                'tanggal' => now()->subDays(3),
+                'nama_barang' => 'Cincin Kalcer',
                 'jumlah' => 3,
                 'kota' => 'Medan',
                 'transaksi' => 'Barang Keluar',
@@ -60,31 +145,21 @@ class RiwayatController extends Controller
             ],
         ]);
 
-
+        // FILTER
         $riwayat = $riwayat->filter(function ($item) use ($request) {
 
-            // 🔎 FILTER DARI
-            if ($request->dari) {
-                if ($item->tanggal < Carbon::parse($request->dari)) {
-                    return false;
-                }
+            if ($request->dari && $item->tanggal < Carbon::parse($request->dari)) {
+                return false;
             }
 
-            // 🔎 FILTER SAMPAI
-            if ($request->sampai) {
-                if ($item->tanggal > Carbon::parse($request->sampai)->endOfDay()) {
-                    return false;
-                }
+            if ($request->sampai && $item->tanggal > Carbon::parse($request->sampai)->endOfDay()) {
+                return false;
             }
 
-            // 🔎 FILTER JENIS
-            if ($request->jenis) {
-                if ($item->transaksi !== $request->jenis) {
-                    return false;
-                }
+            if ($request->jenis && $item->transaksi !== $request->jenis) {
+                return false;
             }
 
-            // 🔎 SEARCH (nama barang & kota)
             if ($request->search) {
                 $search = strtolower($request->search);
 
@@ -98,12 +173,29 @@ class RiwayatController extends Controller
 
             return true;
         })->values();
+
+        // PAGINATION
+        $perPage = 10;
+        $page = request()->get('page', 1);
+
+        $items = $riwayat->slice(($page - 1) * $perPage, $perPage)->values();
+
+        $riwayat = new LengthAwarePaginator(
+            $items,
+            $riwayat->count(),
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'query' => request()->query()
+            ]
+        );
+
         return view('pages.riwayat', compact('riwayat'));
     }
 
     public function exportExcel(Request $request)
     {
-        // dummy dulu (biar gak error kalau diklik)
-        return back()->with('success', 'Export Excel dummy berhasil (belum real)');
+        return back()->with('success', 'Export Excel dummy berhasil');
     }
 }

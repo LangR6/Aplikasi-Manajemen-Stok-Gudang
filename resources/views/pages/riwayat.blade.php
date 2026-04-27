@@ -89,10 +89,10 @@
                             <path d="M21 21l-4.35-4.35" />
                         </svg>
 
-                        <input type="text" id="searchInput" placeholder="Cari nama barang, kota..."
-                            value="{{ request('search') }}" onkeydown="if(event.key==='Enter') submitFilter()"
-                            class="w-full pl-10 pr-4 py-2 border rounded-lg
-                        focus:ring-2 focus:ring-orange-400 outline-none h-[42px]">
+                        <input id="searchInput" type="text" onkeydown="if(event.key==='Enter') submitFilter()"
+                            placeholder="Cari nama barang/kota..."
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                        focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
                     </div>
 
                 </div>
@@ -124,7 +124,7 @@
 
                                     <td class="py-3 px-3">{{ $i + 1 }}</td>
                                     <td class="py-3 px-3">
-                                        {{ date('d/m/Y',strtotime($item->tanggal)) }}
+                                        {{ date('d/m/Y', strtotime($item->tanggal)) }}
                                     </td>
                                     <td class="py-3 px-3 font-medium">{{ $item->nama_barang }}</td>
                                     <td class="py-3 px-3">{{ $item->jumlah }}</td>
@@ -180,12 +180,70 @@
                                 </tr>
                             @endforelse
                         </tbody>
-
                     </table>
+                    {{-- FOOTER PAGINATION --}}
+                    <div class="px-3 py-2 flex items-center justify-between text-xs">
+
+                        {{-- INFO --}}
+                        <span class="text-gray-400">
+                            Menampilkan {{ $riwayat->firstItem() }}–{{ $riwayat->lastItem() }}
+                            dari {{ $riwayat->total() }} riwayat
+                        </span>
+
+                        {{-- PAGINATION --}}
+                        <div class="flex items-center gap-1">
+
+                            {{-- PREV --}}
+                            @if ($riwayat->onFirstPage())
+                                <span
+                                    class="w-8 h-8 flex items-center justify-center text-gray-300 border border-gray-200 rounded-md">
+                                    ‹
+                                </span>
+                            @else
+                                <a href="{{ $riwayat->previousPageUrl() }}"
+                                    class="w-8 h-8 flex items-center justify-center text-gray-500
+            border border-gray-300 rounded-md hover:border-orange-500 hover:text-orange-500 transition">
+                                    ‹
+                                </a>
+                            @endif
+
+                            {{-- NUMBER --}}
+                            @for ($i = 1; $i <= $riwayat->lastPage(); $i++)
+                                <a href="{{ $riwayat->url($i) }}"
+                                    class="w-8 h-8 flex items-center justify-center rounded-md border transition
+            {{ $riwayat->currentPage() == $i
+                ? 'bg-orange-500 text-white border-orange-500'
+                : 'text-gray-500 border-gray-300 hover:border-orange-500 hover:text-orange-500' }}">
+                                    {{ $i }}
+                                </a>
+                            @endfor
+
+                            {{-- NEXT --}}
+                            @if ($riwayat->hasMorePages())
+                                <a href="{{ $riwayat->nextPageUrl() }}"
+                                    class="w-8 h-8 flex items-center justify-center text-gray-500
+            border border-gray-300 rounded-md hover:border-orange-500 hover:text-orange-500 transition">
+                                    ›
+                                </a>
+                            @else
+                                <span
+                                    class="w-8 h-8 flex items-center justify-center text-gray-300 border border-gray-200 rounded-md">
+                                    ›
+                                </span>
+                            @endif
+
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    </div>
     </div>
 @endsection
 
