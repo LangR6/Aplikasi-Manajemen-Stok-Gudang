@@ -32,7 +32,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 17H6a2 2 0 01-2-2V7a2 2 0 012-2h9v12m0 0h2m-2 0a2 2 0 104 0m-4 0a2 2 0 11-4 0" />
                 </svg>
-                Kelola Supplier
+                {{ session('role') === 'manager' ? 'Data Supplier' : 'Kelola Supplier' }}
             </a>
         </li>
 
@@ -47,7 +47,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0H4" />
                 </svg>
-                Kelola Barang
+                {{ session('role') === 'manager' ? 'Data Barang' : 'Kelola Barang' }}
             </a>
         </li>
 
@@ -62,7 +62,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M7 7h10M7 12h10M7 17h10M4 7h.01M4 12h.01M4 17h.01" />
                 </svg>
-                Kelola Kategori
+                {{ session('role') === 'manager' ? 'Data Kategori' : 'Kelola Kategori' }}
             </a>
         </li>
 

@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 class SupplierController extends Controller
 {
     public function index()
     {
-        $data = collect([
+        $suppliers = collect([
             [
                 'id' => 1,
                 'nama_supplier' => 'CV Sumber Jaya',
@@ -102,23 +100,14 @@ class SupplierController extends Controller
                 'email' => 'hariesok@email.com',
                 'kota' => 'Batam',
             ],
-        ]);
-
-        $perPage = 10;
-        $currentPage = request()->get('page', 1);
-
-        $currentItems = $data->slice(($currentPage - 1) * $perPage, $perPage)->values();
-
-        $suppliers = new LengthAwarePaginator(
-            $currentItems,
-            $data->count(),
-            $perPage,
-            $currentPage,
             [
-                'path' => request()->url(),
-                'query' => request()->query(),
-            ]
-        );
+                'id' => 14,
+                'nama_supplier' => 'Pt Hari kemarin',
+                'kontak' => '0890-5523-3466',
+                'email' => 'harikemarin@email.com',
+                'kota' => 'Banten',
+            ],
+        ]);
 
         return view('pages.kelola_supplier', compact('suppliers'));
     }

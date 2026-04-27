@@ -476,11 +476,14 @@
                         <div><span class="font-medium">Sisa Stok :</span> {{ $barang['stok'] }}</div>
                     </div>
 
+                    @if (session('role') === 'admin')
                     <button type="button"
                         class="rounded-lg px-4 py-2 text-[15px] font-medium text-white transition-all duration-300
                             {{ $barang['status_baca'] ? 'bg-gray-400 hover:bg-gray-500' : 'bg-orange-500 hover:bg-orange-600' }}">
                         {{ $barang['status_baca'] ? 'Sudah Dibaca' : 'Tandai Dibaca' }}
                     </button>
+                    @endif
+
                 </div>
             </div>
             @empty
@@ -529,6 +532,7 @@
                     </div>
 
                     <!-- Button -->
+                    @if (session('role') === 'admin')
                     <button type="button"
                         class="rounded-lg px-4 py-2 text-[15px] font-medium text-white transition-all duration-300
                             {{ $barang['status_baca'] 
@@ -537,6 +541,7 @@
 
                         {{ $barang['status_baca'] ? 'Sudah Dibaca' : 'Tandai Dibaca' }}
                     </button>
+                    @endif
 
                 </div>
             </div>
