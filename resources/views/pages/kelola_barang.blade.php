@@ -406,15 +406,7 @@
 
             <div class="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-red-600">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center">
-                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24">
-                            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" />
-                            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor"
-                                stroke-width="2" />
-                            <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" />
-                        </svg>
-                    </div>
-                    <h3 class="text-sm font-semibold text-white">Konfirmasi Hapus</h3>
+                    <h3 class="text-[16px] font-semibold text-white">Konfirmasi Hapus</h3>
                 </div>
                 <button onclick="closeOverlay('modalHapus')"
                     class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center
@@ -666,6 +658,8 @@
             const status = getStatus(b.stok);
             const stokCls = b.stok === 0 ? 'stok-red' : b.stok <= 5 ? 'stok-yellow' : 'stok-green';
             const bdgCls = b.stok === 0 ? 'badge-red' : b.stok <= 5 ? 'badge-yellow' : 'badge-green';
+            const imgSrc = b.foto_url ?? 'https://placehold.co/200x200?text=No+Image';
+            const imgStyle = b.foto_url ? '' : 'opacity:0.35;';
 
             // Escape nama & kategori untuk atribut onclick
             const safeName = b.nama.replace(/'/g, "\\'");
@@ -673,15 +667,20 @@
             const safeKode = (b.kode || '').replace(/'/g, "\\'");
 
             const menuHtml = isAdmin ? `
-        <div class="menu-aksi-wrap">
-            <button class="menu-aksi-btn" onclick="toggleMenu(this)">⋮</button>
-            <div class="menu-aksi hidden">
-                <button onclick="openEditModal('${safeKode}','${safeName}','${safeKat}')"
-                    class="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm text-gray-700">✏️ Edit</button>
-                <button onclick="openHapusModal('${safeName}')"
-                    class="w-full text-left px-3 py-2 hover:bg-red-50 text-sm text-red-500">🗑 Hapus</button>
-            </div>
-        </div>` : '';
+    <div class="menu-aksi-wrap">
+        <button class="menu-aksi-btn" onclick="toggleMenu(this)">⋮</button>
+        <div class="menu-aksi hidden">
+            <button
+                data-kode="${safeKode}"
+                data-nama="${safeName}"
+                data-kat="${safeKat}"
+                data-foto="${b.foto_url ?? ''}"
+                onclick="openEditModal(this.dataset.kode, this.dataset.nama, this.dataset.kat, this.dataset.foto)"
+                class="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm text-gray-700">✏️ Edit</button>
+            <button onclick="openHapusModal('${safeName}')"
+                class="w-full text-left px-3 py-2 hover:bg-red-50 text-sm text-red-500">🗑 Hapus</button>
+        </div>
+    </div>` : '';
 
             const btnHtml = isAdmin ? `
         <div class="flex gap-2 mt-2">
@@ -692,12 +691,6 @@
                 class="flex-1 h-9 w-9 bg-green-500 text-white rounded-lg flex items-center justify-center
                        hover:bg-green-600 transition text-lg font-bold leading-none">+</button>
         </div>` : '';
-
-            // Foto barang
-            const imgSrc = b.foto ?
-                `/storage/${b.foto}` :
-                `{{ asset('images/logo1.png') }}`;
-            const imgStyle = b.foto ? '' : 'width:56px;opacity:.75;object-fit:contain;';
 
             return `
     <div class="card-barang">
@@ -726,11 +719,11 @@
             }
 
             const n =
-                'w-7 h-7 rounded-md border border-gray-200 text-sm font-medium flex items-center justify-center cursor-pointer text-gray-600 hover:bg-gray-100 transition-all ';
+                'w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center cursor-pointer text-gray-600 transition-all hover:border-orange-500 hover:text-orange-500';
             const a =
-                'w-7 h-7 rounded-md border border-[#F66B0E] bg-[#F66B0E] text-white text-sm font-medium flex items-center justify-center ';
+                'w-8 h-8 rounded-md border border-[#F66B0E] bg-[#F66B0E] text-white text-sm font-medium flex items-center justify-center ';
             const d =
-                'w-7 h-7 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed ';
+                'w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed ';
 
             let html = curPage === 1 ?
                 `<button class="${d}" disabled>‹</button>` :
@@ -947,16 +940,25 @@
         }
 
         //  MODAL EDIT
-        function openEditModal(kode, nama, kategori) {
+        function openEditModal(kode, nama, kategori, fotoUrl) {
             document.querySelectorAll('.menu-aksi').forEach(m => m.classList.add('hidden'));
 
             document.getElementById('eKode').value = kode;
             document.getElementById('eNama').value = nama;
             document.getElementById('eKategori').value = kategori;
 
-            // Reset foto preview
-            document.getElementById('eImagePreview').classList.add('hidden');
-            document.getElementById('eImageUploadPlaceholder').classList.remove('hidden');
+            const prev = document.getElementById('eImagePreview');
+            const placeholder = document.getElementById('eImageUploadPlaceholder');
+
+            if (fotoUrl) {
+                prev.src = fotoUrl;
+                prev.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                prev.src = '';
+                prev.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
 
             // Clear errors
             ['errEKode', 'errENama', 'errEKategori'].forEach(id => {

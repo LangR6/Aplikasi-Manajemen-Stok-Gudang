@@ -3,15 +3,15 @@
 @section('title', 'Riwayat')
 
 @section('content')
-    <div class="p-4">
-        <div class="bg-white rounded-2xl shadow-lg p-5">
+    <div class="">
+        <div class="rounded-2xl">
 
             {{-- FILTER + SEARCH --}}
             <div class="flex flex-col lg:flex-row lg:justify-between lg:gap-6 gap-3 mb-4">
 
                 <!-- KIRI -->
                 <div class="flex flex-col leading-tight">
-                    <span class="text-sm font-semibold text-gray-600">Filter</span>
+                    <span class="text-base font-semibold text-gray-600">Filter</span>
                     <span class="text-base font-bold text-gray-700">Periode</span>
                 </div>
 
@@ -22,17 +22,17 @@
                     <div class="flex items-end gap-2 w-full">
 
                         <!-- DATE RANGE -->
-                        <div class="flex items-end gap-2 flex-1">
+                        <div class="flex items-end gap-3 flex-1">
 
-                            <div class="flex-1">
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Dari</label>
+                            <div class="w-56">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Dari</label>
                                 <input type="date" name="dari" value="{{ request('dari') }}"
                                     class="bg-gray-50 border border-gray-300 text-sm rounded-lg
                                 focus:ring-orange-500 focus:border-orange-500 w-full p-2 h-[42px]">
                             </div>
 
-                            <div class="flex-1">
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Sampai</label>
+                            <div class="w-56">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Sampai</label>
                                 <input type="date" name="sampai" value="{{ request('sampai') }}"
                                     class="bg-gray-50 border border-gray-300 text-sm rounded-lg
                                 focus:ring-orange-500 focus:border-orange-500 w-full p-2 h-[42px]">
@@ -42,24 +42,23 @@
 
                         <!-- FILTER BUTTON -->
                         <button onclick="submitFilter()"
-                            class="flex items-center gap-2 text-white bg-orange-500 hover:bg-orange-600
-                        rounded-lg text-sm px-4 h-[42px]">
+                            class="flex items-center gap-3 text-white bg-orange-500 hover:bg-orange-600
+                        rounded-lg text-sm px-8 h-[42px]">
 
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
                                 <path
                                     d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
                             </svg>
-
                             Filter
                         </button>
 
                         <!-- JENIS -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Jenis</label>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Jenis Transaksi</label>
                             <select id="filterJenis" onchange="submitFilter()"
                                 class="bg-gray-50 border border-gray-300 text-sm rounded-lg
-                            focus:ring-orange-500 focus:border-orange-500 w-44 p-2 h-[42px]">
+                            focus:ring-orange-500 focus:border-orange-500 w-48 p-2 h-[42px]">
                                 <option value="">Semua Transaksi</option>
                                 <option value="Barang Masuk" {{ request('jenis') == 'Barang Masuk' ? 'selected' : '' }}>
                                     Barang Masuk
@@ -120,7 +119,7 @@
                         {{-- BODY --}}
                         <tbody>
                             @forelse ($riwayat as $i => $item)
-                                <tr class="{{ $loop->odd ? 'bg-gray-100' : 'bg-white' }}">
+                            <tr class="{{ $loop->even ? 'bg-gray-50/60' : '' }}">
 
                                     <td class="py-3 px-3">{{ $i + 1 }}</td>
                                     <td class="py-3 px-3">
@@ -196,12 +195,12 @@
                             {{-- PREV --}}
                             @if ($riwayat->onFirstPage())
                                 <span
-                                    class="w-8 h-8 flex items-center justify-center text-gray-300 border border-gray-200 rounded-md">
+                                    class="w-8 h-8 flex items-center justify-center text-gray-300 font-semibold border border-gray-200 rounded-md">
                                     ‹
                                 </span>
                             @else
                                 <a href="{{ $riwayat->previousPageUrl() }}"
-                                    class="w-8 h-8 flex items-center justify-center text-gray-500
+                                    class="w-8 h-8 flex items-center justify-center text-gray-500 font-semibold
             border border-gray-300 rounded-md hover:border-orange-500 hover:text-orange-500 transition">
                                     ‹
                                 </a>
@@ -210,10 +209,10 @@
                             {{-- NUMBER --}}
                             @for ($i = 1; $i <= $riwayat->lastPage(); $i++)
                                 <a href="{{ $riwayat->url($i) }}"
-                                    class="w-8 h-8 flex items-center justify-center rounded-md border transition
+                                    class="w-8 h-8 flex items-center font-semibold justify-center rounded-md border transition
             {{ $riwayat->currentPage() == $i
                 ? 'bg-orange-500 text-white border-orange-500'
-                : 'text-gray-500 border-gray-300 hover:border-orange-500 hover:text-orange-500' }}">
+                : 'text-gray-600 font-semibold border-gray-300 hover:border-orange-500 hover:text-orange-500' }}">
                                     {{ $i }}
                                 </a>
                             @endfor
@@ -221,13 +220,13 @@
                             {{-- NEXT --}}
                             @if ($riwayat->hasMorePages())
                                 <a href="{{ $riwayat->nextPageUrl() }}"
-                                    class="w-8 h-8 flex items-center justify-center text-gray-500
+                                    class="w-8 h-8 flex items-center justify-center text-gray-600 font-semibold
             border border-gray-300 rounded-md hover:border-orange-500 hover:text-orange-500 transition">
                                     ›
                                 </a>
                             @else
                                 <span
-                                    class="w-8 h-8 flex items-center justify-center text-gray-300 border border-gray-200 rounded-md">
+                                    class="w-8 h-8 flex items-center justify-center text-gray-300 font-semibold border border-gray-200 rounded-md">
                                     ›
                                 </span>
                             @endif
