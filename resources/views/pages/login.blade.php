@@ -66,8 +66,8 @@
                         @enderror
                     </div>
                     <button type="submit"
-                        class="w-full bg-orange-500 text-white py-2 rounded mt-2
-           hover:bg-blue-900 transition duration-300">
+                        class="w-full bg-blue-900 text-white py-2 rounded mt-2
+           hover:bg-blue-950 transition duration-300">
                         Masuk
                     </button>
             </form>

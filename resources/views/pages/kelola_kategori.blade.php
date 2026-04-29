@@ -25,15 +25,15 @@
             {{-- PILL FILTER --}}
             <div class="flex items-center gap-1 bg-white p-1 rounded-lg border border-gray-200">
                 <button data-f="semua" onclick="setPill(this)"
-                    class="pill-btn on px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 hover:bg-orange-100 hover:text-orange-600">
+                    class="pill-btn on px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 hover:text-orange-500">
                     Semua
                 </button>
                 <button data-f="aktif" onclick="setPill(this)"
-                    class="pill-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 transition-all duration-150 hover:bg-orange-100 hover:text-orange-600">
+                    class="pill-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 transition-all duration-15 hover:text-orange-500">
                     Aktif
                 </button>
                 <button data-f="nonaktif" onclick="setPill(this)"
-                    class="pill-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 transition-all duration-150 hover:bg-orange-100 hover:text-orange-600">
+                    class="pill-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 transition-all duration-150 hover:text-orange-500">
                     Nonaktif
                 </button>
             </div>
@@ -88,7 +88,7 @@
                                 data-status="{{ $dataku['status'] ? 'aktif' : 'nonaktif' }}"
                                 data-index="{{ $loop->index }}">
 
-                                <td class="px-4 py-2.5 text-center text-sm text-gray-800 font-medium row-num">
+                                <td class="px-4 py-2.5 text-center text-sm font-medium text-gray-800 row-num">
                                     {{ $loop->iteration }}
                                 </td>
                                 <td class="px-4 py-2.5 text-sm font-medium text-gray-800">
@@ -116,7 +116,7 @@
                                         <div class="flex items-center justify-center gap-2">
                                             <button type="button"
                                                 onclick="openModal('modalKategori'); setModalKategori('edit', '{{ addslashes($dataku['nama_kategori']) }}', {{ $dataku['status'] ? 'true' : 'false' }})"
-                                                class="px-3 py-1 rounded-md text-sm font-medium border border-red-200
+                                                class="px-3 py-1 rounded-md text-sm font-medium border border-orange-200
                                            text-orange-800 bg-orange-100 hover:bg-orange-500 hover:text-white
                                            active:scale-[.98] hover:-translate-y-px transition-all">
                                                 Edit
