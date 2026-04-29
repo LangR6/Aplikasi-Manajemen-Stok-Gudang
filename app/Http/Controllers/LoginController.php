@@ -22,27 +22,35 @@ class LoginController extends Controller
             'username' => 'admin',
             'password' => 'admin',
         ];
+
         $manager = [
             'username' => 'manager',
             'password' => 'manager',
         ];
 
+        // ADMIN
         if ($request->username == $admin['username'] && $request->password == $admin['password']) {
             session()->put('role', 'admin');
             session()->put('nama', ucfirst($request->username));
             session()->put('email', 'admin@gmail.com');
             session()->put('hp', '081234567890');
-            return redirect()->route('dashboard');
 
-        } elseif ($request->username == $manager['username'] && $request->password == $manager['password']) {
+            return redirect()
+                ->route('dashboard')
+                ->with('show_stok_menipis_modal', true);
+        }
+
+        // MANAGER
+        elseif ($request->username == $manager['username'] && $request->password == $manager['password']) {
             session()->put('role', 'manager');
             session()->put('nama', ucfirst($request->username));
             session()->put('email', 'manager@gmail.com');
             session()->put('hp', '089876543210');
-            return redirect()->route('dashboard');
 
-        } else {
-            return back()->with('error', 'Username atau password salah');
+            return redirect()->route('dashboard');
         }
+
+        // ERROR LOGIN
+        return back()->with('error', 'Username atau password salah');
     }
 }

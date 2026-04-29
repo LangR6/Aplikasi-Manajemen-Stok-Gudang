@@ -3,6 +3,15 @@
 @php
     $role = session('role');
     $nama = session('nama', 'Pengguna');
+
+    $titleMap = [
+        'Kelola Supplier' => 'Data Supplier',
+        'Kelola Barang'   => 'Data Barang',
+        'Kelola Kategori' => 'Data Kategori',
+    ];
+    $displayTitle = ($role === 'manager' && isset($titleMap[$title]))
+        ? $titleMap[$title]
+        : $title;
 @endphp
 
 <nav class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-white px-4 py-3 shadow-sm sm:px-6">
@@ -17,7 +26,7 @@
         </button>
 
         <h1 class="truncate text-xl font-semibold text-[#112B3C] sm:text-[18px]">
-            {{ $title }}
+            {{ $displayTitle }}
         </h1>
     </div>
 

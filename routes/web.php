@@ -1,13 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\KelolaBarangController;
 use App\Http\Controllers\KelolaKategoriController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\RiwayatController; // Riwayat
+use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\AuthController;
 
@@ -29,15 +28,6 @@ Route::get('/riwayat/export', [RiwayatController::class, 'exportExcel'])->name('
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/supplier/store', function (Request $request) {
-    $request->validate([
-        'nama_supplier' => 'required|string|max:255',
-        'kontak' => 'required|string|max:100',
-        'kota' => 'required|string|max:100',
-        'email' => 'required|email|max:255',
-    ]);
-
-    return redirect()->route('dashboard')->with('success', 'Supplier berhasil ditambahkan.');
-})->name('supplier.store');
-
+// SUPPLIER
 Route::get('/kelola_supplier', [SupplierController::class, 'index'])->name('kelola_supplier');
+Route::post('/supplier/store', [SupplierController::class, 'store'])->name('supplier.store');

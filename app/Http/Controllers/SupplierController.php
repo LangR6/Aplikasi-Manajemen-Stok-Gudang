@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Routing\Controller;
+use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
@@ -107,8 +107,32 @@ class SupplierController extends Controller
                 'email' => 'harikemarin@email.com',
                 'kota' => 'Banten',
             ],
+
+
         ]);
 
+
+
         return view('pages.kelola_supplier', compact('suppliers'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama_supplier' => 'required',
+            'kontak' => 'required',
+            'email' => 'required|email',
+            'kota' => 'required',
+        ], [
+            'nama_supplier.required' => 'Nama supplier wajib diisi.',
+            'kontak.required' => 'Kontak wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'kota.required' => 'Kota wajib diisi.',
+        ]);
+
+        return redirect()
+            ->route('kelola_supplier')
+            ->with('success', 'Supplier berhasil ditambahkan.');
     }
 }

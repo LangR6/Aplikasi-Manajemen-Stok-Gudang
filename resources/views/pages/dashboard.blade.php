@@ -10,14 +10,14 @@
 @endif
 
 <!-- Top Cards -->
-<div class="grid grid-cols-2 gap-3 mb-4">
+<div class="grid grid-cols-2 gap-4 px-3 sm:px-0 mb-5">
     <!-- Barang Masuk -->
     <div class="cursor-pointer rounded-[22px] p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-white"
         onclick="openDaftarBarangMasukModal()">
         <div class="flex items-center justify-between gap-6 h-full">
             <div class="max-w-[80%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-gray-900">Barang Masuk</h2>
-                <div class="mt-8 text-4xl font-bold leading-none text-gray-900">
+                <h2 class="text-[16px] font-semibold text-green-900">Barang Masuk</h2>
+                <div class="mt-8 text-4xl font-bold leading-none text-green-800">
                     {{ $totalBarangMasuk }}
                 </div>
             </div>
@@ -26,7 +26,7 @@
             <div class="shrink-0 opacity-80">
                 <div class="flex h-22 w-22 items-center justify-center rounded-[22px] ">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-16 w-16 text-gray-900"
+                        class="h-16 w-16 text-green-700"
                         fill="none"
                         viewBox="0 0 32 24"
                         stroke="currentColor"
@@ -46,17 +46,17 @@
         onclick="openDaftarBarangKeluarModal()">
         <div class="flex items-center justify-between gap-6 h-full">
             <div class="max-w-[80%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-gray-900">Barang Keluar</h2>
-                <div class="mt-8 mt-8 text-4xl font-bold leading-none text-gray-900">
+                <h2 class="text-[16px] font-semibold text-red-800">Barang Keluar</h2>
+                <div class="mt-8 mt-8 text-4xl font-bold leading-none text-red-800">
                     {{ $totalBarangKeluar }}
                 </div>
             </div>
 
             <!-- Icon Barang Keluar -->
             <div class="shrink-0 opacity-80">
-                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] text-gray-900">
+                <div class="flex h-22 w-22 items-center justify-center rounded-[22px] text-red-900">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-14 w-14 text-gray-900"
+                        class="h-14 w-14 text-red-800"
                         fill="none"
                         viewBox="0 0 28 24"
                         stroke="currentColor"
@@ -73,22 +73,23 @@
 </div>
 
 <!-- Small Cards -->
-<div class="grid grid-cols-3 gap-3 mb-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
     <!-- Total Barang -->
     <a href="{{ route('kelola_barang') }}"
         class="block rounded-[22px] p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-white cursor-pointer">
 
         <div class="flex items-center justify-between gap-6 h-full">
             <div class="max-w-[70%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-gray-900">Total Barang</h2>
-                <div class="mt-8 text-4xl font-bold leading-none text-gray-900">
+                <h2 class="text-[16px] font-semibold text-sky-900">Total Barang</h2>
+                <div class="mt-8 text-4xl font-bold leading-none text-sky-900">
                     {{ $totalBarang }}
                 </div>
             </div>
 
+            <!-- Icon Total Barang -->
             <div class="shrink-0 opacity-80">
                 <div class="flex h-22 w-22 items-center justify-center rounded-[22px]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-sky-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5 12 3 3.75 7.5 12 12l8.25-4.5ZM3.75 12 12 16.5 20.25 12M3.75 16.5 12 21l8.25-4.5" />
                     </svg>
                 </div>
@@ -101,15 +102,20 @@
         onclick="openStokMenipisModal()">
         <div class="flex items-center justify-between gap-1 h-full">
             <div class="max-w-[70%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-amber-900">Stok Barang Menipis</h2>
+                <h2 class="text-[16px] font-semibold text-amber-600">Stok Barang Menipis</h2>
                 <div class="mt-8 text-4xl font-bold leading-none text-amber-600">
                     {{ $stokMenipis }}
                 </div>
             </div>
 
-            <div class="shrink-0 opacity-80">
+            <!-- Icon Stok Barang Menipis -->
+            <div class="shrink-0">
                 <div class="flex h-22 w-22 items-center justify-center rounded-[22px]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-10 w-10 text-amber-600 stroke-amber-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2.2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
                     </svg>
                 </div>
@@ -122,16 +128,22 @@
         onclick="openStokHabisModal()">
         <div class="flex items-center justify-between gap-6 h-full">
             <div class="max-w-[70%] -mt-4">
-                <h2 class="text-[16px] font-semibold text-rose-900">Stok Barang Habis</h2>
+                <h2 class="text-[16px] font-semibold text-red-600">Stok Barang Habis</h2>
                 <div class="mt-8 text-4xl font-bold leading-none text-red-600">
                     {{ $stokHabis }}
                 </div>
             </div>
 
-            <div class="shrink-0 opacity-80">
+            <!-- Icon Stok Barang Habis -->
+            <div class="shrink-0">
                 <div class="flex h-22 w-22 items-center justify-center rounded-[22px]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-13 w-13 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636 5.636 18.364M5.636 5.636l12.728 12.728M7.5 7.5h9v9h-9z" />
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-13 w-13 text-red-600 stroke-red-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M18.364 5.636 5.636 18.364M5.636 5.636l12.728 12.728M7.5 7.5h9v9h-9z" />
                     </svg>
                 </div>
             </div>
@@ -140,9 +152,10 @@
 </div>
 
 <!-- Bottom Section -->
-<div class="grid grid-cols-12 gap-5">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
     <!-- Data Supplier -->
-    <div class="col-span-6">
+    <div class="col-span-12 lg:col-span-6">
+
         <div
             class="overflow-hidden rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
 
@@ -200,7 +213,7 @@
     </div>
 
     <!-- Right Cards -->
-    <div class="col-span-6 space-y-4">
+    <div class="col-span-12 lg:col-span-6 space-y-4">
 
         <!-- Barang Masuk terbaru -->
         <div class="rounded-[24px] border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all">
@@ -285,7 +298,7 @@
 <!-- Modal Daftar Barang Masuk -->
 <div id="daftarBarangMasukModal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/20 px-4 backdrop-blur-[1px]">
-    <div class="w-full max-w-[720px] overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div class="w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-xl">
 
         <!-- Header -->
         <div class="flex items-center justify-between rounded-t-2xl bg-green-600 px-4 py-3">
@@ -326,7 +339,7 @@
 <div id="daftarBarangKeluarModal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/20 px-4 backdrop-blur-[1px]">
 
-    <div class="w-full max-w-[720px] overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div class="w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-xl">
 
         <!-- Header -->
         <div class="flex items-center justify-between rounded-t-2xl bg-red-500 px-4 py-3">
@@ -369,7 +382,7 @@
 <div id="barangMasukModal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/20 px-4 backdrop-blur-[1px]">
 
-    <div class="w-full max-w-[700px] overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div class="w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-xl">
 
         <!-- Header -->
         <div class="flex items-center justify-between rounded-t-2xl bg-orange-500 px-4 py-3">
@@ -411,7 +424,7 @@
 <div id="barangKeluarModal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/20 px-4 backdrop-blur-[1px]">
 
-    <div class="w-full max-w-[700px] overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div class="w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-xl">
 
         <!-- Header -->
         <div class="flex items-center justify-between rounded-t-2xl bg-red-500 px-4 py-3">
@@ -451,7 +464,7 @@
 <!-- Modal Stok Barang Menipis -->
 <div id="stokMenipisModal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/20 px-4 backdrop-blur-[1px]">
-    <div class="w-full max-w-[720px] overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div class="w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-xl">
         <!-- Header -->
         <div class="flex items-center justify-between rounded-t-2xl bg-orange-500 px-4 py-3">
             <h3 class="text-[20px] font-semibold text-white">Daftar Stok Barang Menipis</h3>
@@ -500,7 +513,7 @@
 <div id="stokHabisModal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/20 px-4 backdrop-blur-[1px]">
 
-    <div class="w-full max-w-[720px] overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div class="w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-xl">
 
         <!-- Header -->
         <div class="flex items-center justify-between rounded-t-2xl bg-red-500 px-4 py-3">
@@ -555,7 +568,10 @@
 </div>
 @endpush
 
+
+
 @push('scripts')
+
 <script>
     function lockBodyScroll() {
         const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -676,4 +692,13 @@
         }
     }
 </script>
+
+@if (session('show_stok_menipis_modal') && session('role') === 'admin')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        openStokMenipisModal();
+    });
+</script>
+@endif
+
 @endpush
