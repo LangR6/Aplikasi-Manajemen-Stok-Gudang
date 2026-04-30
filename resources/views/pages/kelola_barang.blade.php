@@ -9,7 +9,7 @@
         <div class="flex flex-wrap items-center gap-3">
 
             {{-- Search --}}
-            <div class="relative flex-1">
+            <div class="relative w-full sm:flex-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -21,31 +21,35 @@
                        focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
             </div>
 
-            {{-- Filter Status --}}
-            <select id="filterStatus" onchange="onFilter()"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
-                   rounded-lg focus:ring-orange-500 focus:border-orange-500 pr-9 p-2.5 cursor-pointer">
-                <option value="">Semua Status</option>
-                <option value="Tersedia">Tersedia</option>
-                <option value="Menipis">Menipis</option>
-                <option value="Habis">Habis</option>
-            </select>
+            {{-- Filter Status & Kategori --}}
+            <div class="flex gap-3 w-full sm:w-auto sm:contents">
+                <select id="filterStatus" onchange="onFilter()"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+           rounded-lg focus:ring-orange-500 focus:border-orange-500 pr-9 p-2.5 cursor-pointer
+           flex-1 sm:flex-none">
+                    <option value="">Semua Status</option>
+                    <option value="Tersedia">Tersedia</option>
+                    <option value="Menipis">Menipis</option>
+                    <option value="Habis">Habis</option>
+                </select>
 
-            {{-- Filter Kategori --}}
-            <select id="filterKategori" onchange="onFilter()"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
-                   rounded-lg focus:ring-orange-500 focus:border-orange-500 pr-9 p-2.5 cursor-pointer">
-                <option value="">Semua Kategori</option>
-                @foreach ($kategori as $kat)
-                    <option value="{{ $kat }}">{{ $kat }}</option>
-                @endforeach
-            </select>
+                <select id="filterKategori" onchange="onFilter()"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+           rounded-lg focus:ring-orange-500 focus:border-orange-500 pr-9 p-2.5 cursor-pointer
+           flex-1 sm:flex-none">
+                    <option value="">Semua Kategori</option>
+                    @foreach ($kategori as $kat)
+                        <option value="{{ $kat }}">{{ $kat }}</option>
+                    @endforeach
+                </select>
+            </div>
 
             {{-- Tombol Tambah --}}
             @if (session('role') === 'admin')
                 <button type="button" onclick="openModal('tambah')"
-                    class="flex items-center gap-2 bg-[#F66B0E] hover:bg-orange-600 active:scale-[.98]
-                   text-white text-sm font-medium px-6 py-2.5 rounded-lg transition-all whitespace-nowrap">
+                    class="flex items-center justify-center gap-2 bg-[#F66B0E] hover:bg-orange-600 active:scale-[.98]
+                     text-white text-sm font-medium px-6 py-2.5 rounded-lg transition-all whitespace-nowrap
+                        w-full sm:w-auto">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 18 18">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"
                             d="M9 1v16M1 9h16" />
@@ -79,10 +83,10 @@
             </button>
         </div>
 
-        {{-- ── PAGINATION FOOTER ── --}}
-        <div class="px-1 py-2 flex flex-wrap items-center justify-between gap-2">
-            <span id="tblInfo" class="text-sm text-gray-400"></span>
-            <div id="pgnWrap" class="flex items-center gap-1"></div>
+        {{-- FOOTER PAGINATION --}}
+        <div class="px-4 py-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
+            <span id="tblInfo" class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left"></span>
+            <div id="pgnWrap" class="flex items-center justify-center sm:justify-end gap-1 w-full sm:w-auto"></div>
         </div>
 
     </div>

@@ -7,101 +7,96 @@
 <div class="p-0.5">
 
     {{-- FILTER + SEARCH --}}
-    <div class="flex flex-col lg:flex-row lg:justify-between lg:gap-6 gap-3 mb-4">
+<div class="flex flex-col lg:flex-row lg:justify-between lg:gap-6 gap-3 mb-4">
 
-        <!-- KIRI -->
-        <div class="flex flex-col leading-tight">
-            <span class="text-sm font-semibold text-gray-600">Filter</span>
-            <span class="text-base font-bold text-gray-700">Periode</span>
-        </div>
+    <!-- KIRI -->
+    <div class="flex flex-col leading-tight">
+        <span class="text-sm font-semibold text-gray-600">Filter</span>
+        <span class="text-base font-bold text-gray-700">Periode</span>
+    </div>
 
-        <!-- KANAN -->
-        <div class="flex flex-col items-end w-full lg:w-[900px]">
+    <!-- KANAN -->
+    <div class="flex flex-col w-full lg:w-[900px] gap-2">
 
-            <!-- FILTER -->
-            <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-end gap-2 w-full">
+        <!-- FILTER ROW -->
+        <div class="flex flex-wrap items-end gap-3 w-full">
 
-                <!-- DATE RANGE -->
-                <div class="flex flex-col sm:flex-row gap-2 flex-1 w-full">
-
-                    <div class="flex-1">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Dari</label>
-                        <input type="date" id="inputDari" name="dari"
-                            value="{{ request('dari') }}"
-                            class="bg-gray-50 border border-gray-300 text-sm rounded-lg
-                            focus:ring-orange-500 focus:border-orange-500 w-full p-2 h-[42px]">
-                    </div>
-
-                    <div class="flex-1">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Sampai</label>
-                        <input type="date" id="inputSampai" name="sampai"
-                            value="{{ request('sampai') }}"
-                            class="bg-gray-50 border border-gray-300 text-sm rounded-lg
-                            focus:ring-orange-500 focus:border-orange-500 w-full p-2 h-[42px]">
-                    </div>
-
-                </div>
-
-                <!-- FILTER BUTTON -->
-                <div class="flex flex-col w-full sm:w-auto">
-                    <label class="block text-xs font-medium text-gray-500 mb-1 invisible">Aksi</label>
-                    <button onclick="submitFilter()"
-                        class="flex items-center justify-center gap-2 text-white bg-orange-500 hover:bg-orange-600
-                        rounded-lg text-sm px-8 h-[42px] w-full sm:w-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
-                        </svg>
-                        Filter
-                    </button>
-                </div>
-
-                <!-- JENIS -->
-                <div class="w-full sm:w-auto">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Jenis Transaksi</label>
-                    <select id="filterJenis" onchange="submitFilter()"
+            <!-- DATE RANGE -->
+            <div class="flex flex-row gap-2 flex-1 min-w-0">
+                <div class="flex-1 min-w-0">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Dari</label>
+                    <input type="date" id="inputDari" name="dari"
+                        value="{{ request('dari') }}"
                         class="bg-gray-50 border border-gray-300 text-sm rounded-lg
-                        focus:ring-orange-500 focus:border-orange-500 w-full sm:w-48 p-2 h-[42px]">
-                        <option value="">Semua Transaksi</option>
-                        <option value="Barang Masuk" {{ request('jenis') == 'Barang Masuk' ? 'selected' : '' }}>
-                            Barang Masuk
-                        </option>
-                        <option value="Barang Keluar" {{ request('jenis') == 'Barang Keluar' ? 'selected' : '' }}>
-                            Barang Keluar
-                        </option>
-                    </select>
+                        focus:ring-orange-500 focus:border-orange-500 w-full p-2 h-[42px]">
                 </div>
-
-                <!-- EXPORT -->
-                <div class="flex flex-col w-full sm:w-auto">
-                    <label class="block text-xs font-medium text-gray-500 mb-1 invisible">Export</label>
-                    <a id="exportBtn" href="{{ route('riwayat.export', request()->query()) }}"
-                        class="flex items-center justify-center gap-2 text-white bg-green-500 hover:bg-green-600
-                        rounded-lg text-sm px-6 h-[42px] w-full sm:w-auto">
-                        Export Excel
-                    </a>
+                <div class="flex-1 min-w-0">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Sampai</label>
+                    <input type="date" id="inputSampai" name="sampai"
+                        value="{{ request('sampai') }}"
+                        class="bg-gray-50 border border-gray-300 text-sm rounded-lg
+                        focus:ring-orange-500 focus:border-orange-500 w-full p-2 h-[42px]">
                 </div>
-
             </div>
 
-            <!-- SEARCH -->
-            <div class="relative mt-3 w-full">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="M21 21l-4.35-4.35" />
-                </svg>
+            <!-- TOMBOL FILTER -->
+            <div class="w-full sm:w-auto sm:mt-[21px]">
+                <button onclick="submitFilter()"
+                    class="flex items-center justify-center gap-2 text-white bg-orange-500 hover:bg-orange-600
+                    rounded-lg text-sm px-8 h-[42px] w-full sm:w-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+                    </svg>
+                    Filter
+                </button>
+            </div>
 
-                <input id="searchInput" type="text"
-                    value="{{ request('search') }}"
-                    onkeydown="if(event.key==='Enter') submitFilter()"
-                    placeholder="Cari nama barang/kota..."
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                    focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
+            <!-- JENIS TRANSAKSI -->
+            <div class="w-full sm:w-auto">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Jenis Transaksi</label>
+                <select id="filterJenis" onchange="submitFilter()"
+                    class="bg-gray-50 border border-gray-300 text-sm rounded-lg
+                    focus:ring-orange-500 focus:border-orange-500 w-full sm:w-48 p-2 h-[42px]">
+                    <option value="">Semua Transaksi</option>
+                    <option value="Barang Masuk" {{ request('jenis') == 'Barang Masuk' ? 'selected' : '' }}>
+                        Barang Masuk
+                    </option>
+                    <option value="Barang Keluar" {{ request('jenis') == 'Barang Keluar' ? 'selected' : '' }}>
+                        Barang Keluar
+                    </option>
+                </select>
+            </div>
+
+            <!-- EXPORT -->
+            <div class="w-full sm:w-auto sm:mt-[21px]">
+                <a id="exportBtn" href="{{ route('riwayat.export', request()->query()) }}"
+                    class="flex items-center justify-center gap-2 text-white bg-green-500 hover:bg-green-600
+                    rounded-lg text-sm px-6 h-[42px] w-full sm:w-auto">
+                    Export Excel
+                </a>
             </div>
 
         </div>
+
+        <!-- SEARCH -->
+        <div class="relative w-full">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input id="searchInput" type="text"
+                value="{{ request('search') }}"
+                onkeydown="if(event.key==='Enter') submitFilter()"
+                placeholder="Cari nama barang/kota..."
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
+        </div>
+
+    </div>
+</div>
     </div>
 
     {{-- ACTIVE FILTER BADGES --}}

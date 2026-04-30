@@ -9,7 +9,7 @@
         <div class="flex flex-wrap items-center gap-3">
 
             {{-- SEARCH --}}
-            <div class="relative flex-1">
+            <div class="relative w-full sm:flex-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 20 20">
@@ -23,7 +23,8 @@
             </div>
 
             {{-- PILL FILTER --}}
-            <div class="flex items-center gap-1 bg-white p-1 rounded-lg border border-gray-200">
+            <div
+                class="flex items-center gap-1 bg-white p-1 rounded-lg border border-gray-200 w-full sm:w-auto justify-between sm:justify-start">
                 <button data-f="semua" onclick="setPill(this)"
                     class="pill-btn on px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 hover:text-orange-500">
                     Semua
@@ -41,9 +42,9 @@
             {{-- TAMBAH --}}
             @if (session('role') === 'admin')
                 <button type="button" onclick="openModal('modalKategori'); setModalKategori('tambah')"
-                    class="flex items-center gap-2 bg-[#F66B0E] hover:bg-orange-600
-                   active:scale-[.98] text-white text-sm font-medium px-6 py-2.5
-                   rounded-lg transition-all whitespace-nowrap">
+                    class="flex items-center justify-center gap-2 bg-[#F66B0E] hover:bg-orange-600
+                active:scale-[.98] text-white text-sm font-medium px-6 py-2.5
+                rounded-lg transition-all whitespace-nowrap w-full sm:w-auto">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 18 18">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"
                             d="M9 1v16M1 9h16" />
@@ -55,13 +56,14 @@
 
         {{-- TABLE --}}
         <div class="border border-gray-300 rounded-xl overflow-hidden">
-            <div class="overflow-x-auto">
+
+            {{-- Desktop table (hidden on mobile) --}}
+            <div class="overflow-x-auto" id="desktopTable">
                 <table class="w-full text-left table-fixed min-w-120">
                     <colgroup>
                         <col class="w-11">
                         <col>
                         <col class="w-40">
-
                         @if (session('role') === 'admin')
                             <col class="w-40">
                         @endif
@@ -75,39 +77,32 @@
                             <th class="px-4 py-3 text-xs font-semibold text-white uppercase tracking-wide">Status</th>
                             @if (session('role') === 'admin')
                                 <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase tracking-wide">
-                                    Aksi
-                                </th>
+                                    Aksi</th>
                             @endif
                         </tr>
                     </thead>
                     <tbody id="tbody">
                         @foreach ($data as $dataku)
-                            <tr class="tbl-row border-b border-gray-100
-                                {{ $loop->even ? '' : 'bg-gray-50/60' }}"
+                            <tr class="tbl-row border-b border-gray-100 {{ $loop->even ? '' : 'bg-gray-50/60' }}"
                                 data-name="{{ strtolower($dataku['nama_kategori']) }}"
                                 data-status="{{ $dataku['status'] ? 'aktif' : 'nonaktif' }}"
                                 data-index="{{ $loop->index }}">
-
                                 <td class="px-4 py-2.5 text-center text-sm font-medium text-gray-800 row-num">
-                                    {{ $loop->iteration }}
-                                </td>
-                                <td class="px-4 py-2.5 text-sm font-medium text-gray-800">
-                                    {{ $dataku['nama_kategori'] }}
+                                    {{ $loop->iteration }}</td>
+                                <td class="px-4 py-2.5 text-sm font-medium text-gray-800">{{ $dataku['nama_kategori'] }}
                                 </td>
                                 <td class="px-4 py-2.5">
                                     @if ($dataku['status'])
                                         <span
-                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full
-                                             bg-green-100 text-green-700 text-sm font-medium">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span>
-                                            Aktif
+                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full 
+                                            bg-green-100 text-green-700 text-sm font-medium">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span>Aktif
                                         </span>
                                     @else
                                         <span
-                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full
-                                             bg-gray-100 text-gray-500 text-sm font-medium border border-gray-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0"></span>
-                                            Nonaktif
+                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full 
+                                            bg-gray-100 text-gray-500 text-sm font-medium border border-gray-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0"></span>Nonaktif
                                         </span>
                                     @endif
                                 </td>
@@ -115,19 +110,16 @@
                                     <td class="px-4 py-2.5">
                                         <div class="flex items-center justify-center gap-2">
                                             <button type="button"
-                                                onclick="openModal('modalKategori'); setModalKategori('edit', '{{ addslashes($dataku['nama_kategori']) }}', {{ $dataku['status'] ? 'true' : 'false' }})"
+                                                onclick="openModal('modalKategori'); setModalKategori('edit', 
+                                                '{{ addslashes($dataku['nama_kategori']) }}', {{ $dataku['status'] ? 'true' : 'false' }})"
                                                 class="px-3 py-1 rounded-md text-sm font-medium border border-orange-200
-                                           text-orange-800 bg-orange-100 hover:bg-orange-500 hover:text-white
-                                           active:scale-[.98] hover:-translate-y-px transition-all">
-                                                Edit
-                                            </button>
+                                               text-orange-800 bg-orange-100 hover:bg-orange-500 hover:text-white
+                                               active:scale-[.98] hover:-translate-y-px transition-all">Edit</button>
                                             <button type="button"
-                                                onclick="openModal('modalHapus'); setModalHapus('{{ $dataku['nama_kategori'] }}')"
+                                                onclick="openModal('modalHapus'); setModalHapus('{{ $dataku['nama_kategori'] }}', {{ $loop->index }})"
                                                 class="px-3 py-1 rounded-md text-sm font-medium border border-red-200
-                                           text-red-800 bg-red-100 hover:bg-red-600 hover:text-white
-                                           active:scale-[.98] hover:-translate-y-px transition-all">
-                                                Hapus
-                                            </button>
+                                               text-red-800 bg-red-100 hover:bg-red-600 hover:text-white
+                                               active:scale-[.98] hover:-translate-y-px transition-all">Hapus</button>
                                         </div>
                                     </td>
                                 @endif
@@ -137,11 +129,70 @@
                 </table>
             </div>
 
+            {{-- Mobile card list (visible on mobile only) --}}
+            <div class="divide-y divide-gray-100" id="cardList">
+                @foreach ($data as $dataku)
+                    <div class="mobile-card px-4 py-3 {{ $loop->even ? '' : 'bg-gray-50/60' }}"
+                        data-name="{{ strtolower($dataku['nama_kategori']) }}"
+                        data-status="{{ $dataku['status'] ? 'aktif' : 'nonaktif' }}" data-index="{{ $loop->index }}">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span
+                                    class="mobile-num shrink-0 w-6 h-6 rounded-full bg-[#205375] text-white text-xs font-semibold flex items-center justify-center">
+                                    {{ $loop->iteration }}
+                                </span>
+                                <span
+                                    class="text-sm font-medium text-gray-800 truncate">{{ $dataku['nama_kategori'] }}</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if ($dataku['status'])
+                                    <span
+                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span>Aktif
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full 
+                                        bg-gray-100 text-gray-500 text-xs font-medium border border-gray-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0"></span>Nonaktif
+                                    </span>
+                                @endif
+                                @if (session('role') === 'admin')
+                                    <button type="button"
+                                        onclick="openModal('modalKategori'); setModalKategori('edit', '{{ addslashes($dataku['nama_kategori']) }}',
+                                        {{ $dataku['status'] ? 'true' : 'false' }})"
+                                        class="p-1.5 rounded-md border border-orange-200 text-orange-700 bg-orange-50
+                                       hover:bg-orange-500 hover:text-white active:scale-[.98] transition-all"
+                                        title="Edit">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button"
+                                        onclick="openModal('modalHapus'); setModalHapus('{{ $dataku['nama_kategori'] }}', {{ $loop->index }})"
+                                        class="p-1.5 rounded-md border border-red-200 text-red-700 bg-red-50
+                                       hover:bg-red-600 hover:text-white active:scale-[.98] transition-all"
+                                        title="Hapus">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
             {{-- EMPTY STATE --}}
             <div id="emptyState" class="hidden py-12 text-center">
                 <div
                     class="w-10 h-10 rounded-full bg-gray-100 border border-gray-200
-                        flex items-center justify-center mx-auto mb-3">
+                    flex items-center justify-center mx-auto mb-3">
                     <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24">
                         <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor"
@@ -152,15 +203,15 @@
                 <p class="text-sm text-gray-400 mb-4">Coba ubah kata kunci atau filter</p>
                 <button onclick="resetFilter()"
                     class="inline-flex items-center gap-1.5 bg-[#F66B0E] hover:bg-orange-600
-                       text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                   text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                     Tampilkan Semua
                 </button>
             </div>
 
             {{-- FOOTER PAGINATION --}}
             <div class="px-4 py-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
-                <span id="tblInfo" class="text-sm text-gray-400"></span>
-                <div id="pgnWrap" class="flex items-center gap-1"></div>
+                <span id="tblInfo" class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left"></span>
+                <div id="pgnWrap" class="flex items-center justify-center sm:justify-end gap-1 w-full sm:w-auto"></div>
             </div>
         </div>
 
@@ -223,7 +274,7 @@
                                        position:relative;transition:background .2s;">
                                 <div id="toggleThumb"
                                     style="position:absolute;top:3px;left:3px;width:16px;height:16px;
-                                           border-radius:50%;background:white;transition:transform .2s;">
+                                        border-radius:50%;background:white;transition:transform .2s;">
                                 </div>
                             </div>
                         </label>
@@ -234,7 +285,7 @@
             <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
                 <button onclick="closeModal('modalKategori')"
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200
-                       rounded-lg hover:bg-gray-50 active:scale-[.98] transition-all">
+                    rounded-lg active:scale-[.98] hover:bg-gray-50 transition-all">
                     Batal
                 </button>
                 <button type="button" onclick="simpanKategori()"
@@ -292,7 +343,7 @@
             <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
                 <button onclick="closeModal('modalHapus')"
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200
-                       rounded-lg hover:bg-gray-50 active:scale-[.98] transition-all">
+                       rounded-lg active:scale-[.98] transition-all">
                     Batal
                 </button>
                 <button type="button" onclick="hapusKategori()"
@@ -346,6 +397,18 @@
         .overflow-x-auto {
             -webkit-overflow-scrolling: touch;
         }
+
+        @media (max-width: 639px) {
+            #desktopTable {
+                display: none;
+            }
+        }
+
+        @media (min-width: 640px) {
+            #cardList {
+                display: none !important;
+            }
+        }
     </style>
 @endpush
 
@@ -357,7 +420,9 @@
         let curFilter = 'semua';
         let curKw = '';
 
+        // Simpan referensi rows dan cards berpasangan via data-index
         const allRows = Array.from(document.querySelectorAll('#tbody .tbl-row'));
+        const allCards = Array.from(document.querySelectorAll('#cardList .mobile-card'));
 
         function getFiltered() {
             return allRows.filter(function(r) {
@@ -376,8 +441,12 @@
             const start = (curPage - 1) * PER_PAGE;
             const end = start + PER_PAGE;
 
+            // Sembunyikan semua dulu
             allRows.forEach(function(r) {
                 r.style.display = 'none';
+            });
+            allCards.forEach(function(c) {
+                c.style.display = 'none';
             });
 
             const empty = document.getElementById('emptyState');
@@ -394,15 +463,20 @@
                 r.style.display = '';
                 const numCell = r.querySelector('.row-num');
                 if (numCell) numCell.textContent = start + i + 1;
+                r.classList.toggle('bg-gray-50/60', i % 2 === 1);
 
-                r.classList.remove('bg-gray-50/60');
-                if (i % 2 === 1) {
-                    r.classList.add('bg-gray-50/60');
+                // Cari card yang data-index-nya sama dengan row
+                const matchedCard = allCards.find(c => c.dataset.index === r.dataset.index);
+                if (matchedCard) {
+                    matchedCard.style.display = '';
+                    const numEl = matchedCard.querySelector('.mobile-num');
+                    if (numEl) numEl.textContent = start + i + 1;
+                    matchedCard.classList.toggle('bg-gray-50/60', i % 2 === 1);
                 }
             });
 
-            const s = start + 1,
-                e = Math.min(end, total);
+            const s = start + 1;
+            const e = Math.min(end, total);
             document.getElementById('tblInfo').textContent =
                 'Menampilkan ' + s + '–' + e + ' dari ' + total + ' kategori';
 
@@ -417,9 +491,8 @@
             }
 
             const base =
-                'w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center transition-all cursor-pointer';
-            const btnNorm = base +
-                'border-gray-200 text-gray-600 hover:border-orange-500 hover:text-orange-500 ';
+                'w-8 h-8 rounded-md border text-sm font-medium flex items-center justify-center transition-all cursor-pointer ';
+            const btnNorm = base + 'border-gray-200 text-gray-600 hover:border-orange-500 hover:text-orange-500 ';
             const btnCur = base + 'border-[#F66B0E] bg-[#F66B0E] text-white ';
             const btnDis = base + 'border-gray-100 text-gray-300 cursor-not-allowed ';
 
@@ -527,7 +600,7 @@
             document.getElementById('modalKategoriTitle').textContent =
                 isTambah ? 'Tambah Kategori' : 'Edit Kategori';
 
-            document.getElementById('namaKategori').value = isTambah ? '' : nama;
+            document.getElementById('namaKategori').value = isTambah ? '' : nama.trim();
             document.getElementById('statusToggle').checked = isTambah ? true : aktif;
 
             clearAlert('alertKategori', 'namaKategori');
@@ -572,19 +645,27 @@
             thumb.style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
         }
 
-        let hapusNamaTarget = '';
+        let hapusIndexTarget = -1; // ✅ FIX #2: simpan index, bukan nama
 
-        function setModalHapus(nama) {
-            hapusNamaTarget = nama;
+        function setModalHapus(nama, index) {
+            hapusIndexTarget = parseInt(index);
             document.getElementById('hapusNama').textContent = nama;
         }
 
         function hapusKategori() {
-            const idx = allRows.findIndex(r => r.dataset.name === hapusNamaTarget.toLowerCase());
-            if (idx !== -1) {
-                allRows[idx].remove();
-                allRows.splice(idx, 1);
+            // ✅ FIX #1 + #2: hapus berdasarkan data-index, dan hapus card juga
+            const rowIdx = allRows.findIndex(r => parseInt(r.dataset.index) === hapusIndexTarget);
+            const cardIdx = allCards.findIndex(c => parseInt(c.dataset.index) === hapusIndexTarget);
+
+            if (rowIdx !== -1) {
+                allRows[rowIdx].remove();
+                allRows.splice(rowIdx, 1);
             }
+            if (cardIdx !== -1) {
+                allCards[cardIdx].remove();
+                allCards.splice(cardIdx, 1);
+            }
+
             closeModal('modalHapus');
             render();
         }
