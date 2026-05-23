@@ -46,7 +46,7 @@
                 </div>
 
                 <div class="text-center">
-                    <p class="font-semibold text-[#112B3C] text-base">{{ session('nama') }}</p>
+                    <p class="font-semibold text-[#112B3C] text-base">{{ session('username') }}</p>
                     <span class="inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-medium
                         {{ session('role') === 'admin' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700' }}">
                         {{ ucfirst(session('role')) }}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -18,39 +19,23 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        $admin = [
-            'username' => 'admin',
-            'password' => 'admin',
+        $credentials = [
+            'username' => $request->username,
+            'password' => $request->password,
         ];
 
-        $manager = [
-            'username' => 'manager',
-            'password' => 'manager',
-        ];
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-        // ADMIN
-        if ($request->username == $admin['username'] && $request->password == $admin['password']) {
-            session()->put('role', 'admin');
-            session()->put('nama', ucfirst($request->username));
-            session()->put('email', 'admin@gmail.com');
-            session()->put('hp', '081234567890');
-
-            return redirect()
-                ->route('dashboard')
-                ->with('show_stok_menipis_modal', true);
-        }
-
-        // MANAGER
-        elseif ($request->username == $manager['username'] && $request->password == $manager['password']) {
-            session()->put('role', 'manager');
-            session()->put('nama', ucfirst($request->username));
-            session()->put('email', 'manager@gmail.com');
-            session()->put('hp', '089876543210');
+            $request->session()->put('role', Auth::user()->role);
+            $request->session()->put('username', Auth::user()->username);
+            $request->session()->put('nama', Auth::user()->username);
+            $request->session()->put('email', Auth::user()->email);
+            $request->session()->put('hp', Auth::user()->no_telpon);
 
             return redirect()->route('dashboard');
         }
 
-        // ERROR LOGIN
         return back()->with('error', 'Username atau password salah');
     }
 }

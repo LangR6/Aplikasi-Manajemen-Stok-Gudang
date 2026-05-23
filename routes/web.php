@@ -10,24 +10,96 @@ use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\AuthController;
 
-Route::get('/login', [LoginController::class, 'login']);
-Route::post('/loginaction', [LoginController::class, 'loginAction'])->name('loginaction');
+/*
+|--------------------------------------------------------------------------
+| LOGIN
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+Route::get('/login', [LoginController::class, 'login'])
+    ->name('login');
 
-Route::get('/kelola_barang', [KelolaBarangController::class, 'index'])->name('kelola_barang');
+Route::post('/loginaction', [LoginController::class, 'loginAction'])
+    ->name('loginaction');
 
-Route::get('/kategori', [KelolaKategoriController::class, 'index'])->name('kelola_kategori');
+/*
+|--------------------------------------------------------------------------
+| LOGOUT
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
 
-// RIWAYAT
-Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat');
-Route::get('/riwayat/export', [RiwayatController::class, 'exportExcel'])->name('riwayat.export');
+/*
+|--------------------------------------------------------------------------
+| ROUTE YANG HARUS LOGIN
+|--------------------------------------------------------------------------
+*/
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware('auth')->group(function () {
 
-// SUPPLIER
-Route::get('/kelola_supplier', [SupplierController::class, 'index'])->name('kelola_supplier');
-Route::post('/supplier/store', [SupplierController::class, 'store'])->name('supplier.store');
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('profile');
+
+    Route::post('/profile/update', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | KELOLA BARANG
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/kelola_barang', [KelolaBarangController::class, 'index'])
+        ->name('kelola_barang');
+
+    /*
+    |--------------------------------------------------------------------------
+    | KATEGORI
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/kategori', [KelolaKategoriController::class, 'index'])
+        ->name('kelola_kategori');
+
+    /*
+    |--------------------------------------------------------------------------
+    | RIWAYAT
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/riwayat', [RiwayatController::class, 'index'])
+        ->name('riwayat');
+
+    Route::get('/riwayat/export', [RiwayatController::class, 'exportExcel'])
+        ->name('riwayat.export');
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUPPLIER
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/kelola_supplier', [SupplierController::class, 'index'])
+        ->name('kelola_supplier');
+
+    Route::post('/supplier/store', [SupplierController::class, 'store'])
+        ->name('supplier.store');
+
+});
