@@ -10,19 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, SoftDeletes;
 
-    /*
-    |--------------------------------------------------------------------------
-    | TABLE
-    |--------------------------------------------------------------------------
-    */
-
     protected $table = 'users';
-
-    /*
-    |--------------------------------------------------------------------------
-    | FILLABLE
-    |--------------------------------------------------------------------------
-    */
 
     protected $fillable = [
         'username',
@@ -32,27 +20,38 @@ class User extends Authenticatable
         'role',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | HIDDEN
-    |--------------------------------------------------------------------------
-    */
-
     protected $hidden = [
         'password',
         'remember_token',
     ];
-
-    /*
-    |--------------------------------------------------------------------------
-    | CASTS
-    |--------------------------------------------------------------------------
-    */
 
     protected function casts(): array
     {
         return [
             'password' => 'hashed',
         ];
+    }
+
+    public function login(): void
+    {
+        auth()->attempt([
+            'username' => $this->username,
+            'password' => $this->password,
+        ]);
+    }
+
+    public function logout(): void
+    {
+        auth()->logout();
+    }
+
+    public function tampilData(): array
+    {
+        return [];
+    }
+
+    public function updateProfile(array $data): void
+    {
+        $this->update($data);
     }
 }
