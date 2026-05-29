@@ -14,7 +14,7 @@
         : $title;
 @endphp
 
-<nav class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-white px-4 py-3 shadow-sm sm:px-6">
+<nav class="fixed top-0 right-0 z-50 flex items-center justify-between gap-3 bg-white px-4 py-3 shadow-sm sm:px-6 md:left-56 left-0 w-auto">
     <div class="flex min-w-0 items-center gap-3">
         <button onclick="openSidebar()"
             class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#EFEFEF] text-[#112B3C] transition hover:bg-gray-300 md:hidden"

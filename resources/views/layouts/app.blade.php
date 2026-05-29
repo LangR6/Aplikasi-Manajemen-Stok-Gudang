@@ -23,8 +23,7 @@
     @endif
 
     <!-- Overlay Sidebar Mobile -->
-    <div id="sidebarOverlay"
-        class="fixed inset-0 z-30 hidden bg-black/50 backdrop-blur-[2px] md:hidden"
+    <div id="sidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/50 backdrop-blur-[2px] md:hidden"
         onclick="closeSidebar()"></div>
 
     <!-- Blade Components -->
@@ -33,9 +32,13 @@
     <div class="min-h-screen md:ml-56">
         <x-navbar :title="View::yieldContent('title')" />
 
-        <main class="p-4 sm:p-5">
+
+
+        <main class="p-4 sm:p-5 mt-12">
             @yield('content')
         </main>
+
+
     </div>
 
     <x-logout-modal />
