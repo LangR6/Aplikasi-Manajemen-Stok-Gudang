@@ -9,20 +9,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('barang_keluar', function (Blueprint $table) {
-            $table->id('id_barangkeluar');
-            $table->foreignId('barang_id')
-                  ->constrained('barang')
-                  ->cascadeOnDelete();
-            $table->foreignId('dicatat_oleh')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+            $table->id('id_barang_keluar');
+
+            // harus nullable karena memakai nullOnDelete()
+            $table->string('id_barang', 50)->nullable();
+
             $table->unsignedInteger('jumlah');
             $table->date('tgl_keluar');
             $table->string('tujuan')->nullable();
             $table->text('keterangan')->nullable();
             $table->timestamps();
-            // Tidak pakai softDeletes — hapus transaksi harus rollback stok
+
+            // foreign key ke tabel barang kolom kode_barang
+            $table->foreign('id_barang')
+                ->references('kode_barang')
+                ->on('barang')
+                ->nullOnDelete();
         });
     }
 
