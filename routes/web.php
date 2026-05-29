@@ -78,6 +78,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/kategori', [KelolaKategoriController::class, 'index'])
         ->name('kelola_kategori');
 
+    Route::post('/kategori', [KelolaKategoriController::class, 'store'])
+        ->name('kelola_kategori.store');
+
+    Route::put('/kategori/{id}', [KelolaKategoriController::class, 'update'])
+        ->name('kelola_kategori.update');
+
+    Route::delete('/kategori/{id}', [KelolaKategoriController::class, 'destroy'])
+        ->name('kelola_kategori.destroy');
+
     /*
     |--------------------------------------------------------------------------
     | RIWAYAT

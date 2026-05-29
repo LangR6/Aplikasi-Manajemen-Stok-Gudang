@@ -1,4 +1,3 @@
-app/Models/Kategori.php
 <?php
 namespace App\Models;
 
@@ -10,6 +9,8 @@ class Kategori extends Model
     use SoftDeletes;
 
     protected $table = 'kategori';
+
+    protected $primaryKey = 'id_kategori';
 
     protected $fillable = [
         'nama_kategori',
@@ -26,15 +27,15 @@ class Kategori extends Model
 
     public function edit(int $id, array $data): void
     {
-        // mencari kategori berdasarkan id, lalu memperbarui datanya
-        self::where('id', $id)->update($data);
+        // mencari kategori berdasarkan id_kategori, lalu memperbarui datanya
+        self::where('id_kategori', $id)->update($data);
     }
 
     public function hapus(int $id): void
     {
         // menghapus kategori secara soft delete
         // data tidak benar-benar terhapus, hanya kolom deleted_at yang diisi
-        self::where('id', $id)->delete();
+        self::where('id_kategori', $id)->delete();
     }
 
     public function barang()

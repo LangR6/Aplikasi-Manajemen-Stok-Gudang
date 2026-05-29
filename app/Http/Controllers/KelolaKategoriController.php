@@ -1,41 +1,87 @@
 <?php
-
 namespace App\Http\Controllers;
+
+use App\Models\Kategori;
+use Illuminate\Http\Request;
 
 class KelolaKategoriController extends Controller
 {
-    public function getData()
-    {
-        $dataKategori = [
-            ['id' => 1,  'nama_kategori' => 'Aksesoris',    'status' => 1],
-            ['id' => 2,  'nama_kategori' => 'Atasan',       'status' => 1],
-            ['id' => 3,  'nama_kategori' => 'Bawahan',      'status' => 1],
-            ['id' => 4,  'nama_kategori' => 'Sepatu',       'status' => 1],
-            ['id' => 5,  'nama_kategori' => 'Tas',          'status' => 1],
-            ['id' => 6,  'nama_kategori' => 'Outerwear',    'status' => 1],
-            ['id' => 7,  'nama_kategori' => 'Pakaian Formal', 'status' => 1],
-            ['id' => 8,  'nama_kategori' => 'Pakaian Santai', 'status' => 1],
-            ['id' => 9,  'nama_kategori' => 'Olahraga',     'status' => 1],
-            ['id' => 10, 'nama_kategori' => 'Elektronik',   'status' => 0],
-            ['id' => 11, 'nama_kategori' => 'Perhiasan',    'status' => 0],
-            ['id' => 12, 'nama_kategori' => 'Travel',       'status' => 0],
-            ['id' => 13, 'nama_kategori' => 'Vintage',      'status' => 0],
-            ['id' => 14, 'nama_kategori' => 'Musiman',      'status' => 0],
-            ['id' => 15, 'nama_kategori' => 'Anak-anak',    'status' => 1],
-            ['id' => 16, 'nama_kategori' => 'Wanita',       'status' => 1],
-            ['id' => 17, 'nama_kategori' => 'Pria',         'status' => 1],
-            ['id' => 18, 'nama_kategori' => 'Unisex',       'status' => 1],
-            ['id' => 19, 'nama_kategori' => 'Limited Edition', 'status' => 0],
-            ['id' => 20, 'nama_kategori' => 'Diskon',       'status' => 0],
+    public function index(Request $request)
+{
+    // mengambil semua data kategori, diurutkan dari yang terbaru
+    $data = Kategori::orderBy('created_at', 'desc')->get()->map(function ($item) {
+        return [
+            'id_kategori'   => $item->id_kategori,
+            'nama_kategori' => $item->nama_kategori,
+            'status'        => $item->status === 'aktif' ? true : false,
         ];
+    });
 
-        return $dataKategori;
+    return view('pages.kelola_kategori', compact('data'));
+}
+
+    public function store(Request $request)
+    {
+        // hanya admin yang boleh menambah kategori
+        if (session('role') !== 'admin') {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses.');
+        }
+
+        // validasi input sebelum menyimpan data kategori baru
+        $request->validate([
+            'nama_kategori' => 'required|unique:kategori,nama_kategori',
+            'status'        => 'required|in:aktif,nonaktif',
+        ]);
+
+        $model = new Kategori();
+        $model->tambah($request->only(['nama_kategori', 'status']));
+
+        return redirect()->back()->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    public function index()
+    public function update(Request $request, int $id)
     {
-        $data = $this->getData();
+        // hanya admin yang boleh mengubah kategori
+        if (session('role') !== 'admin') {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses.');
+        }
 
-        return view('pages.kelola_kategori', compact('data'));
+        // validasi input sebelum memperbarui data kategori
+        $request->validate([
+            'nama_kategori' => 'required|unique:kategori,nama_kategori,' . $id . ',id_kategori',
+            'status'        => 'required|in:aktif,nonaktif',
+        ]);
+
+        $model = new Kategori();
+        $model->edit($id, $request->only(['nama_kategori', 'status']));
+
+        return redirect()->back()->with('success', 'Kategori berhasil diubah.');
+    }
+
+    public function destroy(int $id)
+    {
+        // hanya admin yang boleh menghapus kategori
+        if (session('role') !== 'admin') {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses.');
+        }
+
+        // mengecek apakah kategori masih digunakan oleh barang
+        $kategori = Kategori::withCount('barang')->find($id);
+
+        if (!$kategori) {
+            return redirect()->back()->with('error', 'Kategori tidak ditemukan.');
+        }
+
+        if ($kategori->barang_count > 0) {
+            // menolak penghapusan jika kategori masih digunakan oleh barang
+            return redirect()->back()->with('error',
+                'Kategori tidak bisa dihapus karena masih digunakan oleh ' .
+                $kategori->barang_count . ' barang.');
+        }
+
+        $model = new Kategori();
+        $model->hapus($id);
+
+        return redirect()->back()->with('success', 'Kategori berhasil dihapus.');
     }
 }
