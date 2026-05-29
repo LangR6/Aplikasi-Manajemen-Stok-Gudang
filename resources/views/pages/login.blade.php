@@ -15,10 +15,55 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.85); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .animate-fade-in {
+            animation: fadeInScale 0.3s ease-out forwards;
+        }
     </style>
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    {{-- MODAL LOGIN BERHASIL --}}
+    @if (session('login_success'))
+    <div id="modalSuccess"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl px-8 py-8 flex flex-col items-center gap-4 w-[300px] animate-fade-in">
+
+            {{-- Icon Centang --}}
+            <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-500" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+
+            {{-- Teks --}}
+            <div class="text-center">
+                <h2 class="text-lg font-bold text-[#112B3C]">Login Berhasil!</h2>
+                <p class="text-sm text-gray-500 mt-1">
+                    Selamat datang,
+                    <span class="font-medium text-orange-500">{{ session('nama') }}</span>
+                </p>
+            </div>
+
+            {{-- Loading bar --}}
+            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                <div id="loadingBar"
+                    class="h-1.5 bg-orange-500 rounded-full w-0 transition-all duration-[2000ms] ease-linear">
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-400">Mengalihkan halaman...</p>
+
+        </div>
+    </div>
+    @endif
 
     <div class="
         bg-white
@@ -70,47 +115,42 @@
 
             <!-- ERROR MESSAGE -->
             @if (session('error'))
-
-                <div
-                    id="toast-danger"
-                    class="
-                        fixed
-                        top-5
-                        right-5
-                        z-50
-                        flex
-                        items-center
-                        w-full
-                        max-w-xs
-                        p-4
-                        text-gray-500
-                        bg-white
-                        rounded-lg
-                        shadow
-                        transition-opacity
-                        duration-500
-                    "
-                >
-
-                    <div class="
-                        inline-flex
-                        items-center
-                        justify-center
-                        w-8
-                        h-8
-                        text-red-500
-                        bg-red-100
-                        rounded-lg
-                    ">
-                        ❌
-                    </div>
-
-                    <div class="ms-3 text-sm">
-                        {{ session('error') }}
-                    </div>
-
+            <div
+                id="toast-danger"
+                class="
+                    fixed
+                    top-5
+                    right-5
+                    z-50
+                    flex
+                    items-center
+                    w-full
+                    max-w-xs
+                    p-4
+                    text-gray-500
+                    bg-white
+                    rounded-lg
+                    shadow
+                    transition-opacity
+                    duration-500
+                "
+            >
+                <div class="
+                    inline-flex
+                    items-center
+                    justify-center
+                    w-8
+                    h-8
+                    text-red-500
+                    bg-red-100
+                    rounded-lg
+                ">
+                    ❌
                 </div>
-
+                <div class="ms-3 text-sm">
+                    {{ session('error') }}
+                </div>
+            </div>
             @endif
 
             <!-- LOGIN FORM -->
@@ -124,16 +164,9 @@
 
                 <!-- USERNAME -->
                 <div class="space-y-1">
-
-                    <label class="
-                        block
-                        text-sm
-                        font-medium
-                        text-gray-700
-                    ">
+                    <label class="block text-sm font-medium text-gray-700">
                         Nama Pengguna
                     </label>
-
                     <input
                         type="text"
                         name="username"
@@ -153,33 +186,16 @@
                             transition
                         "
                     >
-
                     @error('username')
-
-                        <p class="
-                            text-red-500
-                            text-xs
-                            leading-tight
-                        ">
-                            {{ $message }}
-                        </p>
-
+                        <p class="text-red-500 text-xs leading-tight">{{ $message }}</p>
                     @enderror
-
                 </div>
 
                 <!-- PASSWORD -->
                 <div class="space-y-1">
-
-                    <label class="
-                        block
-                        text-sm
-                        font-medium
-                        text-gray-700
-                    ">
+                    <label class="block text-sm font-medium text-gray-700">
                         Kata Sandi
                     </label>
-
                     <input
                         type="password"
                         name="password"
@@ -198,19 +214,9 @@
                             transition
                         "
                     >
-
                     @error('password')
-
-                        <p class="
-                            text-red-500
-                            text-xs
-                            leading-tight
-                        ">
-                            {{ $message }}
-                        </p>
-
+                        <p class="text-red-500 text-xs leading-tight">{{ $message }}</p>
                     @enderror
-
                 </div>
 
                 <!-- BUTTON -->
@@ -241,17 +247,29 @@
 
 </body>
 
-<!-- TOAST AUTO HIDE -->
 <script>
+    // ===== TOAST ERROR AUTO HIDE =====
     setTimeout(() => {
         const toast = document.getElementById('toast-danger');
         if (toast) {
             toast.classList.add('opacity-0');
-            setTimeout(() => {
-                toast.remove();
-            }, 500);
+            setTimeout(() => toast.remove(), 500);
         }
     }, 3000);
+
+    // ===== MODAL LOGIN BERHASIL =====
+    const modal = document.getElementById('modalSuccess');
+    if (modal) {
+        // Jalankan loading bar
+        setTimeout(() => {
+            document.getElementById('loadingBar').style.width = '100%';
+        }, 100);
+
+        // Redirect ke dashboard setelah 2.3 detik
+        setTimeout(() => {
+            window.location.href = "{{ route('dashboard') }}";
+        }, 2300);
+    }
 </script>
 
 </html>

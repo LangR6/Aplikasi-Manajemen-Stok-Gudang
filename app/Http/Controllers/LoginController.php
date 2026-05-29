@@ -33,7 +33,8 @@ class LoginController extends Controller
             $request->session()->put('email', Auth::user()->email);
             $request->session()->put('hp', Auth::user()->no_telpon);
 
-            return redirect()->route('dashboard');
+            // ✅ Redirect ke login dulu agar modal muncul
+            return redirect()->route('login')->with('login_success', true);
         }
 
         return back()->with('error', 'Username atau password salah');
