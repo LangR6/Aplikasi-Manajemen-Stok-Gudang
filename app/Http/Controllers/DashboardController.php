@@ -67,19 +67,19 @@ class DashboardController extends Controller
             [
                 'nama_barang' => 'Celana Jeans',
                 'kategori' => 'Pakaian',
-                'stok' => 8,
+                'stok' => 3,
                 'status_baca' => false,
             ],
             [
                 'nama_barang' => 'Jaket Denim',
                 'kategori' => 'Pakaian',
-                'stok' => 5,
+                'stok' => 4,
                 'status_baca' => false,
             ],
             [
                 'nama_barang' => 'Sweater Polos',
                 'kategori' => 'Pakaian',
-                'stok' => 7,
+                'stok' => 2,
                 'status_baca' => true,
             ],
             [

@@ -111,4 +111,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/supplier/store', [SupplierController::class, 'store'])
         ->name('supplier.store');
 
+    Route::put('/supplier/update/{id}', [SupplierController::class, 'update'])
+        ->name('supplier.update');
+
+    Route::delete('/supplier/delete/{id}', [SupplierController::class, 'destroy'])
+        ->name('supplier.destroy');
 });

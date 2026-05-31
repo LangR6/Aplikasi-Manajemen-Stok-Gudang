@@ -68,15 +68,15 @@
                 <tbody id="tbody">
                     @forelse($suppliers as $supplier)
                     <tr class="tbl-row border-b border-gray-100 {{ $loop->even ? '' : 'bg-gray-50/60' }}"
-                        data-name="{{ strtolower($supplier['nama_supplier'] . ' ' . $supplier['kontak'] . ' ' . $supplier['email'] . ' ' . $supplier['kota']) }}">
+                        data-name="{{ strtolower($supplier->nama_supplier. ' ' . $supplier->no_kontak . ' ' . $supplier->email . ' ' . $supplier->kota) }}">
                         <td class="row-num px-4 py-3 text-center text-sm text-gray-800 font-medium">
                             {{ $loop->iteration }}
                         </td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-800">{{ $supplier['nama_supplier'] }}
+                        <td class="px-4 py-3 text-sm font-medium text-gray-800">{{ $supplier->nama_supplier }}
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-700">{{ $supplier['kontak'] }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700 wrap-break-words">{{ $supplier['email'] }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700">{{ $supplier['kota'] }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{{ $supplier->no_kontak }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700 wrap-break-words">{{ $supplier->email }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{{ $supplier->kota }}</td>
                         @if (session('role') === 'admin')
                         <td class="px-4 py-3">
                             <div class="flex items-center justify-center gap-2">
@@ -85,11 +85,16 @@
                                     class="px-3 py-1 rounded-md text-sm font-medium border border-orange-200
                                                text-orange-800 bg-orange-100 hover:bg-orange-500 hover:text-white
                                                active:scale-[.98] hover:-translate-y-px transition-all">Edit</button>
-                                <button type="button" data-nama="{{ $supplier['nama_supplier'] }}"
-                                    onclick="openModal('modalHapusSupplier'); setModalHapusSupplier(this.dataset.nama)"
+                                <button
+                                    type="button"
+                                    data-id="{{ $supplier->id_supplier }}"
+                                    data-nama="{{ $supplier->nama_supplier }}"
+                                    onclick="openModal('modalHapusSupplier'); setModalHapusSupplier(this.dataset.id, this.dataset.nama)"
                                     class="px-3 py-1 rounded-md text-sm font-medium border border-red-200
-                                               text-red-800 bg-red-100 hover:bg-red-600 hover:text-white
-                                               active:scale-[.98] hover:-translate-y-px transition-all">Hapus</button>
+           text-red-800 bg-red-100 hover:bg-red-600 hover:text-white
+           active:scale-[.98] hover:-translate-y-px transition-all">
+                                    Hapus
+                                </button>
                             </div>
                         </td>
                         @endif
@@ -130,7 +135,7 @@
         <div class="divide-y divide-gray-100" id="cardList">
             @forelse($suppliers as $supplier)
             <div class="mobile-card px-4 py-3 {{ $loop->even ? '' : 'bg-gray-50/60' }}"
-                data-name="{{ strtolower($supplier['nama_supplier'] . ' ' . $supplier['kontak'] . ' ' . $supplier['email'] . ' ' . $supplier['kota']) }}">
+                data-name="{{ strtolower($supplier->nama_supplier . ' ' . $supplier->no_kontak . ' ' . $supplier->email . ' ' . $supplier->kota) }}">
 
                 {{-- Baris atas: nomor + nama + tombol aksi --}}
                 <div class="flex items-start justify-between gap-3">
@@ -141,7 +146,7 @@
                             {{ $loop->iteration }}
                         </span>
                         <span class="text-sm font-semibold text-gray-800 truncate">
-                            {{ $supplier['nama_supplier'] }}
+                            {{ $supplier->nama_supplier }}
                         </span>
                     </div>
 
@@ -158,13 +163,15 @@
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </button>
-                        <button type="button" data-nama="{{ $supplier['nama_supplier'] }}"
-                            onclick="openModal('modalHapusSupplier'); setModalHapusSupplier(this.dataset.nama)"
+                        <button
+                            type="button"
+                            data-id="{{ $supplier->id_supplier }}"
+                            data-nama="{{ $supplier->nama_supplier }}"
+                            onclick="openModal('modalHapusSupplier'); setModalHapusSupplier(this.dataset.id, this.dataset.nama)"
                             class="p-1.5 rounded-md border border-red-200 text-red-700 bg-red-50
-                                       hover:bg-red-600 hover:text-white active:scale-[.98] transition-all"
+           hover:bg-red-600 hover:text-white active:scale-[.98] transition-all"
                             title="Hapus">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                stroke-width="2">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
@@ -181,7 +188,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <span>{{ $supplier['kontak'] }}</span>
+                        <span>{{ $supplier->no_kontak }}</span>
                     </div>
                     <div class="flex items-center gap-1.5 text-xs text-gray-500">
                         <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24"
@@ -189,7 +196,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <span class="break-all">{{ $supplier['email'] }}</span>
+                        <span class="break-all">{{ $supplier->email }}</span>
                     </div>
                     <div class="flex items-center gap-1.5 text-xs text-gray-500">
                         <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24"
@@ -199,7 +206,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span>{{ $supplier['kota'] }}</span>
+                        <span>{{ $supplier->kota }}</span>
                     </div>
                 </div>
             </div>
@@ -256,7 +263,10 @@
             </button>
         </div>
 
-        <form onsubmit="return validateSupplierForm()" class="px-5 py-5 space-y-4">
+        <form id="supplierForm" action="{{ route('supplier.store') }}" method="POST" onsubmit="return validateSupplierForm()" class="px-5 py-5 space-y-4">
+            @csrf
+
+            <input type="hidden" name="_method" id="supplierMethod" value="POST">
 
             <div>
                 <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
@@ -340,15 +350,6 @@
             <div class="flex items-center gap-2.5">
                 <h3 class="text-[16px] font-semibold text-white">Konfirmasi Hapus</h3>
             </div>
-
-            <button onclick="closeModal('modalHapusSupplier')"
-                class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center
-                text-white hover:bg-white/30 transition">
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                </svg>
-            </button>
         </div>
 
         <div class="px-5 py-6 text-center">
@@ -374,17 +375,18 @@
         </div>
 
         <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
-            <button onclick="closeModal('modalHapusSupplier')"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200
-                rounded-lg hover:bg-gray-50 active:scale-[.98] transition-all">
-                Batal
-            </button>
+            <form id="deleteSupplierForm" method="POST">
+                @csrf
+                @method('DELETE')
 
-            <button type="button" onclick="hapusSupplier()"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700
-                rounded-lg active:scale-[.98] hover:-translate-y-px transition-all">
-                Hapus
-            </button>
+                <button type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700
+        rounded-lg active:scale-[.98] hover:-translate-y-px transition-all">
+                    Hapus
+                </button>
+            </form>
+
+
         </div>
     </div>
 </div>
@@ -467,18 +469,47 @@
         document.getElementById('supplierModalTitle').textContent =
             isEdit ? 'Edit Supplier' : 'Tambah Supplier';
 
-        document.getElementById('namaSupplier').value = isEdit ? (data.nama_supplier ?? '') : '';
-        document.getElementById('kontakSupplier').value = isEdit ? (data.kontak ?? '') : '';
-        document.getElementById('kotaSupplier').value = isEdit ? (data.kota ?? '') : '';
-        document.getElementById('emailSupplier').value = isEdit ? (data.email ?? '') : '';
+        // ACTION FORM
+        document.getElementById('supplierForm').action = isEdit ?
+            `/supplier/update/${data.id_supplier}` :
+            `{{ route('supplier.store') }}`;
 
-        ['namaSupplier', 'kontakSupplier', 'kotaSupplier', 'emailSupplier'].forEach(function(id) {
+        // METHOD
+        document.getElementById('supplierMethod').value =
+            isEdit ? 'PUT' : 'POST';
+
+        // ISI INPUT
+        document.getElementById('namaSupplier').value =
+            isEdit ? (data.nama_supplier ?? '') : '';
+
+        document.getElementById('kontakSupplier').value =
+            isEdit ? (data.no_kontak ?? '') : '';
+
+        document.getElementById('kotaSupplier').value =
+            isEdit ? (data.kota ?? '') : '';
+
+        document.getElementById('emailSupplier').value =
+            isEdit ? (data.email ?? '') : '';
+
+        // TEXT BUTTON
+        document.getElementById('supplierSubmitBtn').textContent =
+            'Simpan';
+
+        // RESET ERROR
+        ['namaSupplier', 'kontakSupplier', 'kotaSupplier', 'emailSupplier']
+        .forEach(function(id) {
             const input = document.getElementById(id);
-            if (input) input.classList.remove('border-orange-500', 'bg-red-50');
+            if (input) {
+                input.classList.remove('border-orange-500', 'bg-red-50');
+            }
         });
-        ['errNamaSupplier', 'errKontakSupplier', 'errKotaSupplier', 'errEmailSupplier'].forEach(function(id) {
+
+        ['errNamaSupplier', 'errKontakSupplier', 'errKotaSupplier', 'errEmailSupplier']
+        .forEach(function(id) {
             const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
+            if (el) {
+                el.classList.add('hidden');
+            }
         });
     }
 
@@ -486,29 +517,14 @@
         closeModal('supplierModal');
     }
 
-    function setModalHapusSupplier(nama) {
-        hapusNamaSupplierTarget = nama;
+    function setModalHapusSupplier(id, nama) {
         document.getElementById('hapusNamaSupplier').textContent = nama;
+
+        document.getElementById('deleteSupplierForm').action =
+            `/supplier/delete/${id}`;
     }
 
-    function hapusSupplier() {
-        const rowIdx = allRows.findIndex(r => r.dataset.name && r.dataset.name.startsWith(hapusNamaSupplierTarget
-            .toLowerCase()));
-        const cardIdx = allCards.findIndex(c => c.dataset.name && c.dataset.name.startsWith(hapusNamaSupplierTarget
-            .toLowerCase()));
 
-        if (rowIdx !== -1) {
-            allRows[rowIdx].remove();
-            allRows.splice(rowIdx, 1);
-        }
-        if (cardIdx !== -1) {
-            allCards[cardIdx].remove();
-            allCards.splice(cardIdx, 1);
-        }
-
-        closeModal('modalHapusSupplier');
-        render();
-    }
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.modal-overlay').forEach(function(ov) {
