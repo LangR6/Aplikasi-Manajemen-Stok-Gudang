@@ -69,6 +69,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/kelola_barang', [KelolaBarangController::class, 'index'])
         ->name('kelola_barang');
 
+    Route::post('/kelola_barang', [KelolaBarangController::class, 'store'])
+        ->name('kelola_barang.store');
+
+    Route::put('/kelola_barang/{kode}', [KelolaBarangController::class, 'update'])
+        ->name('kelola_barang.update');
+
+    Route::post('/kelola_barang/masuk', [KelolaBarangController::class, 'masuk'])
+        ->name('kelola_barang.masuk');
+
+    Route::post('/kelola_barang/keluar', [KelolaBarangController::class, 'keluar'])
+        ->name('kelola_barang.keluar');
+
     /*
     |--------------------------------------------------------------------------
     | KATEGORI

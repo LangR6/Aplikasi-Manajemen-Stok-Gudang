@@ -9,35 +9,33 @@ class Kategori extends Model
     use SoftDeletes;
 
     protected $table = 'kategori';
-
     protected $primaryKey = 'id_kategori';
 
     protected $fillable = [
         'nama_kategori',
         'status'
     ];
-
     protected $dates = ['deleted_at'];
 
+    // CREATE - menyimpan data kategori baru ke database
     public function tambah(array $data): void
     {
-        // menyimpan data kategori baru ke dalam database
         self::create($data);
     }
 
+    // UPDATE - memperbarui data kategori berdasarkan id
     public function edit(int $id, array $data): void
     {
-        // mencari kategori berdasarkan id_kategori, lalu memperbarui datanya
         self::where('id_kategori', $id)->update($data);
     }
 
+    // DELETE - soft delete kategori berdasarkan id
     public function hapus(int $id): void
     {
-        // menghapus kategori secara soft delete
-        // data tidak benar-benar terhapus, hanya kolom deleted_at yang diisi
         self::where('id_kategori', $id)->delete();
     }
 
+    // relasi ke barang
     public function barang()
     {
         // satu kategori bisa memiliki banyak barang
