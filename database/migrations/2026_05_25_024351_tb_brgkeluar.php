@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('tgl_keluar');
             $table->string('tujuan')->nullable();
             $table->text('keterangan')->nullable();
+            $table->string('dicatat_oleh');
             $table->timestamps();
 
             // foreign key ke tabel barang kolom kode_barang

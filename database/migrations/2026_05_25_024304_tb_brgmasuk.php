@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('jumlah');
             $table->date('tgl_masuk');
             $table->text('keterangan')->nullable();
+            $table->string('dicatat_oleh');
             $table->timestamps();
 
             // foreign key ke barang.kode_barang

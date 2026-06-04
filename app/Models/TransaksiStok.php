@@ -1,4 +1,3 @@
-app/Models/TransaksiStok.php
 <?php
 namespace App\Models;
 

@@ -15,11 +15,10 @@ return new class extends Migration
             $table->binary('foto_barang')->nullable();
             $table->unsignedInteger('stok')->default(0);
             $table->foreignId('id_kategori')
-                  ->nullable()
-                  ->constrained('kategori', 'id_kategori')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('kategori', 'id_kategori')
+                ->nullOnDelete();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
