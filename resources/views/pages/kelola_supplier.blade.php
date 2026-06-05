@@ -3,36 +3,52 @@
 @section('title', 'Kelola Supplier')
 
 @section('content')
+
+{{-- Data untuk JS auto-open modal --}}
+<meta name="old-nama" content="{{ old('nama_supplier') }}">
+<meta name="old-kontak" content="{{ old('kontak') }}">
+<meta name="old-kota" content="{{ old('kota') }}">
+<meta name="old-email" content="{{ old('email') }}">
+<meta name="has-error" content="{{ $errors->hasAny(['nama_supplier', 'kontak', 'email', 'kota']) ? '1' : '0' }}">
+
 <div class="space-y-3">
 
+
     {{-- TOOLBAR --}}
-    <div class="flex flex-wrap items-center gap-3">
+    <form method="GET" action="{{ route('kelola_supplier') }}" id="filterForm">
+        <div class="flex flex-wrap items-center gap-3">
 
-        {{-- SEARCH --}}
-        <div class="relative w-full sm:flex-1">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 20 20">
-                    <path stroke="currentColor" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                </svg>
+            {{-- SEARCH --}}
+            <div class="relative w-full sm:flex-1">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    </svg>
+                </div>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari berdasarkan nama supplier, kontak, email, atau kota..."
+                    onchange="document.getElementById('filterForm').submit()"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                           focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
             </div>
-            <input id="srchInput" type="text" oninput="onSearch()" placeholder="Cari supplier..."
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                   focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
-        </div>
 
-        {{-- TAMBAH --}}
-        @if (session('role') === 'admin')
-        <button type="button" onclick="openSupplierModal()"
-            class="flex items-center justify-center gap-2 bg-[#F66B0E] hover:bg-orange-600
-                   active:scale-[.98] text-white text-sm font-medium px-6 py-2.5
-                   rounded-lg transition-all whitespace-nowrap w-full sm:w-auto">
-            <svg class="w-3 h-3" fill="none" viewBox="0 0 18 18">
-                <path stroke="currentColor" stroke-width="2.2" d="M9 1v16M1 9h16" />
-            </svg>
-            Tambah Supplier
-        </button>
-        @endif
-    </div>
+            {{-- TAMBAH --}}
+            @if (session('role') === 'admin')
+            <button type="button" onclick="openSupplierModal()"
+                class="flex items-center justify-center gap-2 bg-[#F66B0E] hover:bg-orange-600
+                       active:scale-[.98] text-white text-sm font-medium px-6 py-2.5
+                       rounded-lg transition-all whitespace-nowrap w-full sm:w-auto">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 18 18">
+                    <path stroke="currentColor" stroke-width="2.2" d="M9 1v16M1 9h16" />
+                </svg>
+                Tambah Supplier
+            </button>
+            @endif
+        </div>
+    </form>
 
     {{-- TABLE --}}
     <div class="border border-gray-300 rounded-xl overflow-hidden">
@@ -52,47 +68,44 @@
                 </colgroup>
                 <thead class="bg-[#205375] border-b border-gray-200">
                     <tr>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase tracking-wide">No
-                        </th>
-                        <th class="px-4 py-3 text-xs font-semibold text-white uppercase tracking-wide">Nama Supplier
-                        </th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase tracking-wide">No</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-white uppercase tracking-wide">Nama Supplier</th>
                         <th class="px-4 py-3 text-xs font-semibold text-white uppercase tracking-wide">Kontak</th>
                         <th class="px-4 py-3 text-xs font-semibold text-white uppercase tracking-wide">Email</th>
                         <th class="px-4 py-3 text-xs font-semibold text-white uppercase tracking-wide">Kota</th>
                         @if (session('role') === 'admin')
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase tracking-wide">
-                            Aksi</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase tracking-wide">Aksi</th>
                         @endif
                     </tr>
                 </thead>
-                <tbody id="tbody">
-                    @forelse($suppliers as $supplier)
-                    <tr class="tbl-row border-b border-gray-100 {{ $loop->even ? '' : 'bg-gray-50/60' }}"
-                        data-name="{{ strtolower($supplier->nama_supplier. ' ' . $supplier->no_kontak . ' ' . $supplier->email . ' ' . $supplier->kota) }}">
-                        <td class="row-num px-4 py-3 text-center text-sm text-gray-800 font-medium">
-                            {{ $loop->iteration }}
+                <tbody>
+                    @forelse ($suppliers as $supplier)
+                    <tr class="border-b border-gray-100 {{ $loop->even ? '' : 'bg-gray-50/60' }}">
+                        <td class="px-4 py-3 text-center text-sm text-gray-800 font-medium">
+                            {{ $loop->iteration + ($suppliers->currentPage() - 1) * $suppliers->perPage() }}
                         </td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-800">{{ $supplier->nama_supplier }}
-                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-800">{{ $supplier->nama_supplier }}</td>
                         <td class="px-4 py-3 text-sm text-gray-700">{{ $supplier->no_kontak }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700 wrap-break-words">{{ $supplier->email }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700 break-words">{{ $supplier->email }}</td>
                         <td class="px-4 py-3 text-sm text-gray-700">{{ $supplier->kota }}</td>
                         @if (session('role') === 'admin')
                         <td class="px-4 py-3">
                             <div class="flex items-center justify-center gap-2">
-                                <button type="button" data-supplier='@json($supplier)'
+                                <button type="button"
+                                    data-supplier='@json($supplier)'
                                     onclick="openSupplierModal('edit', JSON.parse(this.dataset.supplier))"
                                     class="px-3 py-1 rounded-md text-sm font-medium border border-orange-200
-                                               text-orange-800 bg-orange-100 hover:bg-orange-500 hover:text-white
-                                               active:scale-[.98] hover:-translate-y-px transition-all">Edit</button>
-                                <button
-                                    type="button"
+                                           text-orange-800 bg-orange-100 hover:bg-orange-500 hover:text-white
+                                           active:scale-[.98] hover:-translate-y-px transition-all">
+                                    Edit
+                                </button>
+                                <button type="button"
                                     data-id="{{ $supplier->id_supplier }}"
                                     data-nama="{{ $supplier->nama_supplier }}"
                                     onclick="openModal('modalHapusSupplier'); setModalHapusSupplier(this.dataset.id, this.dataset.nama)"
                                     class="px-3 py-1 rounded-md text-sm font-medium border border-red-200
-           text-red-800 bg-red-100 hover:bg-red-600 hover:text-white
-           active:scale-[.98] hover:-translate-y-px transition-all">
+                                           text-red-800 bg-red-100 hover:bg-red-600 hover:text-white
+                                           active:scale-[.98] hover:-translate-y-px transition-all">
                                     Hapus
                                 </button>
                             </div>
@@ -100,10 +113,7 @@
                         @endif
                     </tr>
                     @empty
-                    @endforelse
-
-                    {{-- Data kosong disearch --}}
-                    <tr id="emptySearchRow" class="hidden">
+                    <tr>
                         <td colspan="{{ session('role') === 'admin' ? 6 : 5 }}" class="px-4 py-0">
                             <div class="flex min-h-[260px] flex-col items-center justify-center text-center">
                                 <div class="mb-4 flex h-[60px] w-[60px] items-center justify-center rounded-full border border-gray-200 bg-gray-50">
@@ -111,39 +121,32 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" />
                                     </svg>
                                 </div>
-
-                                <p class="text-sm font-medium text-gray-700 mb-1">
-                                    Tidak ada supplier ditemukan
-                                </p>
-                                <p class="text-sm text-gray-400 mb-4">
-                                    Coba ubah kata kunci atau filter
-                                </p>
-
-                                <button type="button" onclick="resetSupplierSearch()"
+                                <p class="text-sm font-medium text-gray-700 mb-1">Tidak ada supplier ditemukan</p>
+                                <p class="text-sm text-gray-400 mb-4">Coba ubah kata kunci pencarian</p>
+                                <a href="{{ route('kelola_supplier') }}"
                                     class="inline-flex items-center gap-1.5 bg-[#F66B0E] hover:bg-orange-600
-                                    text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                                           text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                                     Tampilkan Semua
-                                </button>
+                                </a>
                             </div>
                         </td>
                     </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
         {{-- Mobile card list --}}
         <div class="divide-y divide-gray-100" id="cardList">
-            @forelse($suppliers as $supplier)
-            <div class="mobile-card px-4 py-3 {{ $loop->even ? '' : 'bg-gray-50/60' }}"
-                data-name="{{ strtolower($supplier->nama_supplier . ' ' . $supplier->no_kontak . ' ' . $supplier->email . ' ' . $supplier->kota) }}">
+            @forelse ($suppliers as $supplier)
+            <div class="px-4 py-3 {{ $loop->even ? '' : 'bg-gray-50/60' }}">
 
                 {{-- Baris atas: nomor + nama + tombol aksi --}}
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-2.5 min-w-0">
-                        <span
-                            class="mobile-num shrink-0 w-6 h-6 rounded-full bg-[#205375] text-white
+                        <span class="shrink-0 w-6 h-6 rounded-full bg-[#205375] text-white
                                      text-xs font-semibold flex items-center justify-center">
-                            {{ $loop->iteration }}
+                            {{ $loop->iteration + ($suppliers->currentPage() - 1) * $suppliers->perPage() }}
                         </span>
                         <span class="text-sm font-semibold text-gray-800 truncate">
                             {{ $supplier->nama_supplier }}
@@ -152,24 +155,23 @@
 
                     @if (session('role') === 'admin')
                     <div class="flex items-center gap-1.5 shrink-0">
-                        <button type="button" data-supplier='@json($supplier)'
+                        <button type="button"
+                            data-supplier='@json($supplier)'
                             onclick="openSupplierModal('edit', JSON.parse(this.dataset.supplier))"
                             class="p-1.5 rounded-md border border-orange-200 text-orange-700 bg-orange-50
-                                       hover:bg-orange-500 hover:text-white active:scale-[.98] transition-all"
+                                   hover:bg-orange-500 hover:text-white active:scale-[.98] transition-all"
                             title="Edit">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                stroke-width="2">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </button>
-                        <button
-                            type="button"
+                        <button type="button"
                             data-id="{{ $supplier->id_supplier }}"
                             data-nama="{{ $supplier->nama_supplier }}"
                             onclick="openModal('modalHapusSupplier'); setModalHapusSupplier(this.dataset.id, this.dataset.nama)"
                             class="p-1.5 rounded-md border border-red-200 text-red-700 bg-red-50
-           hover:bg-red-600 hover:text-white active:scale-[.98] transition-all"
+                                   hover:bg-red-600 hover:text-white active:scale-[.98] transition-all"
                             title="Hapus">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -183,58 +185,83 @@
                 {{-- Detail info --}}
                 <div class="mt-2 ml-8.5 space-y-1 pl-1">
                     <div class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
+                        <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
                         <span>{{ $supplier->no_kontak }}</span>
                     </div>
                     <div class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
+                        <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         <span class="break-all">{{ $supplier->email }}</span>
                     </div>
                     <div class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
+                        <svg class="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         <span>{{ $supplier->kota }}</span>
                     </div>
                 </div>
             </div>
             @empty
-            @endforelse
-
-            {{-- Data kosong search mobile --}}
-            <div id="emptySearchCard" class="hidden px-4 py-10 text-center">
+            <div class="px-4 py-10 text-center">
                 <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-gray-200 bg-gray-50">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" />
                     </svg>
                 </div>
-
                 <h3 class="text-base font-semibold text-gray-800">Tidak ada supplier ditemukan</h3>
-                <p class="mt-1 text-sm text-gray-400">Coba ubah kata kunci atau filter</p>
-
-                <button type="button" onclick="resetSupplierSearch()"
-                    class="mt-5 rounded-full bg-[#F66B0E] px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-orange-600 active:scale-[.98]">
+                <p class="mt-1 text-sm text-gray-400">Coba ubah kata kunci pencarian</p>
+                <a href="{{ route('kelola_supplier') }}"
+                    class="mt-5 inline-block rounded-full bg-[#F66B0E] px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-orange-600 active:scale-[.98]">
                     Tampilkan Semua
-                </button>
+                </a>
             </div>
+            @endforelse
         </div>
 
         {{-- FOOTER PAGINATION --}}
         <div class="px-4 py-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
-            <span id="tblInfo" class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left"></span>
-            <div id="pgnWrap" class="flex items-center justify-center sm:justify-end gap-1 w-full sm:w-auto"></div>
+            <span class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left">
+                @if ($suppliers->total())
+                Menampilkan {{ $suppliers->firstItem() }}–{{ $suppliers->lastItem() }} dari {{ $suppliers->total() }} supplier
+                @endif
+            </span>
+
+            <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
+                {{-- Prev --}}
+                @if ($suppliers->onFirstPage())
+                <span class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">‹</span>
+                @else
+                <a href="{{ $suppliers->previousPageUrl() }}"
+                    class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">‹</a>
+                @endif
+
+                {{-- Page numbers --}}
+                @foreach ($suppliers->links()->elements[0] as $page => $url)
+                @if (is_string($page))
+                <span class="text-sm text-gray-400 px-0.5">…</span>
+                @elseif ($page == $suppliers->currentPage())
+                <span class="w-8 h-8 rounded-md border border-[#F66B0E] bg-[#F66B0E] text-white text-sm font-medium flex items-center justify-center">{{ $page }}</span>
+                @else
+                <a href="{{ $url }}"
+                    class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">{{ $page }}</a>
+                @endif
+                @endforeach
+
+                {{-- Next --}}
+                @if ($suppliers->hasMorePages())
+                <a href="{{ $suppliers->nextPageUrl() }}"
+                    class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">›</a>
+                @else
+                <span class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">›</span>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -263,7 +290,7 @@
             </button>
         </div>
 
-        <form id="supplierForm" action="{{ route('supplier.store') }}" method="POST" onsubmit="return validateSupplierForm()" class="px-5 py-5 space-y-4">
+        <form id="supplierForm" action="{{ route('supplier.store') }}" method="POST" class="px-5 py-5 space-y-4">
             @csrf
 
             <input type="hidden" name="_method" id="supplierMethod" value="POST">
@@ -279,6 +306,17 @@
 
                 <!-- ERROR -->
                 <x-input-error id="errNamaSupplier" message="Nama supplier wajib diisi." class="hidden" />
+
+                @error('nama_supplier')
+                <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                    <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ $message }}</span>
+                </p>
+                @enderror
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -329,7 +367,7 @@
                     Batal
                 </button>
 
-                <button id="supplierSubmitBtn" type="submit"
+                <button id="supplierSubmitBtn" type="button" onclick="simpanSupplier()"
                     class="px-4 py-2 text-sm font-medium text-white bg-[#F66B0E] hover:bg-orange-600
             rounded-lg active:scale-[.98] hover:-translate-y-px transition-all">
                     Simpan
@@ -409,14 +447,12 @@
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Mobile: sembunyikan tabel, tampilkan cards */
     @media (max-width: 639px) {
         #desktopTable {
             display: none;
         }
     }
 
-    /* Desktop: sembunyikan cards, tampilkan tabel */
     @media (min-width: 640px) {
         #cardList {
             display: none !important;
@@ -427,8 +463,6 @@
 
 @push('scripts')
 <script>
-    let hapusNamaSupplierTarget = '';
-
     function lockBodyScroll() {
         const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
         document.body.classList.add('overflow-hidden');
@@ -461,6 +495,80 @@
         unlockBodyScroll();
     }
 
+    // ===== SHOW / HIDE ERROR  =====
+    function showErr(errId, inputId) {
+        const err = document.getElementById(errId);
+        const input = document.getElementById(inputId);
+        if (err) err.style.display = 'flex';
+        if (input) input.classList.add('border-red-400', 'bg-red-50');
+    }
+
+    function hideErr(errId, inputId) {
+        const err = document.getElementById(errId);
+        const input = document.getElementById(inputId);
+        if (err) err.style.display = 'none';
+        if (input) input.classList.remove('border-red-400', 'bg-red-50');
+    }
+
+    // ===== VALIDASI SEBELUM SUBMIT  =====
+    function simpanSupplier() {
+        let valid = true;
+
+        const nama = document.getElementById('namaSupplier').value.trim();
+        const kontak = document.getElementById('kontakSupplier').value.trim();
+        const kota = document.getElementById('kotaSupplier').value.trim();
+        const email = document.getElementById('emailSupplier').value.trim();
+
+        // Nama wajib diisi
+        if (!nama) {
+            showErr('errNamaSupplier', 'namaSupplier');
+            valid = false;
+        } else {
+            hideErr('errNamaSupplier', 'namaSupplier');
+        }
+
+        // Kontak: wajib dan minimal 6 angka
+        const digitOnly = kontak.replace(/[\s\-]/g, '');
+        if (!kontak) {
+            document.querySelector('#errKontakSupplier span').textContent = 'Kontak wajib diisi.';
+            showErr('errKontakSupplier', 'kontakSupplier');
+            valid = false;
+        } else if (!/^\d+$/.test(digitOnly) || digitOnly.length < 6) {
+            document.querySelector('#errKontakSupplier span').textContent = 'Kontak minimal 6 angka.';
+            showErr('errKontakSupplier', 'kontakSupplier');
+            valid = false;
+        } else {
+            hideErr('errKontakSupplier', 'kontakSupplier');
+        }
+
+        // Kota wajib diisi
+        if (!kota) {
+            showErr('errKotaSupplier', 'kotaSupplier');
+            valid = false;
+        } else {
+            hideErr('errKotaSupplier', 'kotaSupplier');
+        }
+
+        // Email wajib dan format harus ada @
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            document.querySelector('#errEmailSupplier span').textContent = 'Email wajib diisi.';
+            showErr('errEmailSupplier', 'emailSupplier');
+            valid = false;
+        } else if (!emailRegex.test(email)) {
+            document.querySelector('#errEmailSupplier span').textContent = 'Format email tidak valid.';
+            showErr('errEmailSupplier', 'emailSupplier');
+            valid = false;
+        } else {
+            hideErr('errEmailSupplier', 'emailSupplier');
+        }
+
+        if (valid) {
+            document.getElementById('supplierForm').submit();
+        }
+    }
+
+    // ===== OPEN/CLOSE MODAL SUPPLIER =====
     function openSupplierModal(mode = 'tambah', data = {}) {
         openModal('supplierModal');
 
@@ -469,47 +577,25 @@
         document.getElementById('supplierModalTitle').textContent =
             isEdit ? 'Edit Supplier' : 'Tambah Supplier';
 
-        // ACTION FORM
         document.getElementById('supplierForm').action = isEdit ?
             `/supplier/update/${data.id_supplier}` :
             `{{ route('supplier.store') }}`;
 
-        // METHOD
-        document.getElementById('supplierMethod').value =
-            isEdit ? 'PUT' : 'POST';
+        document.getElementById('supplierMethod').value = isEdit ? 'PUT' : 'POST';
 
-        // ISI INPUT
-        document.getElementById('namaSupplier').value =
-            isEdit ? (data.nama_supplier ?? '') : '';
+        document.getElementById('namaSupplier').value = isEdit ? (data.nama_supplier ?? '') : '';
+        document.getElementById('kontakSupplier').value = isEdit ? (data.no_kontak ?? '') : '';
+        document.getElementById('kotaSupplier').value = isEdit ? (data.kota ?? '') : '';
+        document.getElementById('emailSupplier').value = isEdit ? (data.email ?? '') : '';
 
-        document.getElementById('kontakSupplier').value =
-            isEdit ? (data.no_kontak ?? '') : '';
-
-        document.getElementById('kotaSupplier').value =
-            isEdit ? (data.kota ?? '') : '';
-
-        document.getElementById('emailSupplier').value =
-            isEdit ? (data.email ?? '') : '';
-
-        // TEXT BUTTON
-        document.getElementById('supplierSubmitBtn').textContent =
-            'Simpan';
-
-        // RESET ERROR
-        ['namaSupplier', 'kontakSupplier', 'kotaSupplier', 'emailSupplier']
-        .forEach(function(id) {
-            const input = document.getElementById(id);
-            if (input) {
-                input.classList.remove('border-orange-500', 'bg-red-50');
-            }
-        });
-
-        ['errNamaSupplier', 'errKontakSupplier', 'errKotaSupplier', 'errEmailSupplier']
-        .forEach(function(id) {
+        // Reset semua error (tiru clearAlert kategori)
+        ['errNamaSupplier', 'errKontakSupplier', 'errKotaSupplier', 'errEmailSupplier'].forEach(function(id) {
             const el = document.getElementById(id);
-            if (el) {
-                el.classList.add('hidden');
-            }
+            if (el) el.style.display = 'none';
+        });
+        ['namaSupplier', 'kontakSupplier', 'kotaSupplier', 'emailSupplier'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('border-red-400', 'bg-red-50');
         });
     }
 
@@ -519,12 +605,8 @@
 
     function setModalHapusSupplier(id, nama) {
         document.getElementById('hapusNamaSupplier').textContent = nama;
-
-        document.getElementById('deleteSupplierForm').action =
-            `/supplier/delete/${id}`;
+        document.getElementById('deleteSupplierForm').action = `/supplier/delete/${id}`;
     }
-
-
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.modal-overlay').forEach(function(ov) {
@@ -536,164 +618,16 @@
             }
         });
     });
-
-    const PER_PAGE = 10;
-    let curPage = 1;
-    let curKw = '';
-
-    const allRows = Array.from(document.querySelectorAll('#tbody .tbl-row'));
-    const allCards = Array.from(document.querySelectorAll('#cardList .mobile-card'));
-    const emptySearchRow = document.getElementById('emptySearchRow');
-    const emptySearchCard = document.getElementById('emptySearchCard');
-
-    function getFiltered() {
-        return allRows.filter(function(r) {
-            return !curKw || (r.dataset.name || '').includes(curKw);
-        });
-    }
-
-    function render() {
-        const filtered = getFiltered();
-        const total = filtered.length;
-        const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
-        if (curPage > totalPages) curPage = totalPages;
-
-        const start = (curPage - 1) * PER_PAGE;
-        const end = start + PER_PAGE;
-
-        allRows.forEach(function(r) {
-            r.style.display = 'none';
-        });
-        allCards.forEach(function(c) {
-            c.style.display = 'none';
-        });
-
-        if (emptySearchRow) emptySearchRow.classList.add('hidden');
-        if (emptySearchCard) emptySearchCard.classList.add('hidden');
-
-        if (total === 0) {
-            if (emptySearchRow) emptySearchRow.classList.remove('hidden');
-            if (emptySearchCard) emptySearchCard.classList.remove('hidden');
-            document.getElementById('tblInfo').textContent = 'Tidak ada data';
-            document.getElementById('pgnWrap').innerHTML = '';
-            return;
+    // ===== AUTO OPEN MODAL JIKA ADA ERROR VALIDASI =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const hasError = document.querySelector('meta[name="has-error"]').getAttribute('content') === '1';
+        if (hasError) {
+            openSupplierModal();
+            document.getElementById('namaSupplier').value = document.querySelector('meta[name="old-nama"]').getAttribute('content');
+            document.getElementById('kontakSupplier').value = document.querySelector('meta[name="old-kontak"]').getAttribute('content');
+            document.getElementById('kotaSupplier').value = document.querySelector('meta[name="old-kota"]').getAttribute('content');
+            document.getElementById('emailSupplier').value = document.querySelector('meta[name="old-email"]').getAttribute('content');
         }
-
-        filtered.slice(start, end).forEach(function(r, i) {
-            r.style.display = '';
-            const numCell = r.querySelector('.row-num');
-            if (numCell) numCell.textContent = start + i + 1;
-            r.classList.toggle('bg-gray-50/60', i % 2 === 1);
-
-            const matchedCard = allCards.find(c => c.dataset.name === r.dataset.name);
-            if (matchedCard) {
-                matchedCard.style.display = '';
-                const numEl = matchedCard.querySelector('.mobile-num');
-                if (numEl) numEl.textContent = start + i + 1;
-                matchedCard.classList.toggle('bg-gray-50/60', i % 2 === 1);
-            }
-        });
-
-        document.getElementById('tblInfo').textContent =
-            'Menampilkan ' + (start + 1) + '–' + Math.min(end, total) + ' dari ' + total + ' supplier';
-
-        renderPagination(totalPages);
-    }
-
-    function renderPagination(totalPages) {
-        const wrap = document.getElementById('pgnWrap');
-        if (totalPages <= 1) {
-            wrap.innerHTML = '';
-            return;
-        }
-
-        const base =
-            'w-8 h-8 rounded-md border text-sm font-medium flex items-center justify-center transition-all cursor-pointer ';
-        const btnNorm = base + 'border-gray-200 text-gray-600 hover:border-orange-500 hover:text-orange-500 ';
-        const btnCur = base + 'border-[#F66B0E] bg-[#F66B0E] text-white ';
-        const btnDis = base + 'border-gray-100 text-gray-300 cursor-not-allowed ';
-
-        let html = '';
-
-        html += curPage === 1 ?
-            '<button type="button" class="' + btnDis + '" disabled>‹</button>' :
-            '<button type="button" class="' + btnNorm + '" onclick="goPage(' + (curPage - 1) + ')">‹</button>';
-
-        const rangeStart = Math.max(1, curPage - 2);
-        const rangeEnd = Math.min(totalPages, curPage + 2);
-
-        if (rangeStart > 1) {
-            html += '<button type="button" class="' + btnNorm + '" onclick="goPage(1)">1</button>';
-            if (rangeStart > 2) html += '<span class="text-sm text-gray-400 px-0.5">…</span>';
-        }
-        for (let p = rangeStart; p <= rangeEnd; p++) {
-            html += '<button type="button" class="' + (p === curPage ? btnCur : btnNorm) + '" onclick="goPage(' + p +
-                ')">' + p + '</button>';
-        }
-        if (rangeEnd < totalPages) {
-            if (rangeEnd < totalPages - 1) html += '<span class="text-sm text-gray-400 px-0.5">…</span>';
-            html += '<button type="button" class="' + btnNorm + '" onclick="goPage(' + totalPages + ')">' + totalPages +
-                '</button>';
-        }
-
-        html += curPage === totalPages ?
-            '<button type="button" class="' + btnDis + '" disabled>›</button>' :
-            '<button type="button" class="' + btnNorm + '" onclick="goPage(' + (curPage + 1) + ')">›</button>';
-
-        wrap.innerHTML = html;
-    }
-
-    function goPage(p) {
-        const tp = Math.max(1, Math.ceil(getFiltered().length / PER_PAGE));
-        if (p < 1 || p > tp) return;
-        curPage = p;
-        render();
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
-
-    function resetSupplierSearch() {
-        const input = document.getElementById('srchInput');
-        if (input) input.value = '';
-        curKw = '';
-        curPage = 1;
-        render();
-    }
-
-    function onSearch() {
-        curKw = document.getElementById('srchInput').value.toLowerCase().trim();
-        curPage = 1;
-        render();
-    }
-
-    render();
-
-    function validateSupplierForm() {
-        let valid = true;
-
-        const fields = [
-            ['namaSupplier', 'errNamaSupplier'],
-            ['kontakSupplier', 'errKontakSupplier'],
-            ['kotaSupplier', 'errKotaSupplier'],
-            ['emailSupplier', 'errEmailSupplier'],
-        ];
-
-        fields.forEach(([inputId, errorId]) => {
-            const input = document.getElementById(inputId);
-            const error = document.getElementById(errorId);
-            if (input.value.trim() === '') {
-                error.classList.remove('hidden');
-                input.classList.add('border-orange-500', 'bg-red-50');
-                valid = false;
-            } else {
-                error.classList.add('hidden');
-                input.classList.remove('border-orange-500', 'bg-red-50');
-            }
-        });
-
-        return valid;
-    }
+    });
 </script>
 @endpush
