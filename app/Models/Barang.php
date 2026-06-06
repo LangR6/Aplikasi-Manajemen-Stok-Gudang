@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,9 @@ class Barang extends Model
         'nama_barang',
         'foto_barang',
         'stok',
-        'id_kategori'
+        'id_kategori',
+        'stok_menipis_dibaca_pada',  
+        'stok_habis_dibaca_pada'
     ];
 
     // CREATE - menyimpan data barang baru ke database

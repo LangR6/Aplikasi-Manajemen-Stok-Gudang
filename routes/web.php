@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
+    Route::post('/dashboard/tandai-baca', [DashboardController::class, 'tandaiBaca'])->name('dashboard.tandaiBaca');
+
     /*
     |--------------------------------------------------------------------------
     | PROFILE

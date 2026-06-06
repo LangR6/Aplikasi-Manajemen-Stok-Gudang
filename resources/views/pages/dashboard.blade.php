@@ -295,9 +295,9 @@
                         <span class="font-medium truncate">{{ $barangMasukTerbaru['nama_barang'] }}</span>
                     </div>
                     <div class="grid grid-cols-[80px_8px_auto] sm:grid-cols-[100px_10px_auto] items-start">
-                        <span class="text-gray-500">Kategori</span>
+                        <span class="text-gray-500">Jumlah</span>
                         <span class="text-gray-400">:</span>
-                        <span class="truncate">{{ $barangMasukTerbaru['kategori'] }}</span>
+                        <span class="truncate">{{ $barangMasukTerbaru['jumlah'] }}</span>
                     </div>
                     <div class="grid grid-cols-[80px_8px_auto] sm:grid-cols-[100px_10px_auto] items-start">
                         <span class="text-gray-500">Tanggal</span>
@@ -327,9 +327,9 @@
                         <span class="font-medium truncate">{{ $barangKeluarTerbaru['nama_barang'] }}</span>
                     </div>
                     <div class="grid grid-cols-[80px_8px_auto] sm:grid-cols-[100px_10px_auto] items-start">
-                        <span class="text-gray-500">Kategori</span>
+                        <span class="text-gray-500">Jumlah</span>
                         <span class="text-gray-400">:</span>
-                        <span class="truncate">{{ $barangKeluarTerbaru['kategori'] }}</span>
+                        <span class="truncate">{{ $barangKeluarTerbaru['jumlah'] }}</span>
                     </div>
                     <div class="grid grid-cols-[80px_8px_auto] sm:grid-cols-[100px_10px_auto] items-start">
                         <span class="text-gray-500">Tanggal</span>
@@ -546,10 +546,15 @@
                         <div><span class="font-medium">Sisa Stok :</span> {{ $barang['stok'] }}</div>
                     </div>
 
+                    <!-- Button tandai dibaca -->
                     @if (session('role') === 'admin')
                     <button type="button"
+                        data-kode="{{ $barang['kode'] }}"
+                        data-tipe="menipis"
+                        onclick="tandaiBaca(this)"
+                        {{ $barang['status_baca'] ? 'disabled' : '' }}
                         class="shrink-0 rounded-lg px-3 sm:px-4 py-2 text-[13px] sm:text-[15px] font-medium text-white transition-all duration-300
-                            {{ $barang['status_baca'] ? 'bg-gray-400 hover:bg-gray-500' : 'bg-orange-500 hover:bg-orange-600' }}">
+        {{ $barang['status_baca'] ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600' }}">
                         {{ $barang['status_baca'] ? 'Sudah Dibaca' : 'Tandai Dibaca' }}
                     </button>
                     @endif
@@ -601,13 +606,15 @@
                         <div><span class="font-medium">Sisa Stok :</span> {{ $barang['stok'] }}</div>
                     </div>
 
-                    <!-- Button -->
+                    <!-- Button tandai dibaca-->
                     @if (session('role') === 'admin')
                     <button type="button"
+                        data-kode="{{ $barang['kode'] }}"
+                        data-tipe="habis"
+                        onclick="tandaiBaca(this)"
+                        {{ $barang['status_baca'] ? 'disabled' : '' }}
                         class="shrink-0 rounded-lg px-3 sm:px-4 py-2 text-[13px] sm:text-[15px] font-medium text-white transition-all duration-300
-                            {{ $barang['status_baca']
-                                ? 'bg-gray-400 hover:bg-gray-500'
-                                : 'bg-red-500 hover:bg-red-600' }}">
+        {{ $barang['status_baca'] ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600' }}">
                         {{ $barang['status_baca'] ? 'Sudah Dibaca' : 'Tandai Dibaca' }}
                     </button>
                     @endif
@@ -740,9 +747,30 @@
             }
         });
     });
+
+    function tandaiBaca(btn) {
+        if (btn.disabled) return;
+
+        fetch('{{ route("dashboard.tandaiBaca") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({
+                kode_barang: btn.dataset.kode,
+                tipe: btn.dataset.tipe,
+            }),
+        }).then(() => {
+            btn.textContent = 'Sudah Dibaca';
+            btn.disabled = true;
+            btn.classList.remove('bg-orange-500', 'bg-red-500', 'hover:bg-orange-600', 'hover:bg-red-600');
+            btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+        });
+    }
 </script>
 
-@if (session('show_stok_menipis_modal') && session('role') === 'admin')
+@if ($showStokMenipisModal)
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         openStokMenipisModal();

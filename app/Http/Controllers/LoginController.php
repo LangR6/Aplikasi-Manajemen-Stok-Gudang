@@ -36,6 +36,10 @@ class LoginController extends Controller
             $request->session()->put('email', Auth::user()->email);
             $request->session()->put('hp', Auth::user()->no_telpon);
 
+            if (Auth::user()->role === 'admin') {
+                session(['show_stok_menipis' => true]);
+            }
+
             return redirect()->route('login')->with('login_success', true);
         }
 

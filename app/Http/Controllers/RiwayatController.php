@@ -13,7 +13,7 @@ class RiwayatController extends Controller
     public function index(Request $request)
     {
         // ===== AMBIL DATA BARANG MASUK =====
-        $masuk = BarangMasuk::with(['barang.kategori', 'supplier'])
+        $masuk = collect(BarangMasuk::with(['barang.kategori', 'supplier'])
             ->get()
             ->map(function ($item) {
                 return (object)[
@@ -23,17 +23,18 @@ class RiwayatController extends Controller
                     'kota'         => $item->supplier->kota ?? '-',
                     'transaksi'    => 'Barang Masuk',
                     'kategori'     => $item->barang->kategori->nama_kategori ?? '-',
-                    'nama_supplier'=> $item->supplier->nama_supplier ?? '-',
+                    'nama_supplier' => $item->supplier->nama_supplier ?? '-',
                     'kontak'       => $item->supplier->no_kontak ?? '-',
                     'email'        => $item->supplier->email ?? '-',
                     'keterangan'   => $item->keterangan ?? '-',
                     'dicatat_oleh' => $item->dicatat_oleh ?? '-',
-                    'created_at'   => $item->created_at,
+                    'created_at' => $item->created_at?->toDateTimeString(),
+
                 ];
-            });
+            }));
 
         // ===== AMBIL DATA BARANG KELUAR =====
-        $keluar = BarangKeluar::with(['barang.kategori'])
+        $keluar = collect(BarangKeluar::with(['barang.kategori'])
             ->get()
             ->map(function ($item) {
                 return (object)[
@@ -43,14 +44,14 @@ class RiwayatController extends Controller
                     'kota'         => $item->tujuan ?? '-',
                     'transaksi'    => 'Barang Keluar',
                     'kategori'     => $item->barang->kategori->nama_kategori ?? '-',
-                    'nama_supplier'=> '-',
+                    'nama_supplier' => '-',
                     'kontak'       => '-',
                     'email'        => '-',
                     'keterangan'   => $item->keterangan ?? '-',
                     'dicatat_oleh' => $item->dicatat_oleh ?? '-',
-                    'created_at'   => $item->created_at,
+                    'created_at' => $item->created_at?->toDateTimeString(),
                 ];
-            });
+            }));
 
         // ===== GABUNGKAN & URUTKAN TERBARU =====
         $riwayat = $masuk->merge($keluar)
@@ -111,7 +112,7 @@ class RiwayatController extends Controller
                 'query' => $request->query(),
             ]
         );
-
+        
         return view('pages.riwayat', compact('riwayat'));
     }
 

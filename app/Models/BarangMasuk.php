@@ -19,7 +19,7 @@ class BarangMasuk extends TransaksiStok
 
     public function catat(array $data): void
     {
-        // POLYMORPHISME:
+       // POLYMORPHISME:
         // mengimplementasikan method catat() dari abstract class TransaksiStok
         // bedanya dengan BarangKeluar, method ini akan MENAMBAH stok barang
 
@@ -28,8 +28,18 @@ class BarangMasuk extends TransaksiStok
 
         // menambah stok barang secara otomatis sesuai jumlah yang diinput
         // pakai kode_barang karena itu primary key tabel barang
-        Barang::where('kode_barang', $data['id_barang'])
-            ->increment('stok', $data['jumlah']);
+        $barang = Barang::where('kode_barang', $data['id_barang'])->first();
+        $barang->increment('stok', $data['jumlah']);
+        $barang->refresh();
+
+        if ($barang->stok > 5) {
+            $barang->update([
+                'stok_menipis_dibaca_pada' => null,
+                'stok_habis_dibaca_pada'   => null,
+            ]);
+        } elseif ($barang->stok > 0) {
+            $barang->update(['stok_habis_dibaca_pada' => null]);
+        }
     }
 
     public function barang()
