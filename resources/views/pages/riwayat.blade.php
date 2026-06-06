@@ -99,6 +99,16 @@
 </div>
     </div>
 
+    {{-- INFO 3 BULAN TERAKHIR --}}
+    @if(!request('dari') && !request('sampai') && !request('jenis') && !request('search'))
+    <div class="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100 text-xs text-blue-600 w-fit">
+        <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3"/>
+        </svg>
+        Menampilkan aktivitas <span class="font-semibold mx-1">3 bulan terakhir</span>. Gunakan filter untuk melihat data lebih lama.
+    </div>
+    @endif
+
     {{-- ACTIVE FILTER BADGES --}}
     @if(request('dari') || request('sampai') || request('jenis') || request('search'))
     <div class="flex flex-wrap gap-2 mb-3">
@@ -201,10 +211,18 @@
                                     <div><span class="text-gray-500">Supplier:</span> {{ $item->nama_supplier }}</div>
                                     <div><span class="text-gray-500">Kontak:</span> {{ $item->kontak }}</div>
                                     <div><span class="text-gray-500">Email:</span> {{ $item->email }}</div>
-                                    <div><span class="text-gray-500">Kota:</span> {{ $item->kota }}</div>
-                                    <div class="col-span-1 sm:col-span-2">
-                                        <span class="text-gray-500">Keterangan:</span> {{ $item->keterangan }}
+                                    <div><span class="text-gray-500">{{ $item->transaksi === 'Barang Keluar' ? 'Tujuan' : 'Kota' }}:</span> {{ $item->kota }}</div>
+                                    <div><span class="text-gray-500">Keterangan:</span> {{ $item->keterangan }}</div>
+                                    <div>
+                                        <span class="text-gray-500">Dicatat Oleh:</span>
+                                        <span class="inline-flex items-center gap-1.5 ml-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
+                                            {{ $item->dicatat_oleh }}
+                                        </span>
                                     </div>
+                                </div>
                                 </div>
                             </td>
                         </tr>
@@ -310,12 +328,10 @@
         if (sampai) params.set('sampai', sampai);
         if (jenis)  params.set('jenis',  jenis);
         if (search) params.set('search', search);
-        // page di-reset ke 1 setiap kali filter berubah
 
         window.location.href = '{{ route('riwayat') }}?' + params.toString();
     }
 
-    // Update href Export secara real-time saat filter berubah
     function updateExportHref() {
         const dari   = document.getElementById('inputDari').value;
         const sampai = document.getElementById('inputSampai').value;

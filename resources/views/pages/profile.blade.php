@@ -17,7 +17,7 @@
                     </p>
                 </div>
 
-                <button onclick="window.history.back()"
+                <button onclick="goBack()"
                     class="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-[#112B3C] hover:bg-red-600 text-white transition-all duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -28,31 +28,6 @@
                     <span>Kembali</span>
                 </button>
             </div>
-
-            {{-- SUCCESS --}}
-            @if (session('success'))
-                <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            {{-- ERROR --}}
-            @if (session('error'))
-                <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            {{-- VALIDATION ERROR --}}
-            @if ($errors->any())
-                <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-                    <ul class="list-disc pl-5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
 
             <div class="grid grid-cols-1 md:grid-cols-5 gap-0">
 
@@ -258,6 +233,21 @@
     </div>
 
     <script>
+        // Simpan halaman asal sebelum masuk profil
+        const PREV_KEY = 'profile_back_url';
+        if (document.referrer && !document.referrer.includes('/profile')) {
+            sessionStorage.setItem(PREV_KEY, document.referrer);
+        }
+
+        function goBack() {
+            const url = sessionStorage.getItem(PREV_KEY);
+            if (url) {
+                sessionStorage.removeItem(PREV_KEY);
+                window.location.href = url;
+            } else {
+                window.history.go(-2);
+            }
+        }
         const eyeIcon = `
             <path stroke-linecap="round" stroke-linejoin="round"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -278,20 +268,20 @@
 
         function togglePassword(inputId, iconId) {
             const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
+            const icon  = document.getElementById(iconId);
 
             if (input.type === 'password') {
-                input.type = 'text';
+                input.type     = 'text';
                 icon.innerHTML = eyeOffIcon;
             } else {
-                input.type = 'password';
+                input.type     = 'password';
                 icon.innerHTML = eyeIcon;
             }
         }
 
         function resetPasswordIcons() {
-            ['icon_lama', 'icon_baru', 'icon_konfirmasi'].forEach(iconId => {
-                document.getElementById(iconId).innerHTML = eyeIcon;
+            ['icon_lama', 'icon_baru', 'icon_konfirmasi'].forEach(id => {
+                document.getElementById(id).innerHTML = eyeIcon;
             });
         }
 
@@ -314,14 +304,7 @@
         let originalData = {};
 
         function enableEdit() {
-            const inputs = [
-                'nama',
-                'email',
-                'hp',
-                'password_lama',
-                'password_baru',
-                'konfirmasi_password'
-            ];
+            const inputs = ['nama', 'email', 'hp', 'password_lama', 'password_baru', 'konfirmasi_password'];
 
             inputs.forEach(id => {
                 const el = document.getElementById(id);
@@ -338,14 +321,7 @@
         }
 
         function cancelEdit() {
-            const inputs = [
-                'nama',
-                'email',
-                'hp',
-                'password_lama',
-                'password_baru',
-                'konfirmasi_password'
-            ];
+            const inputs = ['nama', 'email', 'hp', 'password_lama', 'password_baru', 'konfirmasi_password'];
 
             inputs.forEach(id => {
                 const el = document.getElementById(id);

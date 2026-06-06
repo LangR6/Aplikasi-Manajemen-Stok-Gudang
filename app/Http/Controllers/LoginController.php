@@ -17,6 +17,9 @@ class LoginController extends Controller
         $request->validate([
             'username' => 'required',
             'password' => 'required',
+        ], [
+            'username.required' => 'Nama pengguna wajib diisi.',
+            'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
         $credentials = [
@@ -33,7 +36,6 @@ class LoginController extends Controller
             $request->session()->put('email', Auth::user()->email);
             $request->session()->put('hp', Auth::user()->no_telpon);
 
-            // ✅ Redirect ke login dulu agar modal muncul
             return redirect()->route('login')->with('login_success', true);
         }
 
