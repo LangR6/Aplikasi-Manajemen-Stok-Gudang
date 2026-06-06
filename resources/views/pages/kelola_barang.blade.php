@@ -17,7 +17,8 @@
                                 d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                         </svg>
                     </div>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari barang..."
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari kode atau nama barang..."
                         onchange="document.getElementById('filterForm').submit()"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                            focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
@@ -30,6 +31,7 @@
                            rounded-lg focus:ring-orange-500 focus:border-orange-500 pr-9 p-2.5 cursor-pointer
                            flex-1 sm:flex-none">
                         <option value="">Semua Status</option>
+                        <option value="Baru" {{ request('status') === 'Baru' ? 'selected' : '' }}>Baru</option>
                         <option value="Tersedia" {{ request('status') === 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
                         <option value="Menipis" {{ request('status') === 'Menipis' ? 'selected' : '' }}>Menipis</option>
                         <option value="Habis" {{ request('status') === 'Habis' ? 'selected' : '' }}>Habis</option>
@@ -70,10 +72,23 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                 @foreach ($data as $b)
                     @php
+                        $isBaru = $b['is_baru'];
                         $stok = $b['stok'];
-                        $status = $stok === 0 ? 'Habis' : ($stok <= 5 ? 'Menipis' : 'Tersedia');
-                        $stokCls = $stok === 0 ? 'stok-red' : ($stok <= 5 ? 'stok-yellow' : 'stok-green');
-                        $bdgCls = $stok === 0 ? 'badge-red' : ($stok <= 5 ? 'badge-yellow' : 'badge-green');
+                        $status = $isBaru ? 'Baru' : ($stok === 0 ? 'Habis' : ($stok <= 5 ? 'Menipis' : 'Tersedia'));
+                        $stokCls = $isBaru
+                            ? 'stok-blue'
+                            : ($stok === 0
+                                ? 'stok-red'
+                                : ($stok <= 5
+                                    ? 'stok-yellow'
+                                    : 'stok-green'));
+                        $bdgCls = $isBaru
+                            ? 'badge-blue'
+                            : ($stok === 0
+                                ? 'badge-red'
+                                : ($stok <= 5
+                                    ? 'badge-yellow'
+                                    : 'badge-green'));
                         $imgSrc = $b['foto_url'] ?? 'https://placehold.co/200x200?text=No+Image';
                         $imgStyle = $b['foto_url'] ? '' : 'opacity:0.35;';
                     @endphp
@@ -90,7 +105,7 @@
                                             '{{ $b['id_kategori'] }}',
                                             '{{ $b['foto_url'] ?? '' }}'
                                         )"
-                                        class="w-full text-left px-3 py-2 text-sm text-gray-700">
+                                        class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                         ✏️ Edit
                                     </button>
                                 </div>
@@ -205,8 +220,7 @@
             <div id="mhdr" class="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-[#F66B0E]">
                 <h3 id="mhdrTitle" class="text-[16px] font-semibold text-white">Tambah Barang</h3>
                 <button type="button" onclick="closeOverlay('modalCatatBarang')"
-                    class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center
-                           text-white hover:bg-white/30 transition">
+                    class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
@@ -219,11 +233,10 @@
                 @csrf
                 <input type="hidden" name="_method" id="formBarangMethod" value="POST">
                 <input type="hidden" name="mode" id="formBarangMode" value="tambah">
-                {{-- FIX 1: Hidden fields untuk kirim nama & kategori display ke controller --}}
                 <input type="hidden" name="nama_display" id="trNamaHidden">
                 <input type="hidden" name="kategori_display" id="trKategoriHidden">
 
-                <div class="px-5 py-5 space-y-4">
+                <div class="px-5 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
 
                     {{-- SECTION: TAMBAH BARANG BARU --}}
                     <div id="sectionTambah" class="hidden space-y-4">
@@ -268,8 +281,9 @@
                                            focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
                                            @error('kode_barang') input-error @enderror" />
                                 <x-input-error id="errTKode" message="Kode barang wajib diisi." />
+                                {{-- error Laravel --}}
                                 @error('kode_barang')
-                                    <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                    <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                         <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -289,7 +303,7 @@
                                            @error('nama_barang') input-error @enderror" />
                                 <x-input-error id="errTNama" message="Nama barang wajib diisi." />
                                 @error('nama_barang')
-                                    <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                    <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                         <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -304,7 +318,8 @@
                         <div>
                             <label
                                 class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Kategori</label>
-                            <select id="tKategori" name="id_kategori" onchange="clearErr('errTKategori','tKategori')"
+                            <select id="tKategori" name="id_kategori" oninput="clearErr('errTKategori','tKategori')"
+                                onchange="clearErr('errTKategori','tKategori')"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
                                        rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
                                        @error('id_kategori') input-error @enderror">
@@ -318,7 +333,7 @@
                             </select>
                             <x-input-error id="errTKategori" message="Kategori wajib dipilih." />
                             @error('id_kategori')
-                                <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                     <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -356,15 +371,14 @@
                             <div>
                                 <label
                                     class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Jumlah</label>
-                                <input id="trJumlah" name="jumlah" type="number" placeholder="Jumlah" min="1"
+                                <input id="trJumlah" name="jumlah" type="number" placeholder="Jumlah"
                                     value="{{ old('jumlah') }}" oninput="clearErr('errTrJumlah','trJumlah')"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                                            focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
                                            @error('jumlah') input-error @enderror" />
                                 <x-input-error id="errTrJumlah" message="Jumlah wajib diisi (> 0)." />
-                                {{-- FIX 2: @error dengan {{ $message }} --}}
                                 @error('jumlah')
-                                    <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                    <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                         <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -384,7 +398,7 @@
                                            @error('tanggal') input-error @enderror" />
                                 <x-input-error id="errTrTanggal" message="Tanggal wajib diisi." />
                                 @error('tanggal')
-                                    <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                    <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                         <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -402,15 +416,17 @@
                                 class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Supplier</label>
                             <div class="relative">
                                 <button type="button" id="supplierBtn" onclick="toggleSupplierDropdown()"
-                                    class=" w-full p-2.5 flex justify-between items-center text-sm rounded-lg border
-                                    {{ $errors->has('id_supplier') ? 'bg-red-50 border-red-300' : 'bg-gray-50 border-gray-300' }}">
+                                    class="w-full p-2.5 flex justify-between items-center text-sm rounded-lg border
+                                    {{ $errors->has('id_supplier') ? 'bg-red-50 border-red-300' : 'bg-gray-50 border-gray-300' }}
+                                    hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-400">
                                     <span id="supplierLabel" class="text-gray-400">Pilih Supplier</span>
                                     <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="2" d="m6 9 6 6 6-6" />
                                     </svg>
                                 </button>
-                                <input type="hidden" id="trSupplier" name="id_supplier" value="">
+                                <input type="hidden" id="trSupplier" name="id_supplier"
+                                    value="{{ old('id_supplier') }}">
                                 <div id="supplierDropdown"
                                     class="hidden absolute w-full left-0 mt-1 border border-gray-200
                                            rounded-lg shadow-lg bg-white z-20">
@@ -431,9 +447,9 @@
                                     </ul>
                                 </div>
                             </div>
-                            <x-input-error id="errTrSupplier" message="Supplier wajib dipilih." />
+                            <x-input-error id="errTrSupplier" message="Supplier wajib dipilih.F" />
                             @error('id_supplier')
-                                <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                     <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -455,7 +471,7 @@
                                        @error('tujuan') input-error @enderror" />
                             <x-input-error id="errTrTujuan" message="Tujuan wajib diisi." />
                             @error('tujuan')
-                                <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                     <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -473,36 +489,6 @@
                             <textarea id="trCatatan" name="keterangan" rows="2" placeholder="Keterangan (opsional)"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                                        focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5">{{ old('keterangan') }}</textarea>
-                        </div>
-
-                        {{-- Dicatat Oleh --}}
-                        <div>
-                            <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Dicatat
-                                Oleh</label>
-                            <select id="trDicatatOleh" name="dicatat_oleh"
-                                onchange="clearErr('errTrDicatatOleh','trDicatatOleh')"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
-                                       rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
-                                       @error('dicatat_oleh') input-error @enderror">
-                                <option value="">— Pilih Admin —</option>
-                                @foreach ($adminList as $admin)
-                                    <option value="{{ $admin['username'] }}"
-                                        {{ old('dicatat_oleh') === $admin['username'] ? 'selected' : '' }}>
-                                        {{ $admin['username'] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error id="errTrDicatatOleh" message="Dicatat oleh wajib dipilih." />
-                            @error('dicatat_oleh')
-                                <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                                    <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    <span>{{ $message }}</span>
-                                </p>
-                            @enderror
                         </div>
 
                     </div>
@@ -536,8 +522,7 @@
                 <div class="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-[#F66B0E]">
                     <h3 class="text-[16px] font-semibold text-white">Edit Barang</h3>
                     <button type="button" onclick="closeOverlay('modalEditBarang')"
-                        class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center
-                               text-white hover:bg-white/30 transition">
+                        class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition">
                         <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
@@ -691,6 +676,11 @@
             font-weight: 700;
         }
 
+        .stok-blue {
+            color: #2563eb;
+            font-weight: 700;
+        }
+
         .badge {
             display: inline-block;
             font-size: .68rem;
@@ -712,6 +702,11 @@
         .badge-red {
             background: #fee2e2;
             color: #dc2626;
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1d4ed8;
         }
 
         .menu-aksi-wrap {
@@ -848,13 +843,11 @@
                 document.getElementById('trKodeBarang').value = kode;
                 document.getElementById('trNama').value = nama;
                 document.getElementById('trKategoriDisplay').value = kategori;
-                // FIX 1: Isi hidden fields
                 document.getElementById('trNamaHidden').value = nama;
                 document.getElementById('trKategoriHidden').value = kategori;
                 document.getElementById('trJumlah').value = '';
                 document.getElementById('trTanggal').value = '';
                 document.getElementById('trCatatan').value = '';
-                document.getElementById('trDicatatOleh').value = '';
 
                 if (mode === 'masuk') {
                     document.getElementById('fieldSupplier').classList.remove('hidden');
@@ -887,7 +880,7 @@
                 }
             } else {
                 const jumlah = document.getElementById('trJumlah').value;
-                if (!jumlah || Number(jumlah) <= 0) {
+                if (!jumlah || jumlah.trim() === '') {
                     showErr('errTrJumlah', 'trJumlah');
                     valid = false;
                 }
@@ -901,10 +894,6 @@
                 }
                 if (currentMode === 'keluar' && !document.getElementById('trTujuan').value.trim()) {
                     showErr('errTrTujuan', 'trTujuan');
-                    valid = false;
-                }
-                if (!document.getElementById('trDicatatOleh').value) {
-                    showErr('errTrDicatatOleh', 'trDicatatOleh');
                     valid = false;
                 }
             }
@@ -941,15 +930,7 @@
                 placeholder.classList.remove('hidden');
             }
 
-            ['errEKode', 'errENama', 'errEKategori'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.add('hidden');
-            });
-            ['eKode', 'eNama', 'eKategori'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('input-error');
-            });
-
+            clearAllErrors();
             openOverlay('modalEditBarang');
         }
 
@@ -1010,7 +991,9 @@
             document.getElementById('supplierLabel').textContent = el.dataset.label;
             document.getElementById('supplierLabel').classList.replace('text-gray-400', 'text-gray-900');
             document.getElementById('supplierDropdown').classList.add('hidden');
-            document.getElementById('errTrSupplier').classList.add('hidden');
+            // hapus error supplier saat dipilih
+            document.getElementById('errTrSupplier').style.display = 'none';
+            document.querySelectorAll('#fieldSupplier .err-laravel').forEach(el => el.remove());
         }
 
         function filterSupplier() {
@@ -1029,6 +1012,16 @@
             document.querySelectorAll('.supplier-item').forEach(i => i.style.display = '');
         }
 
+        function restoreSupplier(oldValue) {
+            if (!oldValue) return;
+            document.getElementById('trSupplier').value = oldValue;
+            const item = document.querySelector(`.supplier-item[data-value="${oldValue}"]`);
+            if (item) {
+                document.getElementById('supplierLabel').textContent = item.dataset.label;
+                document.getElementById('supplierLabel').classList.replace('text-gray-400', 'text-gray-900');
+            }
+        }
+
         document.addEventListener('click', e => {
             if (!e.target.closest('.menu-aksi') && !e.target.classList.contains('menu-aksi-btn'))
                 document.querySelectorAll('.menu-aksi').forEach(m => m.classList.add('hidden'));
@@ -1042,98 +1035,66 @@
         function showErr(errId, inputId) {
             const err = document.getElementById(errId);
             if (!err) return;
-            err.classList.remove('hidden');
-            err.classList.add('flex');
+            err.style.display = 'flex';
             if (inputId) document.getElementById(inputId)?.classList.add('input-error');
         }
 
         function clearErr(errId, inputId) {
             const err = document.getElementById(errId);
             if (!err) return;
-            err.classList.remove('flex');
-            err.classList.add('hidden');
-            if (inputId) document.getElementById(inputId)?.classList.remove('input-error');
-
-            // hapus error Laravel di sekitar input yang sama
+            err.style.display = 'none';
             if (inputId) {
-                const input = document.getElementById(inputId);
-                if (input) {
-                    const parent = input.closest('div');
-                    if (parent) {
-                        parent.querySelectorAll('p.text-red-600').forEach(el => el.remove());
-                    }
-                }
+                document.getElementById(inputId)?.classList.remove('input-error');
+                // hapus error Laravel di sekitar input yang sama
+                document.getElementById(inputId)?.closest('div')
+                    ?.querySelectorAll('.err-laravel').forEach(el => el.remove());
             }
         }
 
-
         function clearAllErrors() {
             ['errTKode', 'errTNama', 'errTKategori',
-                'errTrJumlah', 'errTrTanggal', 'errTrSupplier',
-                'errTrTujuan', 'errTrDicatatOleh',
-                'errENama', 'errEKategori', 'errEKode'
+                'errTrJumlah', 'errTrTanggal', 'errTrSupplier', 'errTrTujuan',
+                'errEKode', 'errENama', 'errEKategori'
             ].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) {
-                    el.classList.remove('flex');
-                    el.classList.add('hidden');
-                }
+                if (el) el.style.display = 'none';
             });
             ['tKode', 'tNama', 'tKategori',
-                'trJumlah', 'trTanggal', 'trTujuan', 'trDicatatOleh',
+                'trJumlah', 'trTanggal', 'trTujuan',
                 'eKode', 'eNama', 'eKategori'
             ].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('input-error');
+                document.getElementById(id)?.classList.remove('input-error');
             });
+            // hapus semua error Laravel di kedua modal
+            document.querySelectorAll('#modalCatatBarang .err-laravel').forEach(el => el.remove());
+            document.querySelectorAll('#modalEditBarang .err-laravel').forEach(el => el.remove());
         }
 
         // ── BUKA MODAL OTOMATIS JIKA ADA ERROR VALIDASI LARAVEL ──
-
-        @if ($errors->hasAny(['kode_barang', 'nama_barang', 'id_kategori', 'foto_barang']))
-            document.addEventListener('DOMContentLoaded', () => {
-                currentMode = 'tambah';
-                const cfg = modeConfig['tambah'];
-                document.getElementById('mhdr').style.background = cfg.bg;
-                document.getElementById('btnSimpan').style.background = cfg.bg;
-                document.getElementById('mhdrTitle').textContent = cfg.title;
-                ['sectionTransaksi', 'fieldSupplier', 'fieldTujuan'].forEach(id =>
-                    document.getElementById(id).classList.add('hidden')
-                );
-                document.getElementById('sectionTambah').classList.remove('hidden');
-                openOverlay('modalCatatBarang');
-            });
-        @endif
-
-        // buka modal otomatis jika ada error validasi laravel
         document.addEventListener('DOMContentLoaded', () => {
 
             @if ($errors->hasAny(['kode_barang', 'nama_barang', 'id_kategori', 'foto_barang']))
-                // error dari tambah barang - buka modal tambah
-                // pastikan modal edit tidak ikut terbuka
+                // error tambah barang — buka modal tambah
                 currentMode = 'tambah';
-                const cfgTambah = modeConfig['tambah'];
-                document.getElementById('mhdr').style.background = cfgTambah.bg;
-                document.getElementById('btnSimpan').style.background = cfgTambah.bg;
-                document.getElementById('mhdrTitle').textContent = cfgTambah.title;
-
+                document.getElementById('mhdr').style.background = modeConfig.tambah.bg;
+                document.getElementById('btnSimpan').style.background = modeConfig.tambah.bg;
+                document.getElementById('mhdrTitle').textContent = modeConfig.tambah.title;
                 ['sectionTransaksi', 'fieldSupplier', 'fieldTujuan'].forEach(id =>
                     document.getElementById(id).classList.add('hidden')
                 );
                 document.getElementById('sectionTambah').classList.remove('hidden');
                 openOverlay('modalCatatBarang');
-            @elseif ($errors->hasAny(['jumlah', 'tanggal', 'id_supplier', 'tujuan', 'dicatat_oleh', 'kode_barang_transaksi']))
-                // error dari barang masuk atau keluar - buka modal transaksi
+            @elseif ($errors->hasAny(['jumlah', 'tanggal', 'id_supplier', 'tujuan', 'kode_barang_transaksi']))
+                // error barang masuk atau keluar — buka modal transaksi
                 const mode = @json(session('_last_modal', 'masuk'));
                 const kode = @json(session('_last_kode', ''));
                 const nama = @json(session('_last_nama', ''));
                 const kategori = @json(session('_last_kategori', ''));
 
                 currentMode = mode;
-                const cfg = modeConfig[mode];
-                document.getElementById('mhdr').style.background = cfg.bg;
-                document.getElementById('btnSimpan').style.background = cfg.bg;
-                document.getElementById('mhdrTitle').textContent = cfg.title;
+                document.getElementById('mhdr').style.background = modeConfig[mode].bg;
+                document.getElementById('btnSimpan').style.background = modeConfig[mode].bg;
+                document.getElementById('mhdrTitle').textContent = modeConfig[mode].title;
 
                 ['sectionTambah', 'fieldSupplier', 'fieldTujuan'].forEach(id =>
                     document.getElementById(id).classList.add('hidden')
@@ -1149,11 +1110,12 @@
 
                 if (mode === 'masuk') {
                     document.getElementById('fieldSupplier').classList.remove('hidden');
+                    // restore supplier yang sudah dipilih sebelumnya
+                    restoreSupplier("{{ old('id_supplier') }}");
                 } else {
                     document.getElementById('fieldTujuan').classList.remove('hidden');
                 }
 
-                // nilai form (jumlah, tanggal, dll) sudah terisi otomatis oleh old() di blade
                 openOverlay('modalCatatBarang');
             @endif
 

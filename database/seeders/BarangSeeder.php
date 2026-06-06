@@ -37,8 +37,8 @@ class BarangSeeder extends Seeder
             [
                 'kode_barang' => 'BRG004',
                 'nama_barang' => 'Kemeja Formal',
-                'stok' => 0,
-                'id_kategori' => 4,
+                'stok' => 20,
+                'id_kategori' => 10,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -149,7 +149,7 @@ class BarangSeeder extends Seeder
             [
                 'kode_barang' => 'BRG018',
                 'nama_barang' => 'Dompet Kulit',
-                'stok' => 13,
+                'stok' => 0,
                 'id_kategori' => 18,
                 'created_at' => now(),
                 'updated_at' => now(),

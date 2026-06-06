@@ -8,7 +8,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
-            <p class="text-sm font-semibold text-gray-800 text-center">{{ session('success') }}</p>
+            <p class="text-sm font-semibold text-gray-800 text-center whitespace-pre-line">{{ session('success') }}</p>
         </div>
     </div>
     <script>
@@ -33,7 +33,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </div>
-            <p class="text-sm font-semibold text-gray-800 text-center">
+            <p class="text-sm font-semibold text-gray-800 text-center whitespace-pre-line">
                 {{ session('error') }}
             </p>
         </div>

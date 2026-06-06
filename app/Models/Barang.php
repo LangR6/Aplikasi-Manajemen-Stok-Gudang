@@ -5,10 +5,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Barang extends Model
 {
-    protected $table = 'barang';
+    protected $table      = 'barang';
     protected $primaryKey = 'kode_barang';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $keyType    = 'string';
+    public    $incrementing = false;
+
     protected $fillable = [
         'kode_barang',
         'nama_barang',
@@ -24,6 +25,13 @@ class Barang extends Model
         self::create($data);
     }
 
+    // READ - mengambil semua data barang beserta kategorinya
+    public function tampilSemua(): array
+    {
+        // mengambil semua barang yang belum dihapus beserta relasi kategorinya
+        return self::with('kategori')->get()->toArray();
+    }
+
     // UPDATE - memperbarui data barang berdasarkan kode_barang
     public function edit(string $kodeBarang, array $data): void
     {
@@ -31,20 +39,11 @@ class Barang extends Model
         self::where('kode_barang', $kodeBarang)->update($data);
     }
 
-    // DELETE - soft delete barang berdasarkan kode_barang
-    public function hapus(string $kodeBarang): void
-    {
-        // menghapus barang secara soft delete
-        // data tidak benar-benar terhapus, hanya kolom deleted_at yang diisi
-        self::where('kode_barang', $kodeBarang)->delete();
-    }
-
     // relasi ke kategori
     public function kategori()
     {
         // setiap barang hanya memiliki satu kategori
-        // withTrashed() supaya kategori yang sudah dihapus tetap bisa dimuat
-        return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori')->withTrashed();
+        return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
     }
 
     // relasi ke transaksi

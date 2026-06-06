@@ -7,7 +7,6 @@ use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
 use App\Models\Kategori;
 use App\Models\Supplier;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class KelolaBarangController extends Controller
@@ -15,11 +14,15 @@ class KelolaBarangController extends Controller
     // READ - menampilkan semua barang dengan filter dan pagination
     public function index(Request $request)
     {
-        $query = Barang::with('kategori');
+        // eager load kategori dan riwayat transaksi masuk
+        $query = Barang::with(['kategori', 'barangMasuk']);
 
-        // filter berdasarkan keyword pencarian nama barang
+        // filter berdasarkan keyword pencarian nama barang atau kode barang
         if ($request->filled('search')) {
-            $query->where('nama_barang', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_barang', 'like', '%' . $request->search . '%')
+                    ->orWhere('kode_barang', 'like', '%' . $request->search . '%');
+            });
         }
 
         // filter berdasarkan kategori yang dipilih
@@ -31,23 +34,31 @@ class KelolaBarangController extends Controller
 
         // filter berdasarkan status stok
         if ($request->filled('status')) {
-            if ($request->status === 'Habis') {
-                // barang dengan stok 0
-                $query->where('stok', 0);
-            } elseif ($request->status === 'Menipis') {
-                // barang dengan stok lebih dari 0 tapi kurang dari atau sama dengan 5
-                $query->where('stok', '>', 0)->where('stok', '<=', 5);
+            if ($request->status === 'Baru') {
+                // barang baru = stok 0 dan belum pernah ada transaksi masuk
+                $query->where('stok', 0)
+                    ->whereDoesntHave('barangMasuk');
             } elseif ($request->status === 'Tersedia') {
                 // barang dengan stok lebih dari 5
                 $query->where('stok', '>', 5);
+            } elseif ($request->status === 'Menipis') {
+                // barang dengan stok lebih dari 0 tapi kurang dari atau sama dengan 5
+                $query->where('stok', '>', 0)->where('stok', '<=', 5);
+            } elseif ($request->status === 'Habis') {
+                // barang habis = stok 0 tapi sudah pernah ada transaksi masuk
+                $query->where('stok', 0)
+                    ->whereHas('barangMasuk');
             }
         }
 
-        // urutkan berdasarkan status stok, lalu nama barang
+        // urutkan: Baru → Tersedia → Menipis → Habis
         $query->orderByRaw("CASE
-            WHEN stok = 0 THEN 2
-            WHEN stok <= 5 THEN 1
-            ELSE 0
+            WHEN stok = 0 AND NOT EXISTS (
+                SELECT 1 FROM barang_masuk WHERE barang_masuk.id_barang = barang.kode_barang
+            ) THEN 0
+            WHEN stok > 5 THEN 1
+            WHEN stok > 0 AND stok <= 5 THEN 2
+            ELSE 3
         END")->orderBy('nama_barang');
 
         // ambil 25 data per halaman dan pertahankan parameter filter di url
@@ -55,14 +66,19 @@ class KelolaBarangController extends Controller
 
         // transform data menjadi array yang dibutuhkan oleh view
         $data = $data->through(function ($item) {
+            // tentukan status berdasarkan stok dan riwayat transaksi
+            $isBaru = $item->stok === 0 && $item->barangMasuk->isEmpty();
+
             return [
                 'kode'        => $item->kode_barang,
                 'nama'        => $item->nama_barang,
                 'stok'        => $item->stok,
+                'is_baru'     => $isBaru,
                 'id_kategori' => $item->id_kategori,
                 'kategori'    => $item->kategori?->nama_kategori ?? '-',
+                // decode binary foto menjadi base64 untuk ditampilkan di img tag
                 'foto_url'    => $item->foto_barang
-                    ? asset('storage/' . $item->foto_barang)
+                    ? 'data:image/jpeg;base64,' . base64_encode($item->foto_barang)
                     : null,
             ];
         });
@@ -76,14 +92,9 @@ class KelolaBarangController extends Controller
         $supplier = Supplier::orderBy('nama_supplier')
             ->get(['id_supplier', 'nama_supplier']);
 
-        // mengambil semua user yang role-nya admin untuk dropdown dicatat oleh
-        $adminList = User::where('role', 'admin')
-            ->orderBy('username')
-            ->get(['id', 'username']);
-
         return view(
             'pages.kelola_barang',
-            compact('data', 'kategori', 'supplier', 'adminList')
+            compact('data', 'kategori', 'supplier')
         );
     }
 
@@ -123,11 +134,11 @@ class KelolaBarangController extends Controller
         // stok awal selalu 0 saat barang baru ditambahkan
         $data['stok'] = 0;
 
-        // simpan foto sebagai path file di storage bukan binary
+        // simpan foto sebagai binary ke database
         if ($request->hasFile('foto_barang')) {
-            $data['foto_barang'] = $request
-                ->file('foto_barang')
-                ->store('barang', 'public');
+            $data['foto_barang'] = file_get_contents(
+                $request->file('foto_barang')->getRealPath()
+            );
         }
 
         $model = new Barang();
@@ -154,7 +165,6 @@ class KelolaBarangController extends Controller
         }
 
         // validasi input - jika gagal Laravel otomatis redirect back dengan error
-        // unique mengabaikan kode_barang yang sedang diedit
         $request->validate([
             'kode_barang' => 'required|string|max:50|unique:barang,kode_barang,' .
                 $kodeBarang . ',kode_barang',
@@ -179,11 +189,11 @@ class KelolaBarangController extends Controller
         // ubah nama barang menjadi title case sebelum disimpan
         $data['nama_barang'] = ucwords(strtolower($data['nama_barang']));
 
-        // simpan foto baru jika ada yang diupload
+        // simpan foto baru sebagai binary jika ada yang diupload
         if ($request->hasFile('foto_barang')) {
-            $data['foto_barang'] = $request
-                ->file('foto_barang')
-                ->store('barang', 'public');
+            $data['foto_barang'] = file_get_contents(
+                $request->file('foto_barang')->getRealPath()
+            );
         }
 
         $model = new Barang();
@@ -203,7 +213,6 @@ class KelolaBarangController extends Controller
         }
 
         // simpan info barang ke session sebelum validasi
-        // supaya saat redirect back blade bisa buka modal yang benar
         session([
             '_last_modal'    => 'masuk',
             '_last_kode'     => $request->kode_barang_transaksi,
@@ -212,24 +221,21 @@ class KelolaBarangController extends Controller
         ]);
 
         // validasi input - jika gagal Laravel otomatis redirect back dengan error
-        // before_or_equal:today mencegah tanggal melebihi hari ini
         $request->validate([
             'kode_barang_transaksi' => 'required|exists:barang,kode_barang',
             'jumlah'                => 'required|integer|min:1',
             'tanggal'               => 'required|date|before_or_equal:today',
             'id_supplier'           => 'required|exists:supplier,id_supplier',
-            'dicatat_oleh'          => 'required|string',
             'keterangan'            => 'nullable|string|max:255',
         ], [
-            'jumlah.required'                  => 'Jumlah wajib diisi.',
-            'jumlah.integer'                   => 'Jumlah harus berupa angka.',
-            'jumlah.min'                       => 'Jumlah minimal 1.',
-            'tanggal.required'                 => 'Tanggal wajib diisi.',
-            'tanggal.before_or_equal'          => 'Tanggal tidak boleh melebihi hari ini.',
-            'id_supplier.required'             => 'Supplier wajib dipilih.',
-            'id_supplier.exists'               => 'Supplier tidak ditemukan.',
-            'dicatat_oleh.required'            => 'Admin wajib dipilih.',
-            'keterangan.max'                   => 'Keterangan maksimal 255 karakter.',
+            'jumlah.required'         => 'Jumlah wajib diisi.',
+            'jumlah.integer'          => 'Jumlah harus berupa angka.',
+            'jumlah.min'              => 'Jumlah minimal 1.',
+            'tanggal.required'        => 'Tanggal wajib diisi.',
+            'tanggal.before_or_equal' => 'Tanggal tidak boleh melebihi hari ini.',
+            'id_supplier.required'    => 'Supplier wajib dipilih.',
+            'id_supplier.exists'      => 'Supplier tidak ditemukan.',
+            'keterangan.max'          => 'Keterangan maksimal 255 karakter.',
         ]);
 
         // kondisi bisnis - pastikan barang yang akan dicatat ada di database
@@ -248,7 +254,8 @@ class KelolaBarangController extends Controller
             'tgl_masuk'    => $request->tanggal,
             'id_supplier'  => $request->id_supplier,
             'keterangan'   => $request->keterangan,
-            'dicatat_oleh' => $request->dicatat_oleh,
+            // dicatat_oleh diisi otomatis dari session admin yang sedang login
+            'dicatat_oleh' => session('username'),
         ]);
 
         // bersihkan session setelah berhasil
@@ -268,7 +275,6 @@ class KelolaBarangController extends Controller
         }
 
         // simpan info barang ke session sebelum validasi
-        // supaya saat redirect back blade bisa buka modal yang benar
         session([
             '_last_modal'    => 'keluar',
             '_last_kode'     => $request->kode_barang_transaksi,
@@ -277,13 +283,11 @@ class KelolaBarangController extends Controller
         ]);
 
         // validasi input - jika gagal Laravel otomatis redirect back dengan error
-        // before_or_equal:today mencegah tanggal melebihi hari ini
         $request->validate([
             'kode_barang_transaksi' => 'required|exists:barang,kode_barang',
             'jumlah'                => 'required|integer|min:1',
             'tanggal'               => 'required|date|before_or_equal:today',
             'tujuan'                => 'required|string|max:100',
-            'dicatat_oleh'          => 'required|string',
             'keterangan'            => 'nullable|string|max:255',
         ], [
             'jumlah.required'         => 'Jumlah wajib diisi.',
@@ -293,7 +297,6 @@ class KelolaBarangController extends Controller
             'tanggal.before_or_equal' => 'Tanggal tidak boleh melebihi hari ini.',
             'tujuan.required'         => 'Tujuan wajib diisi.',
             'tujuan.max'              => 'Tujuan maksimal 100 karakter.',
-            'dicatat_oleh.required'   => 'Admin wajib dipilih.',
             'keterangan.max'          => 'Keterangan maksimal 255 karakter.',
         ]);
 
@@ -319,7 +322,8 @@ class KelolaBarangController extends Controller
             'tgl_keluar'   => $request->tanggal,
             'tujuan'       => $request->tujuan,
             'keterangan'   => $request->keterangan,
-            'dicatat_oleh' => $request->dicatat_oleh,
+            // dicatat_oleh diisi otomatis dari session admin yang sedang login
+            'dicatat_oleh' => session('username'),
         ]);
 
         // bersihkan session setelah berhasil
