@@ -34,7 +34,9 @@ class User extends Authenticatable
 
     public function login(): void
     {
-        auth()->attempt([
+        /** @var \Illuminate\Auth\SessionGuard $auth */
+        $auth = auth();
+        $auth->attempt([
             'username' => $this->username,
             'password' => $this->password,
         ]);
@@ -42,7 +44,9 @@ class User extends Authenticatable
 
     public function logout(): void
     {
-        auth()->logout();
+        /** @var \Illuminate\Auth\SessionGuard $auth */
+        $auth = auth();
+        $auth->logout();
     }
 
     public function tampilData(): array

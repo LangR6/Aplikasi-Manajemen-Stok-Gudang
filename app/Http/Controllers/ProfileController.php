@@ -11,6 +11,7 @@ class ProfileController extends Controller
 {
     public function index()
     {
+        /** @var User $user */
         $user = Auth::user();
 
         return view('pages.profile', compact('user'));
@@ -37,6 +38,7 @@ class ProfileController extends Controller
             'password_baru.same'         => 'Password baru dan konfirmasi password tidak cocok.',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Update profile
