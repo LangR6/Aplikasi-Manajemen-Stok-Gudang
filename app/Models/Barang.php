@@ -17,30 +17,9 @@ class Barang extends Model
         'foto_barang',
         'stok',
         'id_kategori',
-        'stok_menipis_dibaca_pada',  
-        'stok_habis_dibaca_pada'
+        'stok_menipis_dibaca_pada',
+        'stok_habis_dibaca_pada',
     ];
-
-    // CREATE - menyimpan data barang baru ke database
-    public function tambah(array $data): void
-    {
-        // menyimpan data barang baru ke dalam database
-        self::create($data);
-    }
-
-    // READ - mengambil semua data barang beserta kategorinya
-    public function tampilSemua(): array
-    {
-        // mengambil semua barang yang belum dihapus beserta relasi kategorinya
-        return self::with('kategori')->get()->toArray();
-    }
-
-    // UPDATE - memperbarui data barang berdasarkan kode_barang
-    public function edit(string $kodeBarang, array $data): void
-    {
-        // mencari barang berdasarkan kode_barang, lalu memperbarui datanya
-        self::where('kode_barang', $kodeBarang)->update($data);
-    }
 
     // relasi ke kategori
     public function kategori()
@@ -49,13 +28,14 @@ class Barang extends Model
         return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
     }
 
-    // relasi ke transaksi
+    // relasi ke transaksi masuk
     public function barangMasuk()
     {
         // satu barang bisa memiliki banyak transaksi masuk
         return $this->hasMany(BarangMasuk::class, 'id_barang', 'kode_barang');
     }
 
+    // relasi ke transaksi keluar
     public function barangKeluar()
     {
         // satu barang bisa memiliki banyak transaksi keluar

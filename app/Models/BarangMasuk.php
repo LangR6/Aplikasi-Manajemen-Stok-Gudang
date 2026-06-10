@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class BarangMasuk extends TransaksiStok
+use Illuminate\Database\Eloquent\Model;
+
+class BarangMasuk extends Model
 {
     protected $table = 'barang_masuk';
-
     protected $primaryKey = 'id_barang_masuk';
 
     protected $fillable = [
@@ -17,49 +18,28 @@ class BarangMasuk extends TransaksiStok
         'dicatat_oleh',
     ];
 
-    public function catat(array $data): void
-    {
-       // POLYMORPHISME:
-        // mengimplementasikan method catat() dari abstract class TransaksiStok
-        // bedanya dengan BarangKeluar, method ini akan MENAMBAH stok barang
-
-        // menyimpan data transaksi barang masuk ke database
-        self::create($data);
-
-        // menambah stok barang secara otomatis sesuai jumlah yang diinput
-        // pakai kode_barang karena itu primary key tabel barang
-        $barang = Barang::where('kode_barang', $data['id_barang'])->first();
-        $barang->increment('stok', $data['jumlah']);
-        $barang->refresh();
-
-        if ($barang->stok > 5) {
-            $barang->update([
-                'stok_menipis_dibaca_pada' => null,
-                'stok_habis_dibaca_pada'   => null,
-            ]);
-        } elseif ($barang->stok > 0) {
-            $barang->update(['stok_habis_dibaca_pada' => null]);
-        }
-    }
-
+    /**
+     * Relasi Many To One ke tabel barang.
+     * Setiap transaksi barang masuk terkait dengan satu barang,
+     * sedangkan satu barang dapat memiliki banyak transaksi barang masuk.
+     */
     public function barang()
     {
-        // foreign key id_barang di tabel barang_masuk
-        // merujuk ke kode_barang pada tabel barang
-        return $this->belongsTo(
-            Barang::class,
-            'id_barang',
-            'kode_barang'
-        );
+        return $this->belongsTo(Barang::class, 'id_barang', 'kode_barang');
     }
 
+    /**
+     * Relasi Many To One ke tabel supplier.
+     * Setiap transaksi barang masuk berasal dari satu supplier,
+     * sedangkan satu supplier dapat memiliki banyak transaksi barang masuk.
+     */
     public function supplier()
     {
-        // withTrashed() supaya supplier yang sudah dihapus tetap bisa dimuat di riwayat
         return $this->belongsTo(
             Supplier::class,
             'id_supplier',
             'id_supplier'
+            // withTrashed supaya riwayat tetap tampil meski supplier dihapus
         )->withTrashed();
     }
 }

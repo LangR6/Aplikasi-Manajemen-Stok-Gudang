@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use Exception;
+use Illuminate\Database\Eloquent\Model;
 
-class BarangKeluar extends TransaksiStok
+class BarangKeluar extends Model
 {
     protected $table = 'barang_keluar';
-
     protected $primaryKey = 'id_barang_keluar';
 
     protected $fillable = [
@@ -19,40 +18,13 @@ class BarangKeluar extends TransaksiStok
         'dicatat_oleh',
     ];
 
-    public function catat(array $data): void
-    {
-        // POLYMORPHISME:
-        // mengimplementasikan method catat() dari abstract class TransaksiStok
-        // bedanya dengan BarangMasuk, method ini akan MENGURANGI stok barang
-
-        // mencari barang berdasarkan kode_barang
-        $barang = Barang::where(
-            'kode_barang',
-            $data['id_barang']
-        )->first();
-
-        // validasi jika barang tidak ditemukan
-        if (!$barang) {
-            throw new Exception('Barang tidak ditemukan.');
-        }
-
-        // validasi agar stok tidak menjadi minus
-        if ($barang->stok < $data['jumlah']) {
-            throw new Exception('Stok barang tidak mencukupi.');
-        }
-
-        // menyimpan data transaksi barang keluar ke database
-        self::create($data);
-
-        // mengurangi stok barang secara otomatis
-        // pakai kode_barang karena itu primary key tabel barang
-        $barang->decrement('stok', $data['jumlah']);
-    }
-
+    /**
+     * Relasi Many To One ke tabel barang.
+     * Setiap transaksi barang keluar hanya terkait dengan satu barang,
+     * sedangkan satu barang dapat memiliki banyak transaksi barang keluar.
+     */
     public function barang()
     {
-        // foreign key id_barang di tabel barang_keluar
-        // merujuk ke kode_barang pada tabel barang
         return $this->belongsTo(
             Barang::class,
             'id_barang',

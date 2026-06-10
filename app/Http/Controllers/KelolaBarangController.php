@@ -62,10 +62,7 @@ class KelolaBarangController extends Controller
         END")->orderBy('nama_barang');
 
         // ambil 25 data per halaman dan pertahankan parameter filter di url
-        $data = $query->paginate(25)->withQueryString();
-
-        // transform data menjadi array yang dibutuhkan oleh view
-        $data = $data->through(function ($item) {
+        $data = $query->paginate(25)->withQueryString()->through(function ($item) {
             // tentukan status berdasarkan stok dan riwayat transaksi
             $isBaru = $item->stok === 0 && $item->barangMasuk->isEmpty();
 
@@ -126,13 +123,14 @@ class KelolaBarangController extends Controller
             'foto_barang.max'      => 'Ukuran foto maksimal 2 MB.',
         ]);
 
-        $data = $request->only(['kode_barang', 'nama_barang', 'id_kategori']);
-
-        // ubah nama barang menjadi title case sebelum disimpan
-        $data['nama_barang'] = ucwords(strtolower($data['nama_barang']));
-
-        // stok awal selalu 0 saat barang baru ditambahkan
-        $data['stok'] = 0;
+        $data = [
+            'kode_barang' => $request->kode_barang,
+            // ubah nama barang menjadi title case sebelum disimpan
+            'nama_barang' => ucwords(strtolower($request->nama_barang)),
+            'id_kategori' => $request->id_kategori,
+            // stok awal selalu 0 saat barang baru ditambahkan
+            'stok'        => 0,
+        ];
 
         // simpan foto sebagai binary ke database
         if ($request->hasFile('foto_barang')) {
@@ -141,8 +139,7 @@ class KelolaBarangController extends Controller
             );
         }
 
-        $model = new Barang();
-        $model->tambah($data);
+        Barang::create($data);
 
         return redirect()->back()
             ->with('success', 'Barang berhasil ditambahkan.');
@@ -184,10 +181,12 @@ class KelolaBarangController extends Controller
             'foto_barang.max'      => 'Ukuran foto maksimal 2 MB.',
         ]);
 
-        $data = $request->only(['kode_barang', 'nama_barang', 'id_kategori']);
-
-        // ubah nama barang menjadi title case sebelum disimpan
-        $data['nama_barang'] = ucwords(strtolower($data['nama_barang']));
+        $data = [
+            'kode_barang' => $request->kode_barang,
+            // ubah nama barang menjadi title case sebelum disimpan
+            'nama_barang' => ucwords(strtolower($request->nama_barang)),
+            'id_kategori' => $request->id_kategori,
+        ];
 
         // simpan foto baru sebagai binary jika ada yang diupload
         if ($request->hasFile('foto_barang')) {
@@ -196,8 +195,7 @@ class KelolaBarangController extends Controller
             );
         }
 
-        $model = new Barang();
-        $model->edit($kodeBarang, $data);
+        $barang->update($data);
 
         return redirect()->back()
             ->with('success', 'Barang berhasil diperbarui.');
@@ -245,10 +243,9 @@ class KelolaBarangController extends Controller
                 ->with('error', 'Barang tidak ditemukan.');
         }
 
-        // memanggil method catat() dari model BarangMasuk
+        // simpan transaksi masuk
         // stok barang akan bertambah otomatis sesuai jumlah yang diinput
-        $model = new BarangMasuk();
-        $model->catat([
+        BarangMasuk::create([
             'id_barang'    => $request->kode_barang_transaksi,
             'jumlah'       => $request->jumlah,
             'tgl_masuk'    => $request->tanggal,
@@ -258,7 +255,20 @@ class KelolaBarangController extends Controller
             'dicatat_oleh' => session('username'),
         ]);
 
-        // bersihkan session setelah berhasil
+        // tambah stok
+        $barang->increment('stok', $request->jumlah);
+        $barang->refresh();
+
+        // reset notifikasi stok sesuai kondisi terbaru
+        if ($barang->stok > 5) {
+            $barang->update([
+                'stok_menipis_dibaca_pada' => null,
+                'stok_habis_dibaca_pada'   => null,
+            ]);
+        } elseif ($barang->stok > 0) {
+            $barang->update(['stok_habis_dibaca_pada' => null]);
+        }
+
         session()->forget(['_last_modal', '_last_kode', '_last_nama', '_last_kategori']);
 
         return redirect()->back()
@@ -310,13 +320,15 @@ class KelolaBarangController extends Controller
         // kondisi bisnis - pastikan stok mencukupi sebelum transaksi diproses
         if ($barang->stok < $request->jumlah) {
             return redirect()->back()
-                ->with('error', 'Stok tidak mencukupi. Stok tersedia: ' . $barang->stok . '.');
+                ->withErrors([
+                    'jumlah' => 'Stok tidak mencukupi. Stok tersedia: ' . $barang->stok
+                ])
+                ->withInput();
         }
 
-        // memanggil method catat() dari model BarangKeluar
+        // simpan transaksi keluar
         // stok barang akan berkurang otomatis sesuai jumlah yang diinput
-        $model = new BarangKeluar();
-        $model->catat([
+        BarangKeluar::create([
             'id_barang'    => $request->kode_barang_transaksi,
             'jumlah'       => $request->jumlah,
             'tgl_keluar'   => $request->tanggal,
@@ -326,7 +338,9 @@ class KelolaBarangController extends Controller
             'dicatat_oleh' => session('username'),
         ]);
 
-        // bersihkan session setelah berhasil
+        // kurangi stok
+        $barang->decrement('stok', $request->jumlah);
+
         session()->forget(['_last_modal', '_last_kode', '_last_nama', '_last_kategori']);
 
         return redirect()->back()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 
@@ -28,7 +29,7 @@ class KelolaKategoriController extends Controller
             return [
                 'id_kategori'   => $item->id_kategori,
                 'nama_kategori' => $item->nama_kategori,
-                'status'        => $item->status === 'aktif' ? true : false,
+                'status'        => $item->status === 'aktif',
             ];
         });
 
@@ -55,13 +56,11 @@ class KelolaKategoriController extends Controller
             'nama_kategori.unique'   => 'Nama kategori sudah digunakan.',
         ]);
 
-        $data = $request->only(['nama_kategori', 'status']);
-
-        // ubah menjadi Title Case sebelum disimpan
-        $data['nama_kategori'] = ucwords(strtolower($data['nama_kategori']));
-
-        $model = new Kategori();
-        $model->tambah($data);
+        // menyimpan data kategori baru dengan format huruf awal setiap kata kapital
+        Kategori::create([
+            'nama_kategori' => ucwords(strtolower($request->nama_kategori)),
+            'status'        => $request->status,
+        ]);
 
         return redirect()->back()
             ->with('success', 'Kategori berhasil ditambahkan.');
@@ -94,13 +93,11 @@ class KelolaKategoriController extends Controller
             'nama_kategori.unique'   => 'Nama kategori sudah digunakan.',
         ]);
 
-        $data = $request->only(['nama_kategori', 'status']);
-
-        // ubah menjadi Title Case sebelum disimpan
-        $data['nama_kategori'] = ucwords(strtolower($data['nama_kategori']));
-
-        $model = new Kategori();
-        $model->edit($id, $data);
+        // memperbarui data kategori berdasarkan input yang telah divalidasi
+        $kategori->update([
+            'nama_kategori' => ucwords(strtolower($request->nama_kategori)),
+            'status'        => $request->status,
+        ]);
 
         return redirect()->back()
             ->with('success', 'Kategori berhasil diperbarui.');
@@ -122,50 +119,37 @@ class KelolaKategoriController extends Controller
                 ->with('error', 'Kategori tidak ditemukan.');
         }
 
-        // cek barang dengan stok tersedia atau menipis (stok > 0)
-        // jika ada, kategori tidak boleh dihapus karena masih aktif digunakan
-        $barangAktif = \App\Models\Barang::where('id_kategori', $id)
-            ->where('stok', '>', 0)
-            ->count();
-
+        // barang dengan stok > 0, kategori tidak boleh dihapus
+        $barangAktif = Barang::where('id_kategori', $id)->where('stok', '>', 0)->count();
         if ($barangAktif > 0) {
             return redirect()->back()
                 ->with('error', "Tidak dapat dihapus.\nKategori masih digunakan oleh barang.");
         }
 
-        // cek barang dengan stok 0 tapi sudah pernah ada transaksi masuk (status habis)
-        // jika ada, kategori tidak boleh dihapus karena masih memiliki riwayat transaksi
-        $barangHabis = \App\Models\Barang::where('id_kategori', $id)
+        // barang stok 0 tapi punya riwayat transaksi masuk
+        $barangHabis = Barang::where('id_kategori', $id)
             ->where('stok', 0)
             ->whereHas('barangMasuk')
             ->count();
-
         if ($barangHabis > 0) {
             return redirect()->back()
                 ->with('error', "Tidak dapat dihapus.\nKategori memiliki riwayat transaksi.");
         }
 
-        // cek barang baru yaitu stok 0 dan belum pernah ada transaksi masuk sama sekali
-        // jika ada, kategori tidak dihapus melainkan dinonaktifkan saja
-        $barangBaru = \App\Models\Barang::where('id_kategori', $id)
+        // barang stok 0 dan belum pernah transaksi — nonaktifkan saja
+        $barangBaru = Barang::where('id_kategori', $id)
             ->where('stok', 0)
             ->whereDoesntHave('barangMasuk')
             ->count();
-
         if ($barangBaru > 0) {
-            // nonaktifkan kategori karena masih memiliki barang baru yang belum bertransaksi
-            $model = new Kategori();
-            $model->edit($id, ['status' => 'nonaktif', 'nama_kategori' => $kategori->nama_kategori]);
-
-            return redirect()->back()
-                ->with('success', 'Kategori "' . $kategori->nama_kategori . '" dinonaktifkan karena masih memiliki ' . $barangBaru . ' barang baru yang belum pernah bertransaksi.');
+            $kategori->update(['status' => 'nonaktif']);
+            return redirect()->back()->with('success', 'Kategori "' . $kategori->nama_kategori . '" dinonaktifkan karena masih memiliki ' .
+                $barangBaru . ' barang baru yang belum pernah bertransaksi.');
         }
 
-        // tidak ada barang sama sekali, aman untuk dihapus secara soft delete
-        $model = new Kategori();
-        $model->hapus($id);
+        // tidak ada barang sama sekali, aman dihapus
+        $kategori->delete();
 
-        return redirect()->back()
-            ->with('success', 'Kategori "' . $kategori->nama_kategori . '" berhasil dihapus.');
+        return redirect()->back()->with('success', 'Kategori "' . $kategori->nama_kategori . '" berhasil dihapus.');
     }
 }
