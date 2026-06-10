@@ -31,31 +31,4 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    public function login(): void
-    {
-        /** @var \Illuminate\Auth\SessionGuard $auth */
-        $auth = auth();
-        $auth->attempt([
-            'username' => $this->username,
-            'password' => $this->password,
-        ]);
-    }
-
-    public function logout(): void
-    {
-        /** @var \Illuminate\Auth\SessionGuard $auth */
-        $auth = auth();
-        $auth->logout();
-    }
-
-    public function tampilData(): array
-    {
-        return [];
-    }
-
-    public function updateProfile(array $data): void
-    {
-        $this->update($data);
-    }
 }

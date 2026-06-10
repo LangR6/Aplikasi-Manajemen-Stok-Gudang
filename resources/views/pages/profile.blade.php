@@ -29,6 +29,15 @@
                 </button>
             </div>
 
+            {{-- FLASH MESSAGE --}}
+
+
+            @if (session('error'))
+                <div class="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-5 gap-0">
 
                 {{-- KIRI --}}
@@ -100,8 +109,11 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">
                                     Nama Pengguna
                                 </label>
-                                <input id="nama" name="nama" type="text" value="{{ session('nama') }}" readonly
+                                <input id="nama" name="nama" type="text" value="{{ old('nama', session('nama')) }}" readonly
                                     class="w-full rounded-lg px-3 py-2.5 bg-white border border-gray-200 shadow-sm text-sm text-[#112B3C]">
+                                @error('nama')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             {{-- Email --}}
@@ -109,8 +121,11 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">
                                     Email
                                 </label>
-                                <input id="email" name="email" type="email" value="{{ session('email') }}" readonly
+                                <input id="email" name="email" type="email" value="{{ old('email', session('email')) }}" readonly
                                     class="w-full rounded-lg px-3 py-2.5 bg-white border border-gray-200 shadow-sm text-sm text-[#112B3C]">
+                                @error('email')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             {{-- HP --}}
@@ -118,8 +133,11 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">
                                     No Handphone
                                 </label>
-                                <input id="hp" name="hp" type="text" value="{{ session('hp') }}" readonly
+                                <input id="hp" name="hp" type="text" value="{{ old('hp', session('hp')) }}" readonly
                                     class="w-full rounded-lg px-3 py-2.5 bg-white border border-gray-200 shadow-sm text-sm text-[#112B3C]">
+                                @error('hp')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             {{-- Password Lama --}}
@@ -166,6 +184,9 @@
                                         </svg>
                                     </button>
                                 </div>
+                                @error('password_baru')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             {{-- Konfirmasi Password --}}
@@ -233,7 +254,6 @@
     </div>
 
     <script>
-        // Simpan halaman asal sebelum masuk profil
         const PREV_KEY = 'profile_back_url';
         if (document.referrer && !document.referrer.includes('/profile')) {
             sessionStorage.setItem(PREV_KEY, document.referrer);
@@ -248,6 +268,7 @@
                 window.history.go(-2);
             }
         }
+
         const eyeIcon = `
             <path stroke-linecap="round" stroke-linejoin="round"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -341,6 +362,11 @@
             document.getElementById('btnBatal').classList.add('hidden');
             document.getElementById('btnSimpan').classList.add('hidden');
         }
+
+        // Auto buka mode edit jika ada error validasi
+        @if ($errors->any())
+            enableEdit();
+        @endif
     </script>
 
 @endsection
