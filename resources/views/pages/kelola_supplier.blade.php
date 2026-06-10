@@ -10,6 +10,8 @@
 <meta name="old-kota" content="{{ old('kota') }}">
 <meta name="old-email" content="{{ old('email') }}">
 <meta name="has-error" content="{{ $errors->hasAny(['nama_supplier', 'kontak', 'email', 'kota']) ? '1' : '0' }}">
+<meta name="old-mode" content="{{ old('_form_mode', 'tambah') }}">
+<meta name="old-id" content="{{ old('id_supplier') }}">
 
 <div class="space-y-3">
 
@@ -294,6 +296,8 @@
             @csrf
 
             <input type="hidden" name="_method" id="supplierMethod" value="POST">
+            <input type="hidden" name="_form_mode" id="formMode" value="tambah">
+            <input type="hidden" name="id_supplier" id="supplierId">
 
             <div>
                 <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
@@ -388,6 +392,13 @@
             <div class="flex items-center gap-2.5">
                 <h3 class="text-[16px] font-semibold text-white">Konfirmasi Hapus</h3>
             </div>
+            <button type="button" onclick="closeModal('modalHapusSupplier')"
+                class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
         </div>
 
         <div class="px-5 py-6 text-center">
@@ -413,6 +424,13 @@
         </div>
 
         <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+
+            <button type="button" onclick="closeModal('modalHapusSupplier')"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200
+               rounded-lg hover:bg-gray-50 active:scale-[.98] transition-all">
+                Batal
+            </button>
+
             <form id="deleteSupplierForm" method="POST">
                 @csrf
                 @method('DELETE')
@@ -574,6 +592,12 @@
 
         const isEdit = mode === 'edit';
 
+        document.getElementById('formMode').value =
+            isEdit ? 'edit' : 'tambah';
+
+        document.getElementById('supplierId').value =
+            isEdit ? data.id_supplier : '';
+
         document.getElementById('supplierModalTitle').textContent =
             isEdit ? 'Edit Supplier' : 'Tambah Supplier';
 
@@ -622,11 +646,36 @@
     document.addEventListener('DOMContentLoaded', function() {
         const hasError = document.querySelector('meta[name="has-error"]').getAttribute('content') === '1';
         if (hasError) {
-            openSupplierModal();
-            document.getElementById('namaSupplier').value = document.querySelector('meta[name="old-nama"]').getAttribute('content');
-            document.getElementById('kontakSupplier').value = document.querySelector('meta[name="old-kontak"]').getAttribute('content');
-            document.getElementById('kotaSupplier').value = document.querySelector('meta[name="old-kota"]').getAttribute('content');
-            document.getElementById('emailSupplier').value = document.querySelector('meta[name="old-email"]').getAttribute('content');
+
+            const mode =
+                document.querySelector('meta[name="old-mode"]').content;
+
+            const id =
+                document.querySelector('meta[name="old-id"]').content;
+
+            if (mode === 'edit') {
+
+                openSupplierModal('edit', {
+                    id_supplier: id
+                });
+
+            } else {
+
+                openSupplierModal();
+
+            }
+
+            document.getElementById('namaSupplier').value =
+                document.querySelector('meta[name="old-nama"]').content;
+
+            document.getElementById('kontakSupplier').value =
+                document.querySelector('meta[name="old-kontak"]').content;
+
+            document.getElementById('kotaSupplier').value =
+                document.querySelector('meta[name="old-kota"]').content;
+
+            document.getElementById('emailSupplier').value =
+                document.querySelector('meta[name="old-email"]').content;
         }
     });
 </script>

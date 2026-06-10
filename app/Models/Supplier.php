@@ -11,7 +11,6 @@ class Supplier extends Model
 
     protected $table = 'supplier';
 
-    // PRIMARY KEY DATABASE
     protected $primaryKey = 'id_supplier';
 
     protected $fillable = [
@@ -22,25 +21,8 @@ class Supplier extends Model
         'dicatat_oleh'
     ];
 
-    protected $dates = ['deleted_at'];
-
-    public function tambah(array $data): void
-    {
-        self::create($data);
-    }
-
-    public function edit(int $id, array $data): void
-    {
-        self::where('id_supplier', $id)->update($data);
-    }
-
-    public function hapus(int $id): void
-    {
-        self::where('id_supplier', $id)->delete();
-    }
-
     public function barangMasuk()
     {
-        return $this->hasMany(BarangMasuk::class, 'id_supplier');
+        return $this->hasMany(BarangMasuk::class, 'id_supplier', 'id_supplier');
     }
 }
