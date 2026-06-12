@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -20,7 +21,7 @@ class KategoriSeeder extends Seeder
             ['nama_kategori' => 'Jaket',       'status' => 'aktif'],
             ['nama_kategori' => 'Kemeja',      'status' => 'aktif'],
             ['nama_kategori' => 'Kaos',        'status' => 'aktif'],
-            ['nama_kategori' => 'Celana Jeans','status' => 'aktif'],
+            ['nama_kategori' => 'Celana Jeans', 'status' => 'aktif'],
             ['nama_kategori' => 'Sandal',      'status' => 'nonaktif'],
             ['nama_kategori' => 'Topi',        'status' => 'aktif'],
             ['nama_kategori' => 'Hijab',       'status' => 'aktif'],
@@ -32,7 +33,10 @@ class KategoriSeeder extends Seeder
         ];
 
         foreach ($kategori as $item) {
-            Kategori::create($item);
+            Kategori::firstOrCreate(
+                ['nama_kategori' => $item['nama_kategori']],
+                ['status' => $item['status']]
+            );
         }
     }
 }
