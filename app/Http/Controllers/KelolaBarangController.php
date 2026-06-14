@@ -161,6 +161,11 @@ class KelolaBarangController extends Controller
                 ->with('error', 'Barang tidak ditemukan.');
         }
 
+        // Mengetahui bahwa proses yang dilakukan adalah edit data kategori
+        $request->merge([
+            '_edit_kode' => $kodeBarang,
+        ]);
+
         // validasi input - jika gagal Laravel otomatis redirect back dengan error
         $request->validate([
             'kode_barang' => 'required|string|max:50|unique:barang,kode_barang,' .

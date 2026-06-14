@@ -67,6 +67,58 @@
             </div>
         </form>
 
+        {{-- ACTIVE FILTER TAGS --}}
+        @if (request('search') || request('status') || request('kategori'))
+            <div class="flex flex-wrap items-center gap-2">
+
+                @if (request('status'))
+                    @php
+                        $statusColor = match (request('status')) {
+                            'Baru' => 'bg-blue-100 text-blue-700 border-blue-200',
+                            'Tersedia' => 'bg-green-100 text-green-700 border-green-200',
+                            'Menipis' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
+                            'Habis' => 'bg-red-100 text-red-700 border-red-200',
+                            default => 'bg-gray-100 text-gray-700 border-gray-200',
+                        };
+                    @endphp
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border {{ $statusColor }}">
+                        {{ request('status') }}
+                        <a href="{{ route('kelola_barang', array_merge(request()->except(['status', 'page']))) }}"
+                            class="ml-1 font-bold opacity-60 hover:opacity-100">×</a>
+                    </span>
+                @endif
+
+                @if (request('kategori'))
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#205375] text-white">
+                        {{ request('kategori') }}
+                        <a href="{{ route('kelola_barang', array_merge(request()->except(['kategori', 'page']))) }}"
+                            class="ml-1 font-bold opacity-60 hover:opacity-100">×</a>
+                    </span>
+                @endif
+
+                @if (request('search'))
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        "{{ request('search') }}"
+                        <a href="{{ route('kelola_barang', array_merge(request()->except(['search', 'page']))) }}"
+                            class="ml-1 text-gray-500 hover:text-gray-700 font-bold">×</a>
+                    </span>
+                @endif
+
+                <a href="{{ route('kelola_barang') }}"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-500 hover:text-red-500 underline underline-offset-2 transition">
+                    Reset semua
+                </a>
+
+            </div>
+        @endif
+
         {{-- ── GRID CARDS ── --}}
         @if ($data->count())
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -91,6 +143,16 @@
                                     : 'badge-green'));
                         $imgSrc = $b['foto_url'] ?? 'https://placehold.co/200x200?text=No+Image';
                         $imgStyle = $b['foto_url'] ? '' : 'opacity:0.35;';
+
+                        // Siapkan data untuk JavaScript dengan JSON encoding — stok ikut dikirim
+                        $barangData = json_encode([
+                            'kode' => $b['kode'],
+                            'nama' => $b['nama'],
+                            'kategori' => $b['kategori'],
+                            'id_kategori' => $b['id_kategori'],
+                            'foto_url' => $b['foto_url'] ?? '',
+                            'stok' => $b['stok'],
+                        ]);
                     @endphp
 
                     <div class="card-barang">
@@ -98,13 +160,7 @@
                             <div class="menu-aksi-wrap">
                                 <button class="menu-aksi-btn" onclick="toggleMenu(this)">⋮</button>
                                 <div class="menu-aksi hidden">
-                                    <button
-                                        onclick="openEditModal(
-                                            '{{ $b['kode'] }}',
-                                            '{{ addslashes($b['nama']) }}',
-                                            '{{ $b['id_kategori'] }}',
-                                            '{{ $b['foto_url'] ?? '' }}'
-                                        )"
+                                    <button onclick="openEditModal({{ $barangData }})"
                                         class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                         ✏️ Edit
                                     </button>
@@ -130,12 +186,12 @@
                             @if (session('role') === 'admin')
                                 <div class="flex gap-2 mt-2">
                                     <button
-                                        onclick="openModal('keluar','{{ $b['kode'] }}','{{ addslashes($b['nama']) }}','{{ addslashes($b['kategori']) }}')"
+                                        onclick="openModal('keluar', {{ json_encode($b['kode']) }}, {{ json_encode($b['nama']) }}, {{ json_encode($b['kategori']) }}, {{ $b['stok'] }})"
                                         title="Barang Keluar"
                                         class="flex-1 h-9 bg-red-500 text-white rounded-lg flex items-center justify-center
                                                hover:bg-red-600 transition text-lg font-bold leading-none">−</button>
                                     <button
-                                        onclick="openModal('masuk','{{ $b['kode'] }}','{{ addslashes($b['nama']) }}','{{ addslashes($b['kategori']) }}')"
+                                        onclick="openModal('masuk', {{ json_encode($b['kode']) }}, {{ json_encode($b['nama']) }}, {{ json_encode($b['kategori']) }}, {{ $b['stok'] }})"
                                         title="Barang Masuk"
                                         class="flex-1 h-9 bg-green-500 text-white rounded-lg flex items-center justify-center
                                                hover:bg-green-600 transition text-lg font-bold leading-none">+</button>
@@ -171,6 +227,8 @@
             <span class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left">
                 @if ($data->total())
                     Menampilkan {{ $data->firstItem() }}–{{ $data->lastItem() }} dari {{ $data->total() }} barang
+                @else
+                    Tidak ada barang
                 @endif
             </span>
             <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
@@ -261,7 +319,7 @@
                         </div>
 
                         @error('foto_barang')
-                            <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                            <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                 <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -273,13 +331,14 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Kode
-                                    Barang</label>
+                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                                    Kode Barang
+                                </label>
                                 <input id="tKode" name="kode_barang" type="text" placeholder="Contoh: BRG-001"
                                     value="{{ old('kode_barang') }}" oninput="clearErr('errTKode','tKode')"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                           focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
-                                           @error('kode_barang') input-error @enderror" />
+                                       focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
+                                       @error('kode_barang') input-error @enderror" />
                                 <x-input-error id="errTKode" message="Kode barang wajib diisi." />
                                 {{-- error Laravel --}}
                                 @error('kode_barang')
@@ -294,13 +353,14 @@
                                 @enderror
                             </div>
                             <div>
-                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Nama
-                                    Barang</label>
+                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                                    Nama Barang
+                                </label>
                                 <input id="tNama" name="nama_barang" type="text" placeholder="Contoh: Kaos Polos"
                                     value="{{ old('nama_barang') }}" oninput="clearErr('errTNama','tNama')"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                           focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
-                                           @error('nama_barang') input-error @enderror" />
+                                       focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
+                                       @error('nama_barang') input-error @enderror" />
                                 <x-input-error id="errTNama" message="Nama barang wajib diisi." />
                                 @error('nama_barang')
                                     <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
@@ -316,13 +376,14 @@
                         </div>
 
                         <div>
-                            <label
-                                class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Kategori</label>
+                            <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                                Kategori
+                            </label>
                             <select id="tKategori" name="id_kategori" oninput="clearErr('errTKategori','tKategori')"
                                 onchange="clearErr('errTKategori','tKategori')"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
-                                       rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
-                                       @error('id_kategori') input-error @enderror">
+                                   rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
+                                   @error('id_kategori') input-error @enderror">
                                 <option value="">— Pilih Kategori —</option>
                                 @foreach ($kategori as $kat)
                                     <option value="{{ $kat['id_kategori'] }}"
@@ -336,7 +397,7 @@
                                 <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                     <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
-                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 00-1-1H9z"
                                             clip-rule="evenodd" />
                                     </svg>
                                     <span>{{ $message }}</span>
@@ -365,6 +426,14 @@
                                     class="bg-gray-100 border border-gray-200 text-gray-500 text-sm
                                            rounded-lg block w-full p-2.5 cursor-not-allowed" />
                             </div>
+                        </div>
+
+                        <div
+                            class="flex items-center justify-center gap-2 px-2 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+                            <span class="text-sm text-gray-700">Stok saat ini</span>
+                            <span id="trStokDisplay" class="text-sm font-semibold text-gray-900">
+                                0
+                            </span>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -447,7 +516,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            <x-input-error id="errTrSupplier" message="Supplier wajib dipilih.F" />
+                            <x-input-error id="errTrSupplier" message="Supplier wajib dipilih." />
                             @error('id_supplier')
                                 <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
                                     <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -510,14 +579,13 @@
         </div>
     </div>
 
-
-    {{-- MODAL EDIT BARANG --}}
+{{-- MODAL EDIT BARANG --}}
     @if (session('role') === 'admin')
         <div id="modalEditBarang" class="modal-overlay hidden fixed inset-0 z-50 items-start justify-center pt-20 px-4">
             <div class="modal-backdrop absolute inset-0 bg-black/0 transition-all duration-200"></div>
             <div
                 class="modal-box relative bg-white rounded-2xl w-full max-w-md
-                   transform scale-95 opacity-0 transition-all duration-200 origin-top">
+               transform scale-95 opacity-0 transition-all duration-200 origin-top">
 
                 <div class="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-[#F66B0E]">
                     <h3 class="text-[16px] font-semibold text-white">Edit Barang</h3>
@@ -538,8 +606,8 @@
 
                         <div id="eImageUploadArea" onclick="document.getElementById('eImageInput').click()"
                             class="w-full h-32 border-2 border-dashed border-gray-300 rounded-xl
-                               flex flex-col items-center justify-center cursor-pointer
-                               hover:border-orange-400 hover:bg-orange-50 transition relative overflow-hidden">
+                           flex flex-col items-center justify-center cursor-pointer
+                           hover:border-orange-400 hover:bg-orange-50 transition relative overflow-hidden">
                             <img id="eImagePreview" src="" alt=""
                                 class="hidden absolute inset-0 w-full h-full object-cover rounded-xl">
                             <div id="eImageUploadPlaceholder" class="flex flex-col items-center gap-1 text-gray-400">
@@ -557,31 +625,34 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Kode
-                                    Barang</label>
+                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                                    Kode Barang
+                                </label>
                                 <input id="eKode" name="kode_barang" type="text" placeholder="Contoh: BRG-001"
                                     oninput="clearErr('errEKode','eKode')"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                           focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" />
+                                       focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" />
                                 <x-input-error id="errEKode" message="Kode barang wajib diisi." />
                             </div>
                             <div>
-                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Nama
-                                    Barang</label>
+                                <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                                    Nama Barang
+                                </label>
                                 <input id="eNama" name="nama_barang" type="text" placeholder="Contoh: Kaos Polos"
                                     oninput="clearErr('errENama','eNama')"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                           focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" />
+                                       focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" />
                                 <x-input-error id="errENama" message="Nama barang wajib diisi." />
                             </div>
                         </div>
 
                         <div>
-                            <label
-                                class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Kategori</label>
+                            <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
+                                Kategori
+                            </label>
                             <select id="eKategori" name="id_kategori" onchange="clearErr('errEKategori','eKategori')"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
-                                       rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5">
+                                   rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5">
                                 <option value="">— Pilih Kategori —</option>
                                 @foreach ($kategori as $kat)
                                     <option value="{{ $kat['id_kategori'] }}">{{ $kat['nama_kategori'] }}</option>
@@ -761,6 +832,35 @@
 
 @push('scripts')
     <script>
+        // Helper: set warna stok
+        function setStokDisplay(elId, stok) {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            el.textContent = stok;
+        }
+
+        // data dari server untuk restore modal jika ada error validasi
+        const serverData = {
+            hasEditError: {{ old('_edit_kode') && $errors->hasAny(['kode_barang', 'nama_barang', 'id_kategori', 'foto_barang']) ? 'true' : 'false' }},
+            editOrigKode: @json(old('_edit_kode', '')),
+            editKode: @json(old('kode_barang', '')),
+            editNama: @json(old('nama_barang', '')),
+            editKategori: @json(old('id_kategori', '')),
+            editErrorKode: @json($errors->first('kode_barang')),
+            editErrorNama: @json($errors->first('nama_barang')),
+            editErrorKat: @json($errors->first('id_kategori')),
+
+            hasTambahError: {{ !old('_edit_kode') && $errors->hasAny(['kode_barang', 'nama_barang', 'id_kategori', 'foto_barang']) ? 'true' : 'false' }},
+
+            hasTrError: {{ $errors->hasAny(['jumlah', 'tanggal', 'id_supplier', 'tujuan', 'kode_barang_transaksi']) ? 'true' : 'false' }},
+            trMode: @json(session('_last_modal', 'masuk')),
+            trKode: @json(session('_last_kode', '')),
+            trNama: @json(session('_last_nama', '')),
+            trKategori: @json(session('_last_kategori', '')),
+            trStok: @json(session('_last_stok', 0)),
+            trSupplier: @json(old('id_supplier', '')),
+        };
+
         const isAdmin = {{ session('role') === 'admin' ? 'true' : 'false' }};
 
         // ── MENU AKSI ──
@@ -819,7 +919,7 @@
             },
         };
 
-        function openModal(mode, kode = '', nama = '', kategori = '') {
+        function openModal(mode, kode = '', nama = '', kategori = '', stok = 0) {
             currentMode = mode;
             const cfg = modeConfig[mode];
 
@@ -848,6 +948,9 @@
                 document.getElementById('trJumlah').value = '';
                 document.getElementById('trTanggal').value = '';
                 document.getElementById('trCatatan').value = '';
+
+                // Tampilkan stok dengan warna sesuai kondisi
+                setStokDisplay('trStokDisplay', stok);
 
                 if (mode === 'masuk') {
                     document.getElementById('fieldSupplier').classList.remove('hidden');
@@ -911,17 +1014,17 @@
         }
 
         // ── MODAL EDIT ──
-        function openEditModal(kode, nama, idKategori, fotoUrl) {
+        function openEditModal(data) {
             document.querySelectorAll('.menu-aksi').forEach(m => m.classList.add('hidden'));
-            document.getElementById('formEditBarang').action = '/kelola_barang/' + kode;
-            document.getElementById('eKode').value = kode;
-            document.getElementById('eNama').value = nama;
-            document.getElementById('eKategori').value = idKategori;
+            document.getElementById('formEditBarang').action = '/kelola_barang/' + data.kode;
+            document.getElementById('eKode').value = data.kode;
+            document.getElementById('eNama').value = data.nama;
+            document.getElementById('eKategori').value = data.id_kategori;
 
             const prev = document.getElementById('eImagePreview');
             const placeholder = document.getElementById('eImageUploadPlaceholder');
-            if (fotoUrl) {
-                prev.src = fotoUrl;
+            if (data.foto_url) {
+                prev.src = data.foto_url;
                 prev.classList.remove('hidden');
                 placeholder.classList.add('hidden');
             } else {
@@ -991,7 +1094,6 @@
             document.getElementById('supplierLabel').textContent = el.dataset.label;
             document.getElementById('supplierLabel').classList.replace('text-gray-400', 'text-gray-900');
             document.getElementById('supplierDropdown').classList.add('hidden');
-            // hapus error supplier saat dipilih
             document.getElementById('errTrSupplier').style.display = 'none';
             document.querySelectorAll('#fieldSupplier .err-laravel').forEach(el => el.remove());
         }
@@ -1065,7 +1167,6 @@
             ].forEach(id => {
                 document.getElementById(id)?.classList.remove('input-error');
             });
-            // hapus semua error Laravel di kedua modal
             document.querySelectorAll('#modalCatatBarang .err-laravel').forEach(el => el.remove());
             document.querySelectorAll('#modalEditBarang .err-laravel').forEach(el => el.remove());
         }
@@ -1073,8 +1174,31 @@
         // ── BUKA MODAL OTOMATIS JIKA ADA ERROR VALIDASI LARAVEL ──
         document.addEventListener('DOMContentLoaded', () => {
 
-            @if ($errors->hasAny(['kode_barang', 'nama_barang', 'id_kategori', 'foto_barang']))
-                // error tambah barang — buka modal tambah
+            if (serverData.hasEditError) {
+                document.getElementById('formEditBarang').action = '/kelola_barang/' + serverData.editOrigKode;
+                document.getElementById('eKode').value = serverData.editKode;
+                document.getElementById('eNama').value = serverData.editNama;
+                document.getElementById('eKategori').value = serverData.editKategori;
+
+                if (serverData.editErrorKode) {
+                    document.getElementById('errEKode').querySelector('span').textContent = serverData
+                        .editErrorKode;
+                    showErr('errEKode', 'eKode');
+                }
+                if (serverData.editErrorNama) {
+                    document.getElementById('errENama').querySelector('span').textContent = serverData
+                        .editErrorNama;
+                    showErr('errENama', 'eNama');
+                }
+                if (serverData.editErrorKat) {
+                    document.getElementById('errEKategori').querySelector('span').textContent = serverData
+                        .editErrorKat;
+                    showErr('errEKategori', 'eKategori');
+                }
+
+                openOverlay('modalEditBarang');
+
+            } else if (serverData.hasTambahError) {
                 currentMode = 'tambah';
                 document.getElementById('mhdr').style.background = modeConfig.tambah.bg;
                 document.getElementById('btnSimpan').style.background = modeConfig.tambah.bg;
@@ -1084,12 +1208,12 @@
                 );
                 document.getElementById('sectionTambah').classList.remove('hidden');
                 openOverlay('modalCatatBarang');
-            @elseif ($errors->hasAny(['jumlah', 'tanggal', 'id_supplier', 'tujuan', 'kode_barang_transaksi']))
-                // error barang masuk atau keluar — buka modal transaksi
-                const mode = @json(session('_last_modal', 'masuk'));
-                const kode = @json(session('_last_kode', ''));
-                const nama = @json(session('_last_nama', ''));
-                const kategori = @json(session('_last_kategori', ''));
+
+            } else if (serverData.hasTrError) {
+                const mode = serverData.trMode;
+                const kode = serverData.trKode;
+                const nama = serverData.trNama;
+                const kategori = serverData.trKategori;
 
                 currentMode = mode;
                 document.getElementById('mhdr').style.background = modeConfig[mode].bg;
@@ -1108,17 +1232,18 @@
                 document.getElementById('trNamaHidden').value = nama;
                 document.getElementById('trKategoriHidden').value = kategori;
 
+                // Restore stok saat error transaksi
+                setStokDisplay('trStokDisplay', serverData.trStok);
+
                 if (mode === 'masuk') {
                     document.getElementById('fieldSupplier').classList.remove('hidden');
-                    // restore supplier yang sudah dipilih sebelumnya
-                    restoreSupplier("{{ old('id_supplier') }}");
+                    restoreSupplier(serverData.trSupplier);
                 } else {
                     document.getElementById('fieldTujuan').classList.remove('hidden');
                 }
 
                 openOverlay('modalCatatBarang');
-            @endif
-
+            }
         });
     </script>
 @endpush

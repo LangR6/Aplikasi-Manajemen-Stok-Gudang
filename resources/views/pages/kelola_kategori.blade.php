@@ -60,6 +60,40 @@
             </div>
         </form>
 
+        {{-- ACTIVE FILTER TAGS --}}
+        @if (request('search') || (request('status') && request('status') !== 'semua'))
+            <div class="flex flex-wrap items-center gap-2">
+
+                @if (request('status') && request('status') !== 'semua')
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#205375] text-white">
+                        {{ ucfirst(request('status')) }}
+                        <a href="{{ route('kelola_kategori', array_merge(request()->except(['status', 'page']))) }}"
+                            class="ml-1 font-bold hover:text-gray-200">×</a>
+                    </span>
+                @endif
+
+                @if (request('search'))
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        "{{ request('search') }}"
+                        <a href="{{ route('kelola_kategori', array_merge(request()->except(['search', 'page']))) }}"
+                            class="ml-1 text-gray-500 hover:text-gray-700 font-bold">×</a>
+                    </span>
+                @endif
+
+                <a href="{{ route('kelola_kategori') }}"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-500 hover:text-red-500 underline underline-offset-2 transition">
+                    Reset semua
+                </a>
+
+            </div>
+        @endif
+
         {{-- TABLE --}}
         <div class="border border-gray-300 rounded-xl overflow-hidden">
 
@@ -113,19 +147,14 @@
                                     <td class="px-4 py-2.5">
                                         <div class="flex items-center justify-center gap-2">
                                             <button type="button"
-                                                onclick="openModal('modalKategori'); setModalKategori('edit',
-                                                    '{{ addslashes($dataku['nama_kategori']) }}',
-                                                    {{ $dataku['status'] ? 'true' : 'false' }},
-                                                    {{ $dataku['id_kategori'] }})"
+                                                onclick="openModal('modalKategori'); setModalKategori('edit', {{ json_encode($dataku['nama_kategori']) }}, {{ $dataku['status'] ? 'true' : 'false' }}, {{ json_encode($dataku['id_kategori']) }})"
                                                 class="px-3 py-1 rounded-md text-sm font-medium border border-orange-200
                                                        text-orange-800 bg-orange-100 hover:bg-orange-500 hover:text-white
                                                        active:scale-[.98] hover:-translate-y-px transition-all">
                                                 Edit
                                             </button>
                                             <button type="button"
-                                                onclick="openModal('modalHapus'); setModalHapus(
-                                                    '{{ $dataku['nama_kategori'] }}',
-                                                    {{ $dataku['id_kategori'] }})"
+                                                onclick="openModal('modalHapus'); setModalHapus({{ json_encode($dataku['nama_kategori']) }}, {{ json_encode($dataku['id_kategori']) }})"
                                                 class="px-3 py-1 rounded-md text-sm font-medium border border-red-200
                                                        text-red-800 bg-red-100 hover:bg-red-600 hover:text-white
                                                        active:scale-[.98] hover:-translate-y-px transition-all">
@@ -171,10 +200,7 @@
                                 @endif
                                 @if (session('role') === 'admin')
                                     <button type="button"
-                                        onclick="openModal('modalKategori'); setModalKategori('edit',
-                                            '{{ addslashes($dataku['nama_kategori']) }}',
-                                            {{ $dataku['status'] ? 'true' : 'false' }},
-                                            {{ $dataku['id_kategori'] }})"
+                                        onclick="openModal('modalKategori'); setModalKategori('edit', {{ json_encode($dataku['nama_kategori']) }}, {{ $dataku['status'] ? 'true' : 'false' }}, {{ json_encode($dataku['id_kategori']) }})"
                                         class="p-1.5 rounded-md border border-orange-200 text-orange-700
                                                bg-orange-50 hover:bg-orange-500 hover:text-white
                                                active:scale-[.98] transition-all"
@@ -186,9 +212,7 @@
                                         </svg>
                                     </button>
                                     <button type="button"
-                                        onclick="openModal('modalHapus'); setModalHapus(
-                                            '{{ $dataku['nama_kategori'] }}',
-                                            {{ $dataku['id_kategori'] }})"
+                                        onclick="openModal('modalHapus'); setModalHapus({{ json_encode($dataku['nama_kategori']) }}, {{ json_encode($dataku['id_kategori']) }})"
                                         class="p-1.5 rounded-md border border-red-200 text-red-700
                                                bg-red-50 hover:bg-red-600 hover:text-white
                                                active:scale-[.98] transition-all"
@@ -233,6 +257,8 @@
                 <span class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left">
                     @if ($data->total())
                         Menampilkan {{ $data->firstItem() }}–{{ $data->lastItem() }} dari {{ $data->total() }} kategori
+                    @else
+                        Tidak ada kategori
                     @endif
                 </span>
                 <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
@@ -478,6 +504,16 @@
 
 @push('scripts')
     <script>
+        // data dari server untuk restore modal jika ada error validasi
+        const serverData = {
+            hasError: {{ $errors->has('nama_kategori') ? 'true' : 'false' }},
+            oldNama: @json(old('nama_kategori', '')),
+            oldStatus: @json(old('status', 'aktif')),
+            oldMode: @json(old('_form_mode', 'tambah')), // ← dari old(), bukan session
+            oldId: @json(old('id_kategori', '')), // ← dari old(), bukan session
+            errorMsg: @json($errors->first('nama_kategori')),
+        };
+
         // ===== MODAL =====
         function openModal(id) {
             const ov = document.getElementById(id);
@@ -498,7 +534,7 @@
         });
 
         // ===== MODAL KATEGORI =====
-        function setModalKategori(mode, nama, aktif, id) {
+        function setModalKategori(mode, nama, aktif, id, hapusError = true) {
             if (nama === undefined) nama = '';
             if (aktif === undefined) aktif = true;
             if (id === undefined) id = null;
@@ -515,7 +551,7 @@
                 form.action = "{{ route('kelola_kategori.store') }}";
                 document.getElementById('formMethod').value = 'POST';
             } else {
-                form.action = '/kategori/' + id;
+                form.action = "{{ url('kategori') }}" + '/' + id;
                 document.getElementById('formMethod').value = 'PUT';
             }
 
@@ -546,14 +582,6 @@
             document.getElementById('formKategori').submit();
         }
 
-        function clearAlert(alertId, inputId) {
-            const alertEl = document.getElementById(alertId);
-            const input = document.getElementById(inputId);
-            alertEl.classList.add('hidden');
-            alertEl.classList.remove('flex');
-            if (input) input.classList.remove('input-error');
-        }
-
         function syncLabel(cbId, labelId) {
             const isChecked = document.getElementById(cbId).checked;
             const lbl = document.getElementById(labelId);
@@ -578,7 +606,7 @@
 
         // ===== MODAL HAPUS =====
         function setModalHapus(nama, id) {
-            document.getElementById('formHapus').action = '/kategori/' + id;
+            document.getElementById('formHapus').action = "{{ url('kategori') }}" + '/' + id;
             document.getElementById('hapusNama').textContent = nama;
         }
 
@@ -599,8 +627,26 @@
         @if ($errors->has('nama_kategori'))
             document.addEventListener('DOMContentLoaded', () => {
                 openModal('modalKategori');
-                // isi ulang nilai lama dari old()
-                document.getElementById('namaKategori').value = "{{ old('nama_kategori') }}";
+
+                const isEdit = serverData.oldMode === 'edit' && serverData.oldId;
+
+                document.getElementById('modalKategoriTitle').textContent =
+                    isEdit ? 'Edit Kategori' : 'Tambah Kategori';
+
+                const form = document.getElementById('formKategori');
+                if (isEdit) {
+                    form.action = "{{ url('kategori') }}" + '/' + serverData.oldId;
+                    document.getElementById('formMethod').value = 'PUT';
+                } else {
+                    form.action = "{{ route('kelola_kategori.store') }}";
+                    document.getElementById('formMethod').value = 'POST';
+                }
+
+                document.getElementById('namaKategori').value = serverData.oldNama;
+
+                const isAktif = serverData.oldStatus === 'aktif';
+                document.getElementById('statusToggle').checked = isAktif;
+                syncLabel('statusToggle', 'statusLabel');
                 syncToggleColor(document.getElementById('statusToggle'));
                 syncStatusValue();
             });

@@ -82,6 +82,12 @@ class KelolaKategoriController extends Controller
                 ->with('error', 'Kategori tidak ditemukan.');
         }
 
+        // Mengetahui bahwa proses yang dilakukan adalah edit data kategori
+        $request->merge([
+            '_form_mode'   => 'edit',
+            'id_kategori'  => $id,
+        ]);
+
         // validasi input - jika gagal Laravel otomatis redirect back dengan error
         $request->validate([
             'nama_kategori' => 'required|string|min:2|max:100|unique:kategori,nama_kategori,' . $id . ',id_kategori,deleted_at,NULL',
