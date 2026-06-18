@@ -37,6 +37,7 @@
                            focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
             </div>
 
+
             {{-- TAMBAH --}}
             @if (session('role') === 'admin')
             <button type="button" onclick="openSupplierModal()"
@@ -51,6 +52,32 @@
             @endif
         </div>
     </form>
+
+    {{-- ACTIVE FILTER TAGS --}}
+    @if (request('search'))
+    <div class="flex flex-wrap items-center gap-2 mt-2">
+
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
+                     bg-gray-100 text-gray-700 border border-gray-200">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+            </svg>
+
+            "{{ request('search') }}"
+
+            <a href="{{ route('kelola_supplier', request()->except(['search', 'page'])) }}"
+                class="ml-1 text-gray-500 hover:text-gray-700 font-bold">×</a>
+        </span>
+
+        <a href="{{ route('kelola_supplier') }}"
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                  text-gray-500 hover:text-red-500 underline underline-offset-2 transition">
+            Reset semua
+        </a>
+
+    </div>
+    @endif
 
     {{-- TABLE --}}
     <div class="border border-gray-300 rounded-xl overflow-hidden">
@@ -229,9 +256,12 @@
 
         {{-- FOOTER PAGINATION --}}
         <div class="px-4 py-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
+
             <span class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left">
                 @if ($suppliers->total())
                 Menampilkan {{ $suppliers->firstItem() }}–{{ $suppliers->lastItem() }} dari {{ $suppliers->total() }} supplier
+                @else
+                Tidak ada supplier
                 @endif
             </span>
 
@@ -304,6 +334,7 @@
                     Nama Supplier
                 </label>
                 <input id="namaSupplier" type="text" name="nama_supplier" placeholder="Contoh: CV Sumber Jaya..."
+                    oninput="clearErr('errNamaSupplier', 'namaSupplier')"
                     class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
             rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
             focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
@@ -329,6 +360,7 @@
                         No. Kontak
                     </label>
                     <input id="kontakSupplier" type="text" name="kontak" placeholder="Contoh: 0812-3456-7890"
+                        oninput="clearErr('errKontakSupplier', 'kontakSupplier')"
                         class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
                 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
                 focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
@@ -342,6 +374,7 @@
                         Kota
                     </label>
                     <input id="kotaSupplier" type="text" name="kota" placeholder="Contoh: Bandung"
+                        oninput="clearErr('errKotaSupplier', 'kotaSupplier')"
                         class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
                 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
                 focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
@@ -356,6 +389,7 @@
                     Email
                 </label>
                 <input id="emailSupplier" type="email" name="email" placeholder="Contoh: supplier@email.com"
+                    oninput="clearErr('errEmailSupplier', 'emailSupplier')"
                     class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm
             rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2
             focus:ring-orange-400 focus:border-transparent transition placeholder-gray-300" />
@@ -545,13 +579,17 @@
             hideErr('errNamaSupplier', 'namaSupplier');
         }
 
-        // Kontak: wajib dan minimal 6 angka
+        // Kontak: wajib dan minimal 6 angka dan harus berupa angka
         const digitOnly = kontak.replace(/[\s\-]/g, '');
         if (!kontak) {
             document.querySelector('#errKontakSupplier span').textContent = 'Kontak wajib diisi.';
             showErr('errKontakSupplier', 'kontakSupplier');
             valid = false;
-        } else if (!/^\d+$/.test(digitOnly) || digitOnly.length < 6) {
+        } else if (!/^\d+$/.test(digitOnly)) {
+            document.querySelector('#errKontakSupplier span').textContent = 'Kontak harus berupa angka.';
+            showErr('errKontakSupplier', 'kontakSupplier');
+            valid = false;
+        } else if (digitOnly.length < 6) {
             document.querySelector('#errKontakSupplier span').textContent = 'Kontak minimal 6 angka.';
             showErr('errKontakSupplier', 'kontakSupplier');
             valid = false;
@@ -645,38 +683,46 @@
     // ===== AUTO OPEN MODAL JIKA ADA ERROR VALIDASI =====
     document.addEventListener('DOMContentLoaded', function() {
         const hasError = document.querySelector('meta[name="has-error"]').getAttribute('content') === '1';
+
         if (hasError) {
-
-            const mode =
-                document.querySelector('meta[name="old-mode"]').content;
-
-            const id =
-                document.querySelector('meta[name="old-id"]').content;
+            const mode = document.querySelector('meta[name="old-mode"]').content;
+            const id = document.querySelector('meta[name="old-id"]').content;
 
             if (mode === 'edit') {
-
                 openSupplierModal('edit', {
                     id_supplier: id
                 });
-
             } else {
-
                 openSupplierModal();
-
             }
 
             document.getElementById('namaSupplier').value =
                 document.querySelector('meta[name="old-nama"]').content;
-
             document.getElementById('kontakSupplier').value =
                 document.querySelector('meta[name="old-kontak"]').content;
-
             document.getElementById('kotaSupplier').value =
                 document.querySelector('meta[name="old-kota"]').content;
-
             document.getElementById('emailSupplier').value =
                 document.querySelector('meta[name="old-email"]').content;
         }
+
+
     });
+
+    function showErr(errId, inputId) {
+        const err = document.getElementById(errId);
+        if (!err) return;
+        err.style.display = 'flex';
+        if (inputId) document.getElementById(inputId)?.classList.add('border-red-400', 'bg-red-50');
+    }
+
+    function clearErr(errId, inputId) {
+        const err = document.getElementById(errId);
+        if (!err) return;
+        err.style.display = 'none';
+        if (inputId) {
+            document.getElementById(inputId)?.classList.remove('border-red-400', 'bg-red-50');
+        }
+    }
 </script>
 @endpush

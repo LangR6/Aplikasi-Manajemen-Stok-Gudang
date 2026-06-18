@@ -35,14 +35,27 @@ class SupplierController extends Controller
     {
         $request->validate([
             'nama_supplier' => 'required|string|max:100|unique:supplier,nama_supplier,NULL,id_supplier,deleted_at,NULL',
-            'kontak'        => ['required', 'regex:/^\d[\d\s\-]{4,}\d$/'],
+            'kontak'        => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $digitOnly = preg_replace('/[\s\-]/', '', $value);
+
+                    if (!preg_match('/^\d+$/', $digitOnly)) {
+                        $fail('Kontak harus berupa angka.');
+                        return;
+                    }
+
+                    if (strlen($digitOnly) < 6) {
+                        $fail('Kontak minimal 6 angka.');
+                    }
+                },
+            ],
             'email'         => 'required|email|max:100',
             'kota'          => 'required|string|max:100',
         ], [
             'nama_supplier.required' => 'Nama supplier wajib diisi.',
             'nama_supplier.unique'   => 'Nama supplier sudah digunakan.',
             'kontak.required'        => 'Kontak wajib diisi.',
-            'kontak.regex'           => 'Kontak minimal 6 angka.',
             'email.required'         => 'Email wajib diisi.',
             'email.email'            => 'Format email tidak valid.',
             'kota.required'          => 'Kota wajib diisi.',
@@ -66,7 +79,7 @@ class SupplierController extends Controller
             '_form_mode' => 'edit',
             'id_supplier' => $id
         ]);
-        
+
         $supplier = Supplier::findOrFail($id);
 
         $request->validate([

@@ -17,8 +17,7 @@ class Supplier extends Model
         'nama_supplier',
         'no_kontak',
         'email',
-        'kota',
-        'dicatat_oleh'
+        'kota'
     ];
 
     public function barangMasuk()
