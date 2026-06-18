@@ -171,11 +171,11 @@
 
     <!-- Data Supplier -->
     <div class="col-span-12 lg:col-span-6">
-        <div class="overflow-hidden rounded-[20px] sm:rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
+        <div class="h-full overflow-hidden rounded-[20px] sm:rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
 
             <!-- Header -->
             <div class="flex items-center justify-between border-b border-gray-200 px-4 sm:px-5 py-3 sm:py-4">
-                <h2 class="text-[18px] sm:text-[22px] font-semibold text-[#1f2937]">Data Supplier</h2>
+                <h2 class="text-[18px] sm:text-[20px] font-semibold text-[#1f2937]">Data Supplier</h2>
             </div>
 
             <!-- Table -->
@@ -278,10 +278,10 @@
     </div>
 
     <!-- Right Cards -->
-    <div class="col-span-12 lg:col-span-6 space-y-3 sm:space-y-4">
+    <div class="col-span-12 lg:col-span-6 flex flex-col gap-3 sm:gap-4">
 
         <!-- Barang Masuk terbaru -->
-        <div class="rounded-[20px] sm:rounded-[24px] border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all">
+        <div class="flex-1 rounded-[20px] sm:rounded-[24px] border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all">
 
             <div class="border-b border-gray-200 px-4 sm:px-5 py-3 sm:py-4">
                 <h2 class="text-[16px] sm:text-[20px] font-semibold text-gray-900">Barang Masuk Terbaru</h2>
@@ -313,7 +313,7 @@
         </div>
 
         <!-- Barang Keluar terbaru -->
-        <div class="rounded-[20px] sm:rounded-[24px] border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all">
+        <div class="flex-1 rounded-[20px] sm:rounded-[24px] border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all">
 
             <div class="border-b border-gray-200 px-4 sm:px-5 py-3 sm:py-4">
                 <h2 class="text-[16px] sm:text-[20px] font-semibold text-gray-900">Barang Keluar Terbaru</h2>
@@ -711,7 +711,9 @@
 
     function closeStokMenipisModal() {
         closeModal('stokMenipisModal');
+        setTimeout(() => location.reload(), 250);
     }
+
 
     function openStokHabisModal() {
         openModal('stokHabisModal');
@@ -719,6 +721,7 @@
 
     function closeStokHabisModal() {
         closeModal('stokHabisModal');
+        setTimeout(() => location.reload(), 250);
     }
 
     function openDaftarBarangMasukModal() {

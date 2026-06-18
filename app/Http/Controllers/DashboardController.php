@@ -20,20 +20,25 @@ class DashboardController extends Controller
         $totalBarangKeluar = BarangKeluar::where('tgl_keluar', '>=', $seninIni)->count();
         $totalBarang       = Barang::count();
 
-        $stokMenipis = Barang::where('stok', '>', 0)->where('stok', '<=', 5)
-            ->where(function ($q) {
-                $q->whereNull('stok_menipis_dibaca_pada')
-                    ->orWhereDate('stok_menipis_dibaca_pada', '<', today());
-            })->count();
+        $stokMenipis = Barang::where('stok', '>', 0)
+            ->where('stok', '<=', 5)
+            ->count();
 
         $stokHabis = Barang::where('stok', 0)
-            ->where(function ($q) {
-                $q->whereNull('stok_habis_dibaca_pada')
-                    ->orWhereDate('stok_habis_dibaca_pada', '<', today());
-            })->count();
+            ->whereHas('barangMasuk')
+            ->count();
 
         $daftarStokMenipis = Barang::with('kategori')
-            ->where('stok', '>', 0)->where('stok', '<=', 5)
+            ->where('stok', '>', 0)
+            ->where('stok', '<=', 5)
+            ->orderByRaw("
+        CASE
+            WHEN stok_menipis_dibaca_pada IS NULL
+                 OR DATE(stok_menipis_dibaca_pada) < CURDATE()
+            THEN 0
+            ELSE 1
+        END
+    ")
             ->get()
             ->map(fn($b) => [
                 'kode'        => $b->kode_barang,
@@ -45,8 +50,17 @@ class DashboardController extends Controller
                     : false,
             ]);
 
-        $daftarStokHabis = Barang::with('kategori')
+        $daftarStokHabis = Barang::with(['kategori', 'barangMasuk'])
             ->where('stok', 0)
+            ->whereHas('barangMasuk')
+            ->orderByRaw("
+        CASE
+            WHEN stok_habis_dibaca_pada IS NULL
+                 OR DATE(stok_habis_dibaca_pada) < CURDATE()
+            THEN 0
+            ELSE 1
+        END ASC
+    ")
             ->get()
             ->map(fn($b) => [
                 'kode'        => $b->kode_barang,
