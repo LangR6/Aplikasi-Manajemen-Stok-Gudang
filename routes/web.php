@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\KelolaBarangController;
 use App\Http\Controllers\KelolaKategoriController;
@@ -16,11 +15,8 @@ use App\Http\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', [LoginController::class, 'login'])
-    ->name('login');
-
-Route::post('/loginaction', [LoginController::class, 'loginAction'])
-    ->name('loginaction');
+Route::get('/login',        [AuthController::class, 'index'])->name('login');
+Route::post('/loginaction', [AuthController::class, 'login'])->name('loginaction');
 
 /*
 |--------------------------------------------------------------------------
@@ -28,8 +24,7 @@ Route::post('/loginaction', [LoginController::class, 'loginAction'])
 |--------------------------------------------------------------------------
 */
 
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------

@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     // ===== TAMPILKAN HALAMAN LOGIN =====
     public function index()
     {
-        return view('login');
+        return view('pages.login');
     }
 
     // ===== PROSES LOGIN =====
@@ -26,26 +24,32 @@ class AuthController extends Controller
             'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
-        $user = User::where('username', $request->username)->first();
+        $credentials = [
+            'username' => $request->username,
+            'password' => $request->password,
+        ];
 
-        if ($user && Hash::check($request->password, $user->password)) {
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-            // Simpan data ke session
+            // ===== SIMPAN SESSION =====
             session([
-                'nama'     => $user->nama,
-                'username' => $user->username,
-                'email'    => $user->email,
-                'hp'       => $user->hp,
-                'role'     => $user->role,
+                'nama'     => Auth::user()->username, //Pakai username karena tidak ada kolom nama
+                'username' => Auth::user()->username,
+                'email'    => Auth::user()->email,
+                'hp'       => Auth::user()->no_telpon,
+                'role'     => Auth::user()->role,
             ]);
 
-            // Redirect ke login dulu agar modal muncul
-            return redirect()->route('login')->with('login_success', true);
+            // ===== FLAG STOK MENIPIS UNTUK ADMIN =====
+            if (Auth::user()->role === 'admin') {
+                session(['show_stok_menipis' => true]);
+            }
 
+            return redirect()->route('login')->with('login_success', true);
         }
 
-        // Jika gagal
-        return redirect()->route('login')
+        return back()
             ->with('error', 'Username atau password salah!')
             ->withInput($request->only('username'));
     }
