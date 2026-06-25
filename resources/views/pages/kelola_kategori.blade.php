@@ -205,8 +205,8 @@
                                                bg-orange-50 hover:bg-orange-500 hover:text-white
                                                active:scale-[.98] transition-all"
                                         title="Edit">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                            stroke-width="2">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
@@ -217,8 +217,8 @@
                                                bg-red-50 hover:bg-red-600 hover:text-white
                                                active:scale-[.98] transition-all"
                                         title="Hapus">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                            stroke-width="2">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -521,12 +521,22 @@
             ov.classList.add('flex');
             void ov.offsetWidth;
             ov.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal(id) {
             const ov = document.getElementById(id);
             ov.classList.remove('is-open');
-            setTimeout(() => ov.classList.add('hidden'), 200);
+            setTimeout(() => {
+                ov.classList.remove('flex');
+                ov.classList.add('hidden');
+                // cek apakah masih ada modal lain yang terbuka sebelum buka scroll lagi
+                const anyOpen = ['modalKategori', 'modalHapus'].some(i => {
+                    const el = document.getElementById(i);
+                    return el && !el.classList.contains('hidden');
+                });
+                if (!anyOpen) document.body.style.overflow = '';
+            }, 200);
         }
 
         document.querySelectorAll('.modal-overlay').forEach(ov => {

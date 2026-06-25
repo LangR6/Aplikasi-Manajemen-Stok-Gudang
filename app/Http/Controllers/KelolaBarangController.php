@@ -161,7 +161,7 @@ class KelolaBarangController extends Controller
                 ->with('error', 'Barang tidak ditemukan.');
         }
 
-        // Mengetahui bahwa proses yang dilakukan adalah edit data kategori
+        // Mengetahui bahwa proses yang dilakukan adalah edit data barang
         $request->merge([
             '_edit_kode' => $kodeBarang,
         ]);
@@ -215,12 +215,16 @@ class KelolaBarangController extends Controller
                 ->with('error', 'Anda tidak memiliki akses.');
         }
 
+        // ambil stok barang saat ini untuk ditampilkan kembali jika validasi gagal
+        $stokSaatIni = Barang::find($request->kode_barang_transaksi)?->stok ?? 0;
+
         // simpan info barang ke session sebelum validasi
         session([
             '_last_modal'    => 'masuk',
             '_last_kode'     => $request->kode_barang_transaksi,
             '_last_nama'     => $request->nama_display,
             '_last_kategori' => $request->kategori_display,
+            '_last_stok'     => $stokSaatIni,
         ]);
 
         // validasi input - jika gagal Laravel otomatis redirect back dengan error
@@ -232,7 +236,6 @@ class KelolaBarangController extends Controller
             'keterangan'            => 'nullable|string|max:255',
         ], [
             'jumlah.required'         => 'Jumlah wajib diisi.',
-            'jumlah.integer'          => 'Jumlah harus berupa angka.',
             'jumlah.min'              => 'Jumlah minimal 1.',
             'tanggal.required'        => 'Tanggal wajib diisi.',
             'tanggal.before_or_equal' => 'Tanggal tidak boleh melebihi hari ini.',
@@ -274,7 +277,7 @@ class KelolaBarangController extends Controller
             $barang->update(['stok_habis_dibaca_pada' => null]);
         }
 
-        session()->forget(['_last_modal', '_last_kode', '_last_nama', '_last_kategori']);
+        session()->forget(['_last_modal', '_last_kode', '_last_nama', '_last_kategori', '_last_stok']);
 
         return redirect()->back()
             ->with('success', 'Barang masuk berhasil dicatat.');
@@ -289,12 +292,16 @@ class KelolaBarangController extends Controller
                 ->with('error', 'Anda tidak memiliki akses.');
         }
 
+        // ambil stok barang saat ini untuk ditampilkan kembali jika validasi gagal
+        $stokSaatIni = Barang::find($request->kode_barang_transaksi)?->stok ?? 0;
+
         // simpan info barang ke session sebelum validasi
         session([
             '_last_modal'    => 'keluar',
             '_last_kode'     => $request->kode_barang_transaksi,
             '_last_nama'     => $request->nama_display,
             '_last_kategori' => $request->kategori_display,
+            '_last_stok'     => $stokSaatIni,
         ]);
 
         // validasi input - jika gagal Laravel otomatis redirect back dengan error
@@ -306,7 +313,6 @@ class KelolaBarangController extends Controller
             'keterangan'            => 'nullable|string|max:255',
         ], [
             'jumlah.required'         => 'Jumlah wajib diisi.',
-            'jumlah.integer'          => 'Jumlah harus berupa angka.',
             'jumlah.min'              => 'Jumlah minimal 1.',
             'tanggal.required'        => 'Tanggal wajib diisi.',
             'tanggal.before_or_equal' => 'Tanggal tidak boleh melebihi hari ini.',
@@ -346,7 +352,7 @@ class KelolaBarangController extends Controller
         // kurangi stok
         $barang->decrement('stok', $request->jumlah);
 
-        session()->forget(['_last_modal', '_last_kode', '_last_nama', '_last_kategori']);
+        session()->forget(['_last_modal', '_last_kode', '_last_nama', '_last_kategori', '_last_stok']);
 
         return redirect()->back()
             ->with('success', 'Barang keluar berhasil dicatat.');
