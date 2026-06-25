@@ -33,6 +33,13 @@ class SupplierController extends Controller
 
     public function store(Request $request)
     {
+
+        // Hanya admin yang boleh menambah supplier
+        if (session('role') !== 'admin') {
+            return redirect()->back()
+                ->with('error', 'Anda tidak memiliki akses.');
+        }
+
         $request->validate([
             'nama_supplier' => 'required|string|max:100|unique:supplier,nama_supplier,NULL,id_supplier,deleted_at,NULL',
             'kontak'        => [
@@ -75,6 +82,13 @@ class SupplierController extends Controller
 
     public function update(Request $request, $id)
     {
+
+        // Hanya admin yang boleh mengubah supplier
+        if (session('role') !== 'admin') {
+            return redirect()->back()
+                ->with('error', 'Anda tidak memiliki akses.');
+        }
+
         $request->merge([
             '_form_mode' => 'edit',
             'id_supplier' => $id
@@ -111,6 +125,13 @@ class SupplierController extends Controller
 
     public function destroy($id)
     {
+
+        // Hanya admin yang boleh menghapus supplier
+        if (session('role') !== 'admin') {
+            return redirect()->back()
+                ->with('error', 'Anda tidak memiliki akses.');
+        }
+
         $supplier = Supplier::findOrFail($id);
 
         $namaSupplier = $supplier->nama_supplier;
