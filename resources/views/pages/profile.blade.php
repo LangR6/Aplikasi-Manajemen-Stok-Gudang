@@ -29,15 +29,6 @@
                 </button>
             </div>
 
-            {{-- FLASH MESSAGE --}}
-
-
-            @if (session('error'))
-                <div class="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                    {{ session('error') }}
-                </div>
-            @endif
-
             <div class="grid grid-cols-1 md:grid-cols-5 gap-0">
 
                 {{-- KIRI --}}
@@ -109,10 +100,11 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">
                                     Nama Pengguna
                                 </label>
-                                <input id="nama" name="nama" type="text" value="{{ old('nama', session('nama')) }}" readonly
+                                <input id="nama" name="nama" type="text"
+                                    value="{{ old('nama', session('nama')) }}" readonly
                                     class="w-full rounded-lg px-3 py-2.5 bg-white border border-gray-200 shadow-sm text-sm text-[#112B3C]">
                                 @error('nama')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    <p id="error_nama" class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -121,10 +113,11 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">
                                     Email
                                 </label>
-                                <input id="email" name="email" type="email" value="{{ old('email', session('email')) }}" readonly
+                                <input id="email" name="email" type="email"
+                                    value="{{ old('email', session('email')) }}" readonly
                                     class="w-full rounded-lg px-3 py-2.5 bg-white border border-gray-200 shadow-sm text-sm text-[#112B3C]">
                                 @error('email')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    <p id="error_email" class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -133,10 +126,11 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">
                                     No Handphone
                                 </label>
-                                <input id="hp" name="hp" type="text" value="{{ old('hp', session('hp')) }}" readonly
+                                <input id="hp" name="hp" type="text" value="{{ old('hp', session('hp')) }}"
+                                    readonly
                                     class="w-full rounded-lg px-3 py-2.5 bg-white border border-gray-200 shadow-sm text-sm text-[#112B3C]">
                                 @error('hp')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    <p id="error_hp" class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -161,6 +155,9 @@
                                         </svg>
                                     </button>
                                 </div>
+                                @error('password_lama')
+                                    <p id="error_password_lama" class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             {{-- Password Baru --}}
@@ -185,7 +182,7 @@
                                     </button>
                                 </div>
                                 @error('password_baru')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    <p id="error_password_baru" class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -210,6 +207,7 @@
                                         </svg>
                                     </button>
                                 </div>
+                                {{-- Tidak ada error server untuk konfirmasi_password --}}
                             </div>
 
                             {{-- Role --}}
@@ -289,13 +287,13 @@
 
         function togglePassword(inputId, iconId) {
             const input = document.getElementById(inputId);
-            const icon  = document.getElementById(iconId);
+            const icon = document.getElementById(iconId);
 
             if (input.type === 'password') {
-                input.type     = 'text';
+                input.type = 'text';
                 icon.innerHTML = eyeOffIcon;
             } else {
-                input.type     = 'password';
+                input.type = 'password';
                 icon.innerHTML = eyeIcon;
             }
         }
@@ -342,21 +340,44 @@
         }
 
         function cancelEdit() {
-            const inputs = ['nama', 'email', 'hp', 'password_lama', 'password_baru', 'konfirmasi_password'];
+            const inputs = [
+                'nama',
+                'email',
+                'hp',
+                'password_lama',
+                'password_baru',
+                'konfirmasi_password'
+            ];
 
             inputs.forEach(id => {
                 const el = document.getElementById(id);
+
                 el.value = originalData[id];
                 el.setAttribute('readonly', true);
-                el.classList.remove('bg-yellow-50', 'border-blue-400', 'ring-1', 'ring-blue-200');
 
-                if (['password_lama', 'password_baru', 'konfirmasi_password'].includes(id)) {
+                el.classList.remove(
+                    'bg-yellow-50',
+                    'border-blue-400',
+                    'ring-1',
+                    'ring-blue-200'
+                );
+
+                if (
+                    id === 'password_lama' ||
+                    id === 'password_baru' ||
+                    id === 'konfirmasi_password'
+                ) {
                     el.type = 'password';
                 }
             });
 
             disableToggleButtons();
             resetPasswordIcons();
+
+            // Hilangkan semua pesan error saat batal
+            document.querySelectorAll('.text-red-500').forEach(error => {
+                error.remove();
+            });
 
             document.getElementById('btnEdit').classList.remove('hidden');
             document.getElementById('btnBatal').classList.add('hidden');
@@ -367,6 +388,27 @@
         @if ($errors->any())
             enableEdit();
         @endif
+
+        // Peta input -> id error masing-masing
+        // Saat user mengetik di input tertentu, hanya error input itu yang hilang
+        const errorMap = {
+            'nama'                : 'error_nama',
+            'email'               : 'error_email',
+            'hp'                  : 'error_hp',
+            'password_lama'       : 'error_password_lama',
+            'password_baru'       : 'error_password_baru',
+            'konfirmasi_password' : null  // tidak ada error server untuk field ini
+        };
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function () {
+                const errorId = errorMap[this.id];
+                if (errorId) {
+                    const errorEl = document.getElementById(errorId);
+                    if (errorEl) errorEl.remove();
+                }
+            });
+        });
     </script>
 
 @endsection
