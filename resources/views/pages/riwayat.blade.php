@@ -166,7 +166,7 @@
                         <th class="py-3 px-3 text-left">Tanggal</th>
                         <th class="py-3 px-3 text-left">Nama Barang</th>
                         <th class="py-3 px-3 text-left">Jumlah</th>
-                        <th class="py-3 px-3 text-left">Kota</th>
+                        <th class="py-3 px-3 text-left">Kota / Tujuan</th>
                         <th class="py-3 px-3 text-left">Transaksi</th>
                         <th class="py-3 px-3 text-left">Aksi</th>
                     </tr>
@@ -277,16 +277,45 @@
                         border border-gray-300 rounded-md hover:border-orange-500 hover:text-orange-500 transition">‹</a>
                 @endif
 
-                {{-- NUMBER --}}
-                @for ($p = 1; $p <= $riwayat->lastPage(); $p++)
+                {{-- NUMBER dengan sliding window --}}
+                @php
+                    $current = $riwayat->currentPage();
+                    $last    = $riwayat->lastPage();
+                    $window  = 2; // jumlah nomor kiri & kanan dari halaman aktif
+                    $start   = max(1, $current - $window);
+                    $end     = min($last, $current + $window);
+                @endphp
+
+                {{-- Halaman pertama + dots kiri --}}
+                @if ($start > 1)
+                    <a href="{{ $riwayat->url(1) }}&{{ http_build_query(request()->except('page')) }}"
+                        class="w-8 h-8 flex items-center justify-center rounded-md border text-gray-500
+                        border-gray-300 hover:border-orange-500 hover:text-orange-500 transition">1</a>
+                    @if ($start > 2)
+                        <span class="w-8 h-8 flex items-center justify-center text-gray-400 select-none">…</span>
+                    @endif
+                @endif
+
+                {{-- Sliding window --}}
+                @for ($p = $start; $p <= $end; $p++)
                     <a href="{{ $riwayat->url($p) }}&{{ http_build_query(request()->except('page')) }}"
                         class="w-8 h-8 flex items-center justify-center rounded-md border transition
-                        {{ $riwayat->currentPage() == $p
+                        {{ $current == $p
                             ? 'bg-orange-500 text-white border-orange-500'
                             : 'text-gray-500 border-gray-300 hover:border-orange-500 hover:text-orange-500' }}">
                         {{ $p }}
                     </a>
                 @endfor
+
+                {{-- Dots kanan + halaman terakhir --}}
+                @if ($end < $last)
+                    @if ($end < $last - 1)
+                        <span class="w-8 h-8 flex items-center justify-center text-gray-400 select-none">…</span>
+                    @endif
+                    <a href="{{ $riwayat->url($last) }}&{{ http_build_query(request()->except('page')) }}"
+                        class="w-8 h-8 flex items-center justify-center rounded-md border text-gray-500
+                        border-gray-300 hover:border-orange-500 hover:text-orange-500 transition">{{ $last }}</a>
+                @endif
 
                 {{-- NEXT --}}
                 @if ($riwayat->hasMorePages())
