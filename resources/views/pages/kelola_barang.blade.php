@@ -152,6 +152,7 @@
                             'id_kategori' => $b['id_kategori'],
                             'foto_url' => $b['foto_url'] ?? '',
                             'stok' => $b['stok'],
+                            'punya_transaksi' => $b['punya_transaksi'],
                         ]);
                     @endphp
 
@@ -201,7 +202,7 @@
                     </div>
                 @endforeach
             </div>
-        @else
+        @elseif (request('search') || request('status') || request('kategori'))
             <div class="py-12 text-center border border-gray-300 rounded-xl">
                 <div
                     class="w-10 h-10 rounded-full bg-gray-100 border border-gray-200
@@ -231,35 +232,67 @@
                     Tidak ada barang
                 @endif
             </span>
-            <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
-                @if ($data->onFirstPage())
-                    <span
-                        class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">‹</span>
-                @else
-                    <a href="{{ $data->previousPageUrl() }}"
-                        class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">‹</a>
-                @endif
-
-                @foreach ($data->links()->elements[0] as $page => $url)
-                    @if (is_string($page))
-                        <span class="text-sm text-gray-400 px-0.5">…</span>
-                    @elseif ($page == $data->currentPage())
+            @if ($data->lastPage() > 1)
+                <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
+                    {{-- PREV --}}
+                    @if ($data->onFirstPage())
                         <span
-                            class="w-8 h-8 rounded-md border border-[#F66B0E] bg-[#F66B0E] text-white text-sm font-medium flex items-center justify-center">{{ $page }}</span>
+                            class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">‹</span>
                     @else
-                        <a href="{{ $url }}"
-                            class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">{{ $page }}</a>
+                        <a href="{{ $data->previousPageUrl() }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">‹</a>
                     @endif
-                @endforeach
 
-                @if ($data->hasMorePages())
-                    <a href="{{ $data->nextPageUrl() }}"
-                        class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">›</a>
-                @else
-                    <span
-                        class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">›</span>
-                @endif
-            </div>
+                    {{-- NUMBER dengan sliding window --}}
+                    @php
+                        $current = $data->currentPage();
+                        $last = $data->lastPage();
+                        $window = 2; // jumlah nomor kiri & kanan dari halaman aktif
+                        $start = max(1, $current - $window);
+                        $end = min($last, $current + $window);
+                    @endphp
+
+                    {{-- Halaman pertama + dots kiri --}}
+                    @if ($start > 1)
+                        <a href="{{ $data->url(1) }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">1</a>
+                        @if ($start > 2)
+                            <span
+                                class="w-8 h-8 flex items-center justify-center text-sm text-gray-400 select-none">…</span>
+                        @endif
+                    @endif
+
+                    {{-- Sliding window --}}
+                    @for ($p = $start; $p <= $end; $p++)
+                        <a href="{{ $data->url($p) }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 rounded-md border text-sm font-medium flex items-center justify-center transition-all
+                        {{ $current == $p
+                            ? 'bg-[#F66B0E] border-[#F66B0E] text-white'
+                            : 'text-gray-600 border-gray-300 hover:border-orange-500 hover:text-orange-500' }}">
+                            {{ $p }}
+                        </a>
+                    @endfor
+
+                    {{-- Dots kanan + halaman terakhir --}}
+                    @if ($end < $last)
+                        @if ($end < $last - 1)
+                            <span
+                                class="w-8 h-8 flex items-center justify-center text-sm text-gray-400 select-none">…</span>
+                        @endif
+                        <a href="{{ $data->url($last) }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">{{ $last }}</a>
+                    @endif
+
+                    {{-- NEXT --}}
+                    @if ($data->hasMorePages())
+                        <a href="{{ $data->nextPageUrl() }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">›</a>
+                    @else
+                        <span
+                            class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">›</span>
+                    @endif
+                </div>
+            @endif
         </div>
 
     </div>
@@ -556,8 +589,21 @@
                             <label
                                 class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">Keterangan</label>
                             <textarea id="trCatatan" name="keterangan" rows="2" placeholder="Keterangan (opsional)"
+                                oninput="clearErr('errTrCatatan','trCatatan')"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                       focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5">{{ old('keterangan') }}</textarea>
+                                       focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5
+                                       @error('keterangan') input-error @enderror">{{ old('keterangan') }}</textarea>
+                            <x-input-error id="errTrCatatan" message="Keterangan maksimal 255 karakter." />
+                            @error('keterangan')
+                                <p class="err-laravel mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                    <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
 
                     </div>
@@ -579,7 +625,7 @@
         </div>
     </div>
 
-{{-- MODAL EDIT BARANG --}}
+    {{-- MODAL EDIT BARANG --}}
     @if (session('role') === 'admin')
         <div id="modalEditBarang" class="modal-overlay hidden fixed inset-0 z-50 items-start justify-center pt-20 px-4">
             <div class="modal-backdrop absolute inset-0 bg-black/0 transition-all duration-200"></div>
@@ -633,6 +679,14 @@
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                                        focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" />
                                 <x-input-error id="errEKode" message="Kode barang wajib diisi." />
+                                <p id="eKodeLockInfo" class="hidden mt-1.5 text-xs text-gray-400 flex items-center gap-1">
+                                    <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" stroke-width="2">
+                                        <rect x="5" y="11" width="14" height="9" rx="1.5" />
+                                        <path stroke-linecap="round" d="M8 11V7a4 4 0 118 0v4" />
+                                    </svg>
+                                    <span>Kode tidak dapat diubah karena sudah memiliki riwayat transaksi.</span>
+                                </p>
                             </div>
                             <div>
                                 <label class="block mb-1.5 text-xs font-medium text-gray-800 uppercase tracking-wide">
@@ -839,10 +893,20 @@
             el.textContent = stok;
         }
 
+        // Helper: ambil tanggal hari ini (zona waktu lokal) dalam format yyyy-mm-dd
+        function getTanggalHariIni() {
+            const now = new Date();
+            const tahun = now.getFullYear();
+            const bulan = String(now.getMonth() + 1).padStart(2, '0');
+            const tanggal = String(now.getDate()).padStart(2, '0');
+            return `${tahun}-${bulan}-${tanggal}`;
+        }
+
         // data dari server untuk restore modal jika ada error validasi
         const serverData = {
             hasEditError: {{ old('_edit_kode') && $errors->hasAny(['kode_barang', 'nama_barang', 'id_kategori', 'foto_barang']) ? 'true' : 'false' }},
             editOrigKode: @json(old('_edit_kode', '')),
+            editPunyaTransaksi: @json(old('_punya_transaksi', false)),
             editKode: @json(old('kode_barang', '')),
             editNama: @json(old('nama_barang', '')),
             editKategori: @json(old('id_kategori', '')),
@@ -852,7 +916,7 @@
 
             hasTambahError: {{ !old('_edit_kode') && $errors->hasAny(['kode_barang', 'nama_barang', 'id_kategori', 'foto_barang']) ? 'true' : 'false' }},
 
-            hasTrError: {{ $errors->hasAny(['jumlah', 'tanggal', 'id_supplier', 'tujuan', 'kode_barang_transaksi']) ? 'true' : 'false' }},
+            hasTrError: {{ $errors->hasAny(['jumlah', 'tanggal', 'id_supplier', 'tujuan', 'keterangan', 'kode_barang_transaksi']) ? 'true' : 'false' }},
             trMode: @json(session('_last_modal', 'masuk')),
             trKode: @json(session('_last_kode', '')),
             trNama: @json(session('_last_nama', '')),
@@ -946,7 +1010,7 @@
                 document.getElementById('trNamaHidden').value = nama;
                 document.getElementById('trKategoriHidden').value = kategori;
                 document.getElementById('trJumlah').value = '';
-                document.getElementById('trTanggal').value = '';
+                document.getElementById('trTanggal').value = getTanggalHariIni();
                 document.getElementById('trCatatan').value = '';
 
                 // Tampilkan stok dengan warna sesuai kondisi
@@ -1020,6 +1084,21 @@
             document.getElementById('eKode').value = data.kode;
             document.getElementById('eNama').value = data.nama;
             document.getElementById('eKategori').value = data.id_kategori;
+
+            // kunci field kode barang jika barang sudah memiliki riwayat transaksi
+            const eKode = document.getElementById('eKode');
+            const lockInfo = document.getElementById('eKodeLockInfo');
+            if (data.punya_transaksi) {
+                eKode.readOnly = true;
+                eKode.classList.add('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+                eKode.classList.remove('bg-gray-50');
+                lockInfo.classList.remove('hidden');
+            } else {
+                eKode.readOnly = false;
+                eKode.classList.remove('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+                eKode.classList.add('bg-gray-50');
+                lockInfo.classList.add('hidden');
+            }
 
             const prev = document.getElementById('eImagePreview');
             const placeholder = document.getElementById('eImageUploadPlaceholder');
@@ -1155,14 +1234,14 @@
 
         function clearAllErrors() {
             ['errTKode', 'errTNama', 'errTKategori',
-                'errTrJumlah', 'errTrTanggal', 'errTrSupplier', 'errTrTujuan',
+                'errTrJumlah', 'errTrTanggal', 'errTrSupplier', 'errTrTujuan', 'errTrCatatan',
                 'errEKode', 'errENama', 'errEKategori'
             ].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
             ['tKode', 'tNama', 'tKategori',
-                'trJumlah', 'trTanggal', 'trTujuan',
+                'trJumlah', 'trTanggal', 'trTujuan', 'trCatatan',
                 'eKode', 'eNama', 'eKategori'
             ].forEach(id => {
                 document.getElementById(id)?.classList.remove('input-error');
@@ -1179,6 +1258,15 @@
                 document.getElementById('eKode').value = serverData.editKode;
                 document.getElementById('eNama').value = serverData.editNama;
                 document.getElementById('eKategori').value = serverData.editKategori;
+
+                // kunci field kode barang jika barang sudah memiliki riwayat transaksi
+                const eKode = document.getElementById('eKode');
+                const lockInfo = document.getElementById('eKodeLockInfo');
+                if (serverData.editPunyaTransaksi) {
+                    eKode.readOnly = true;
+                    eKode.classList.add('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+                    lockInfo.classList.remove('hidden');
+                }
 
                 if (serverData.editErrorKode) {
                     document.getElementById('errEKode').querySelector('span').textContent = serverData

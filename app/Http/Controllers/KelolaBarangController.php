@@ -14,8 +14,8 @@ class KelolaBarangController extends Controller
     // READ - menampilkan semua barang dengan filter dan pagination
     public function index(Request $request)
     {
-        // eager load kategori dan riwayat transaksi masuk
-        $query = Barang::with(['kategori', 'barangMasuk']);
+        // eager load kategori dan riwayat transaksi masuk & keluar
+        $query = Barang::with(['kategori', 'barangMasuk', 'barangKeluar']);
 
         // filter berdasarkan keyword pencarian nama barang atau kode barang
         if ($request->filled('search')) {
@@ -66,15 +66,19 @@ class KelolaBarangController extends Controller
             // tentukan status berdasarkan stok dan riwayat transaksi
             $isBaru = $item->stok === 0 && $item->barangMasuk->isEmpty();
 
+            // kode barang terkunci (tidak bisa diedit) jika sudah punya riwayat transaksi
+            $punyaTransaksi = $item->barangMasuk->isNotEmpty() || $item->barangKeluar->isNotEmpty();
+
             return [
-                'kode'        => $item->kode_barang,
-                'nama'        => $item->nama_barang,
-                'stok'        => $item->stok,
-                'is_baru'     => $isBaru,
-                'id_kategori' => $item->id_kategori,
-                'kategori'    => $item->kategori?->nama_kategori ?? '-',
+                'kode'            => $item->kode_barang,
+                'nama'            => $item->nama_barang,
+                'stok'            => $item->stok,
+                'is_baru'         => $isBaru,
+                'id_kategori'     => $item->id_kategori,
+                'kategori'        => $item->kategori?->nama_kategori ?? '-',
+                'punya_transaksi' => $punyaTransaksi,
                 // decode binary foto menjadi base64 untuk ditampilkan di img tag
-                'foto_url'    => $item->foto_barang
+                'foto_url'        => $item->foto_barang
                     ? 'data:image/jpeg;base64,' . base64_encode($item->foto_barang)
                     : null,
             ];
@@ -161,9 +165,18 @@ class KelolaBarangController extends Controller
                 ->with('error', 'Barang tidak ditemukan.');
         }
 
+        // kondisi bisnis - kode barang tidak boleh diubah jika sudah memiliki riwayat transaksi
+        $punyaTransaksi = $barang->barangMasuk()->exists() || $barang->barangKeluar()->exists();
+        if ($punyaTransaksi) {
+            // paksa kode_barang tetap sama walaupun ada nilai lain yang dikirim dari form
+            $request->merge(['kode_barang' => $kodeBarang]);
+        }
+
         // Mengetahui bahwa proses yang dilakukan adalah edit data barang
+        // _punya_transaksi dikirim juga agar modal tetap mengunci field kode saat error validasi
         $request->merge([
-            '_edit_kode' => $kodeBarang,
+            '_edit_kode'      => $kodeBarang,
+            '_punya_transaksi' => $punyaTransaksi,
         ]);
 
         // validasi input - jika gagal Laravel otomatis redirect back dengan error

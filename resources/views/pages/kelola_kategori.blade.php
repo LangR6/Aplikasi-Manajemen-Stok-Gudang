@@ -231,7 +231,7 @@
             </div>
 
             {{-- EMPTY STATE --}}
-            @if ($data->isEmpty())
+            @if ($data->isEmpty() && (request('search') || request('status')))
                 <div class="py-12 text-center">
                     <div
                         class="w-10 h-10 rounded-full bg-gray-100 border border-gray-200
@@ -261,35 +261,68 @@
                         Tidak ada kategori
                     @endif
                 </span>
-                <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
-                    @if ($data->onFirstPage())
-                        <span
-                            class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">‹</span>
-                    @else
-                        <a href="{{ $data->previousPageUrl() }}"
-                            class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">‹</a>
-                    @endif
-
-                    @foreach ($data->links()->elements[0] as $page => $url)
-                        @if (is_string($page))
-                            <span class="text-sm text-gray-400 px-0.5">…</span>
-                        @elseif ($page == $data->currentPage())
+                @if ($data->lastPage() > 1)
+                    <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
+                        {{-- PREV --}}
+                        @if ($data->onFirstPage())
                             <span
-                                class="w-8 h-8 rounded-md border border-[#F66B0E] bg-[#F66B0E] text-white text-sm font-medium flex items-center justify-center">{{ $page }}</span>
+                                class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">‹</span>
                         @else
-                            <a href="{{ $url }}"
-                                class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">{{ $page }}</a>
+                            <a href="{{ $data->previousPageUrl() }}&{{ http_build_query(request()->except('page')) }}"
+                                class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">‹</a>
                         @endif
-                    @endforeach
 
-                    @if ($data->hasMorePages())
-                        <a href="{{ $data->nextPageUrl() }}"
-                            class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">›</a>
-                    @else
-                        <span
-                            class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">›</span>
-                    @endif
-                </div>
+                        {{-- NUMBER dengan sliding window --}}
+                        @php
+                            $current = $data->currentPage();
+                            $last = $data->lastPage();
+                            $window = 2; // jumlah nomor kiri & kanan dari halaman aktif
+                            $start = max(1, $current - $window);
+                            $end = min($last, $current + $window);
+                        @endphp
+
+                        {{-- Halaman pertama + dots kiri --}}
+                        @if ($start > 1)
+                            <a href="{{ $data->url(1) }}&{{ http_build_query(request()->except('page')) }}"
+                                class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">1</a>
+                            @if ($start > 2)
+                                <span
+                                    class="w-8 h-8 flex items-center justify-center text-sm text-gray-400 select-none">…</span>
+                            @endif
+                        @endif
+
+                        {{-- Sliding window --}}
+                        @for ($p = $start; $p <= $end; $p++)
+                            <a href="{{ $data->url($p) }}&{{ http_build_query(request()->except('page')) }}"
+                                class="w-8 h-8 rounded-md border text-sm font-medium flex items-center justify-center transition-all
+                            {{ $current == $p
+                                ? 'bg-[#F66B0E] border-[#F66B0E] text-white'
+                                : 'text-gray-600 border-gray-300 hover:border-orange-500 hover:text-orange-500' }}">
+                                {{ $p }}
+                            </a>
+                        @endfor
+
+                        {{-- Dots kanan + halaman terakhir --}}
+                        @if ($end < $last)
+                            @if ($end < $last - 1)
+                                <span
+                                    class="w-8 h-8 flex items-center justify-center text-sm text-gray-400 select-none">…</span>
+                            @endif
+                            <a href="{{ $data->url($last) }}&{{ http_build_query(request()->except('page')) }}"
+                                class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">{{ $last }}</a>
+                        @endif
+
+                        {{-- NEXT --}}
+                        @if ($data->hasMorePages())
+                            <a href="{{ $data->nextPageUrl() }}&{{ http_build_query(request()->except('page')) }}"
+                                class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">›</a>
+                        @else
+                            <span
+                                class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">›</span>
+                        @endif
+
+                    </div>
+                @endif
             </div>
         </div>
     </div>
