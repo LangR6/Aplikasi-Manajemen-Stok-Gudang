@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             KategoriSeeder::class,
             BarangSeeder::class,
             SupplierSeeder::class,
+            BarangMasukSeeder::class,
+            BarangKeluarSeeder::class,
         ]);
     }
 }

@@ -12,95 +12,142 @@ class RiwayatController extends Controller
 {
     public function index(Request $request)
     {
-        // ===== AMBIL DATA BARANG MASUK =====
-        $masuk = collect(BarangMasuk::with(['barang.kategori', 'supplier'])
-            ->get()
-            ->map(function ($item) {
-                return (object)[
-                    'tanggal'      => $item->tgl_masuk,
-                    'nama_barang'  => $item->barang->nama_barang ?? '-',
-                    'jumlah'       => $item->jumlah,
-                    'kota'         => $item->supplier->kota ?? '-',
-                    'transaksi'    => 'Barang Masuk',
-                    'kategori'     => $item->barang->kategori->nama_kategori ?? '-',
-                    'nama_supplier' => $item->supplier->nama_supplier ?? '-',
-                    'kontak'       => $item->supplier->no_kontak ?? '-',
-                    'email'        => $item->supplier->email ?? '-',
-                    'keterangan'   => $item->keterangan ?? '-',
-                    'dicatat_oleh' => $item->dicatat_oleh ?? '-',
-                    'created_at' => $item->created_at?->toDateTimeString(),
+        // ===========================
+        // DATA BARANG MASUK
+        // ===========================
+        $masuk = collect(
+            BarangMasuk::with(['barang.kategori', 'supplier'])
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'tanggal'        => $item->tgl_masuk,
+                        'kode_barang'    => $item->barang->kode_barang ?? '-',
+                        'nama_barang'    => $item->barang->nama_barang ?? '-',
+                        'jumlah'         => $item->jumlah,
+                        'kota'           => $item->supplier->kota ?? '-',
+                        'transaksi'      => 'Barang Masuk',
+                        'kategori'       => $item->barang->kategori->nama_kategori ?? '-',
+                        'nama_supplier'  => $item->supplier->nama_supplier ?? '-',
+                        'kontak'         => $item->supplier->no_kontak ?? '-',
+                        'email'          => $item->supplier->email ?? '-',
+                        'keterangan'     => $item->keterangan ?? '-',
+                        'dicatat_oleh'   => $item->dicatat_oleh ?? '-',
+                        'created_at'     => $item->created_at?->toDateTimeString(),
+                    ];
+                })
+        );
 
-                ];
-            }));
+        // ===========================
+        // DATA BARANG KELUAR
+        // ===========================
+        $keluar = collect(
+            BarangKeluar::with(['barang.kategori'])
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'tanggal'        => $item->tgl_keluar,
+                        'kode_barang'    => $item->barang->kode_barang ?? '-',
+                        'nama_barang'    => $item->barang->nama_barang ?? '-',
+                        'jumlah'         => $item->jumlah,
+                        'kota'           => $item->tujuan ?? '-',
+                        'transaksi'      => 'Barang Keluar',
+                        'kategori'       => $item->barang->kategori->nama_kategori ?? '-',
+                        'nama_supplier'  => '-',
+                        'kontak'         => '-',
+                        'email'          => '-',
+                        'keterangan'     => $item->keterangan ?? '-',
+                        'dicatat_oleh'   => $item->dicatat_oleh ?? '-',
+                        'created_at'     => $item->created_at?->toDateTimeString(),
+                    ];
+                })
+        );
 
-        // ===== AMBIL DATA BARANG KELUAR =====
-        $keluar = collect(BarangKeluar::with(['barang.kategori'])
-            ->get()
-            ->map(function ($item) {
-                return (object)[
-                    'tanggal'      => $item->tgl_keluar,
-                    'nama_barang'  => $item->barang->nama_barang ?? '-',
-                    'jumlah'       => $item->jumlah,
-                    'kota'         => $item->tujuan ?? '-',
-                    'transaksi'    => 'Barang Keluar',
-                    'kategori'     => $item->barang->kategori->nama_kategori ?? '-',
-                    'nama_supplier' => '-',
-                    'kontak'       => '-',
-                    'email'        => '-',
-                    'keterangan'   => $item->keterangan ?? '-',
-                    'dicatat_oleh' => $item->dicatat_oleh ?? '-',
-                    'created_at' => $item->created_at?->toDateTimeString(),
-                ];
-            }));
-
-        // ===== GABUNGKAN & URUTKAN TERBARU =====
-        $riwayat = $masuk->merge($keluar)
+        // ===========================
+        // GABUNGKAN DATA
+        // ===========================
+        $riwayat = $masuk
+            ->merge($keluar)
             ->sortByDesc('created_at')
             ->values();
 
-        // ===== DEFAULT: 3 BULAN TERAKHIR (jika tidak ada filter aktif) =====
-        $adaFilter = $request->dari || $request->sampai || $request->jenis || $request->search;
+        // ===========================
+        // DEFAULT 3 BULAN TERAKHIR
+        // ===========================
+        $adaFilter =
+            $request->filled('dari') ||
+            $request->filled('sampai') ||
+            $request->filled('jenis') ||
+            $request->filled('search');
 
         if (!$adaFilter) {
             $tiga_bulan_lalu = Carbon::now()->subMonths(3)->startOfDay();
-            $riwayat = $riwayat->filter(function ($item) use ($tiga_bulan_lalu) {
-                return Carbon::parse($item->created_at) >= $tiga_bulan_lalu;
-            })->values();
+
+            $riwayat = $riwayat
+                ->filter(function ($item) use ($tiga_bulan_lalu) {
+                    return Carbon::parse($item->created_at) >= $tiga_bulan_lalu;
+                })
+                ->values();
         }
 
-        // ===== FILTER =====
-        $riwayat = $riwayat->filter(function ($item) use ($request) {
+        // ===========================
+        // FILTER
+        // ===========================
+        $riwayat = $riwayat
+            ->filter(function ($item) use ($request) {
 
-            if ($request->dari && Carbon::parse($item->tanggal)->startOfDay() < Carbon::parse($request->dari)->startOfDay()) {
-                return false;
-            }
-
-            if ($request->sampai && Carbon::parse($item->tanggal)->startOfDay() > Carbon::parse($request->sampai)->startOfDay()) {
-                return false;
-            }
-
-            if ($request->jenis && $item->transaksi !== $request->jenis) {
-                return false;
-            }
-
-            if ($request->search) {
-                $search = strtolower($request->search);
+                // Filter tanggal mulai
                 if (
-                    !str_contains(strtolower($item->nama_barang), $search) &&
-                    !str_contains(strtolower($item->kota), $search)
+                    $request->filled('dari') &&
+                    Carbon::parse($item->tanggal)->startOfDay() <
+                        Carbon::parse($request->dari)->startOfDay()
                 ) {
                     return false;
                 }
-            }
 
-            return true;
-        })->values();
+                // Filter tanggal akhir
+                if (
+                    $request->filled('sampai') &&
+                    Carbon::parse($item->tanggal)->startOfDay() >
+                        Carbon::parse($request->sampai)->startOfDay()
+                ) {
+                    return false;
+                }
 
-        // ===== PAGINATION =====
+                // Filter jenis transaksi
+                if (
+                    $request->filled('jenis') &&
+                    $item->transaksi != $request->jenis
+                ) {
+                    return false;
+                }
+
+                // Filter pencarian
+                if ($request->filled('search')) {
+
+                    $search = strtolower(trim($request->search));
+
+                    if (
+                        !str_contains(strtolower($item->kode_barang), $search) &&
+                        !str_contains(strtolower($item->nama_barang), $search) &&
+                        !str_contains(strtolower($item->kota), $search)
+                    ) {
+                        return false;
+                    }
+                }
+
+                return true;
+            })
+            ->values();
+
+        // ===========================
+        // PAGINATION
+        // ===========================
         $perPage = 10;
-        $page    = $request->get('page', 1);
+        $page = $request->get('page', 1);
 
-        $items = $riwayat->slice(($page - 1) * $perPage, $perPage)->values();
+        $items = $riwayat
+            ->slice(($page - 1) * $perPage, $perPage)
+            ->values();
 
         $riwayat = new LengthAwarePaginator(
             $items,
@@ -112,10 +159,13 @@ class RiwayatController extends Controller
                 'query' => $request->query(),
             ]
         );
-        
+
         return view('pages.riwayat', compact('riwayat'));
     }
 
+    // ===========================
+    // EXPORT EXCEL
+    // ===========================
     public function exportExcel(Request $request)
     {
         $filters = [

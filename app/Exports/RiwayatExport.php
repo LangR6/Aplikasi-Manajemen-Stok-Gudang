@@ -31,6 +31,7 @@ class RiwayatExport
             ->map(function ($item) {
                 return (object)[
                     'tanggal'       => $item->tgl_masuk,
+                    'kode_barang'   => $item->barang->kode_barang ?? '-',
                     'nama_barang'   => $item->barang->nama_barang ?? '-',
                     'jumlah'        => $item->jumlah,
                     'kota'          => $item->supplier->kota ?? '-',
@@ -51,6 +52,7 @@ class RiwayatExport
             ->map(function ($item) {
                 return (object)[
                     'tanggal'       => $item->tgl_keluar,
+                    'kode_barang'   => $item->barang->kode_barang ?? '-',
                     'nama_barang'   => $item->barang->nama_barang ?? '-',
                     'jumlah'        => $item->jumlah,
                     'kota'          => $item->tujuan ?? '-',
@@ -87,7 +89,7 @@ class RiwayatExport
         $spreadsheet = new Spreadsheet();
         $sheet       = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Riwayat Transaksi');
-        $lastCol = 'K';
+        $lastCol = 'L';
 
         // ===== JUDUL UTAMA =====
         $sheet->mergeCells('A1:' . $lastCol . '1');
@@ -136,18 +138,19 @@ class RiwayatExport
         // ===== LEBAR KOLOM (ikut section masuk yang lebih lebar) =====
         $sheet->getColumnDimension('A')->setWidth(5);
         $sheet->getColumnDimension('B')->setWidth(12);
-        $sheet->getColumnDimension('C')->setWidth(22);
-        $sheet->getColumnDimension('D')->setWidth(15);
-        $sheet->getColumnDimension('E')->setWidth(8);
-        $sheet->getColumnDimension('F')->setWidth(22);
-        $sheet->getColumnDimension('G')->setWidth(20);
-        $sheet->getColumnDimension('H')->setWidth(25);
-        $sheet->getColumnDimension('I')->setWidth(15);
-        $sheet->getColumnDimension('J')->setWidth(25);
-        $sheet->getColumnDimension('K')->setWidth(15);
+        $sheet->getColumnDimension('C')->setWidth(14);
+        $sheet->getColumnDimension('D')->setWidth(22);
+        $sheet->getColumnDimension('E')->setWidth(15);
+        $sheet->getColumnDimension('F')->setWidth(8);
+        $sheet->getColumnDimension('G')->setWidth(22);
+        $sheet->getColumnDimension('H')->setWidth(20);
+        $sheet->getColumnDimension('I')->setWidth(25);
+        $sheet->getColumnDimension('J')->setWidth(15);
+        $sheet->getColumnDimension('K')->setWidth(25);
+        $sheet->getColumnDimension('L')->setWidth(15);
 
         // ===== DOWNLOAD =====
-        $filename = 'Riwayat_Transaksi_' . Carbon::now()->format('d-m-Y_His') . '.xlsx';
+        $filename = 'Laporan_Transaksi_' . Carbon::now()->format('d-m-Y_His') . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -163,10 +166,10 @@ class RiwayatExport
         $isMasuk = $judul === 'BARANG MASUK';
 
         $headers = $isMasuk
-            ? ['No', 'Tanggal', 'Nama Barang', 'Kategori', 'Jumlah', 'Supplier', 'Kontak', 'Email', 'Kota', 'Keterangan', 'Dicatat Oleh']
-            : ['No', 'Tanggal', 'Nama Barang', 'Kategori', 'Jumlah', 'Tujuan', 'Keterangan', 'Dicatat Oleh'];
+            ? ['No', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Kategori', 'Jumlah', 'Supplier', 'Kontak', 'Email', 'Kota', 'Keterangan', 'Dicatat Oleh']
+            : ['No', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Kategori', 'Jumlah', 'Tujuan', 'Keterangan', 'Dicatat Oleh'];
 
-        $lastColSection = $isMasuk ? 'K' : 'H';
+        $lastColSection = $isMasuk ? 'L' : 'I';
 
         // ===== JUDUL SECTION =====
         $sheet->mergeCells('A' . $row . ':' . $lastColSection . $row);
@@ -212,24 +215,26 @@ class RiwayatExport
                 if ($isMasuk) {
                     $sheet->setCellValue('A' . $row, $i + 1);
                     $sheet->setCellValue('B' . $row, Carbon::parse($item->tanggal)->format('d/m/Y'));
-                    $sheet->setCellValue('C' . $row, $item->nama_barang);
-                    $sheet->setCellValue('D' . $row, $item->kategori);
-                    $sheet->setCellValue('E' . $row, $item->jumlah);
-                    $sheet->setCellValue('F' . $row, $item->nama_supplier);
-                    $sheet->setCellValue('G' . $row, $item->kontak);
-                    $sheet->setCellValue('H' . $row, $item->email);
-                    $sheet->setCellValue('I' . $row, $item->kota);
-                    $sheet->setCellValue('J' . $row, $item->keterangan);
-                    $sheet->setCellValue('K' . $row, $item->dicatat_oleh);
+                    $sheet->setCellValue('C' . $row, $item->kode_barang);
+                    $sheet->setCellValue('D' . $row, $item->nama_barang);
+                    $sheet->setCellValue('E' . $row, $item->kategori);
+                    $sheet->setCellValue('F' . $row, $item->jumlah);
+                    $sheet->setCellValue('G' . $row, $item->nama_supplier);
+                    $sheet->setCellValue('H' . $row, $item->kontak);
+                    $sheet->setCellValue('I' . $row, $item->email);
+                    $sheet->setCellValue('J' . $row, $item->kota);
+                    $sheet->setCellValue('K' . $row, $item->keterangan);
+                    $sheet->setCellValue('L' . $row, $item->dicatat_oleh);
                 } else {
                     $sheet->setCellValue('A' . $row, $i + 1);
                     $sheet->setCellValue('B' . $row, Carbon::parse($item->tanggal)->format('d/m/Y'));
-                    $sheet->setCellValue('C' . $row, $item->nama_barang);
-                    $sheet->setCellValue('D' . $row, $item->kategori);
-                    $sheet->setCellValue('E' . $row, $item->jumlah);
-                    $sheet->setCellValue('F' . $row, $item->kota); // tujuan
-                    $sheet->setCellValue('G' . $row, $item->keterangan);
-                    $sheet->setCellValue('H' . $row, $item->dicatat_oleh);
+                    $sheet->setCellValue('C' . $row, $item->kode_barang);
+                    $sheet->setCellValue('D' . $row, $item->nama_barang);
+                    $sheet->setCellValue('E' . $row, $item->kategori);
+                    $sheet->setCellValue('F' . $row, $item->jumlah);
+                    $sheet->setCellValue('G' . $row, $item->kota); // tujuan
+                    $sheet->setCellValue('H' . $row, $item->keterangan);
+                    $sheet->setCellValue('I' . $row, $item->dicatat_oleh);
                 }
 
                 $sheet->getStyle('A' . $row . ':' . $lastColSection . $row)->applyFromArray([
@@ -238,7 +243,7 @@ class RiwayatExport
                 ]);
 
                 $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('E' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('F' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
                 $row++;
             }

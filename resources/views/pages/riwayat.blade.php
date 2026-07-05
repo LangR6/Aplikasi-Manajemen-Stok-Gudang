@@ -90,7 +90,7 @@
             <input id="searchInput" type="text"
                 value="{{ request('search') }}"
                 onkeydown="if(event.key==='Enter') submitFilter()"
-                placeholder="Cari nama barang/kota..."
+                placeholder="Cari kode barang,nama barang atau kota..."
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                 focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5" />
         </div>
@@ -204,6 +204,7 @@
                         <tr id="detail-{{ $i }}" class="hidden bg-gray-50">
                             <td colspan="7" class="p-4">
                                 <div class="bg-white border rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                    <div><span class="text-gray-500">Kode Barang:</span> {{ $item->kode_barang }}</div>
                                     <div><span class="text-gray-500">Tanggal:</span> {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</div>
                                     <div><span class="text-gray-500">Kategori:</span> {{ $item->kategori }}</div>
                                     <div><span class="text-gray-500">Jumlah:</span> {{ $item->jumlah }}</div>
