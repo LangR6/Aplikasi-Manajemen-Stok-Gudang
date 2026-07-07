@@ -544,6 +544,7 @@
                         <div><span class="font-medium">Nama Barang :</span> {{ $barang['nama_barang'] }}</div>
                         <div><span class="font-medium">Kategori :</span> {{ $barang['kategori'] }}</div>
                         <div><span class="font-medium">Sisa Stok :</span> {{ $barang['stok'] }}</div>
+                        <div><span class="font-medium">Kode Barang :</span> {{ $barang['kode'] }}</div>
                     </div>
 
                     <!-- Button tandai dibaca -->
@@ -604,6 +605,7 @@
                         <div><span class="font-medium">Nama Barang :</span> {{ $barang['nama_barang'] }}</div>
                         <div><span class="font-medium">Kategori :</span> {{ $barang['kategori'] }}</div>
                         <div><span class="font-medium">Sisa Stok :</span> {{ $barang['stok'] }}</div>
+                        <div><span class="font-medium">Kode Barang :</span> {{ $barang['kode'] }}</div>
                     </div>
 
                     <!-- Button tandai dibaca-->

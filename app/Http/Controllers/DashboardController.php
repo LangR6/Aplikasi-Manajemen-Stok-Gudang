@@ -164,7 +164,10 @@ class DashboardController extends Controller
 
         $showStokMenipisModal = false;
 
-        if (session('role') === 'admin' && session('show_stok_menipis') && $stokMenipis > 0) {
+        $isAdminOrManajer = in_array(session('role'), ['admin', 'manajer']);
+
+        // Muncul Notifikasi
+        if ($isAdminOrManajer && session('show_stok_menipis') && $stokMenipis > 0) {
             $showStokMenipisModal = true;
             session()->forget('show_stok_menipis');
         }

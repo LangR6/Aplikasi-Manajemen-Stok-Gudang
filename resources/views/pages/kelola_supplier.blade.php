@@ -257,50 +257,81 @@
             </div>
 
             {{-- FOOTER PAGINATION --}}
-            <div class="px-4 py-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
+            <div class="px-3 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm border-t border-gray-200">
 
-                <span class="text-sm text-gray-400 w-full text-center sm:w-auto sm:text-left">
-                    @if ($suppliers->total())
-                        Menampilkan {{ $suppliers->firstItem() }}–{{ $suppliers->lastItem() }} dari {{ $suppliers->total() }} supplier
+                <span class="text-gray-400">
+                    @if($suppliers->total() > 0)
+                        Menampilkan {{ $suppliers->firstItem() }}–{{ $suppliers->lastItem() }}
+                        dari {{ $suppliers->total() }} supplier
                     @else
-                        Tidak ada supplier
+                        Tidak ada data
                     @endif
                 </span>
 
-                @if ($suppliers->total())
-                    <div class="w-full sm:w-auto flex justify-center sm:justify-end gap-1">
-                        {{-- Prev --}}
-                        @if ($suppliers->onFirstPage())
-                            <span class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">‹</span>
-                        @else
-                            <a href="{{ $suppliers->previousPageUrl() }}"
-                                class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">‹</a>
-                        @endif
+                @if($suppliers->lastPage() > 1)
+                <div class="flex items-center gap-1">
 
-                        {{-- Page numbers --}}
-                        @foreach ($suppliers->links()->elements[0] as $page => $url)
-                            @if (is_string($page))
-                                <span class="text-sm text-gray-400 px-0.5">…</span>
-                            @elseif ($page == $suppliers->currentPage())
-                                <span class="w-8 h-8 rounded-md border border-[#F66B0E] bg-[#F66B0E] text-white text-sm font-medium flex items-center justify-center">{{ $page }}</span>
-                            @else
-                                <a href="{{ $url }}"
-                                    class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">{{ $page }}</a>
-                            @endif
-                        @endforeach
+                    {{-- PREV --}}
+                    @if ($suppliers->onFirstPage())
+                        <span class="w-8 h-8 flex items-center justify-center text-gray-300 border border-gray-200 rounded-md">‹</span>
+                    @else
+                        <a href="{{ $suppliers->previousPageUrl() }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 flex items-center justify-center text-gray-500
+                            border border-gray-300 rounded-md hover:border-orange-500 hover:text-orange-500 transition">‹</a>
+                    @endif
 
-                        {{-- Next --}}
-                        @if ($suppliers->hasMorePages())
-                            <a href="{{ $suppliers->nextPageUrl() }}"
-                                class="w-8 h-8 rounded-md border border-gray-300 text-sm font-medium flex items-center justify-center text-gray-600 hover:border-orange-500 hover:text-orange-500 transition-all">›</a>
-                        @else
-                            <span class="w-8 h-8 rounded-md border border-gray-100 text-sm font-medium flex items-center justify-center text-gray-300 cursor-not-allowed">›</span>
+                    {{-- NUMBER dengan sliding window --}}
+                    @php
+                        $current = $suppliers->currentPage();
+                        $last    = $suppliers->lastPage();
+                        $window  = 2; // jumlah nomor kiri & kanan dari halaman aktif
+                        $start   = max(1, $current - $window);
+                        $end     = min($last, $current + $window);
+                    @endphp
+
+                    {{-- Halaman pertama + dots kiri --}}
+                    @if ($start > 1)
+                        <a href="{{ $suppliers->url(1) }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 flex items-center justify-center rounded-md border text-gray-500
+                            border-gray-300 hover:border-orange-500 hover:text-orange-500 transition">1</a>
+                        @if ($start > 2)
+                            <span class="w-8 h-8 flex items-center justify-center text-gray-400 select-none">…</span>
                         @endif
-                    </div>
+                    @endif
+
+                    {{-- Sliding window --}}
+                    @for ($p = $start; $p <= $end; $p++)
+                        <a href="{{ $suppliers->url($p) }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 flex items-center justify-center rounded-md border transition
+                            {{ $current == $p
+                                ? 'bg-orange-500 text-white border-orange-500'
+                                : 'text-gray-500 border-gray-300 hover:border-orange-500 hover:text-orange-500' }}">
+                            {{ $p }}
+                        </a>
+                    @endfor
+
+                    {{-- Dots kanan + halaman terakhir --}}
+                    @if ($end < $last)
+                        @if ($end < $last - 1)
+                            <span class="w-8 h-8 flex items-center justify-center text-gray-400 select-none">…</span>
+                        @endif
+                        <a href="{{ $suppliers->url($last) }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 flex items-center justify-center rounded-md border text-gray-500
+                            border-gray-300 hover:border-orange-500 hover:text-orange-500 transition">{{ $last }}</a>
+                    @endif
+
+                    {{-- NEXT --}}
+                    @if ($suppliers->hasMorePages())
+                        <a href="{{ $suppliers->nextPageUrl() }}&{{ http_build_query(request()->except('page')) }}"
+                            class="w-8 h-8 flex items-center justify-center text-gray-500
+                            border border-gray-300 rounded-md hover:border-orange-500 hover:text-orange-500 transition">›</a>
+                    @else
+                        <span class="w-8 h-8 flex items-center justify-center text-gray-300 border border-gray-200 rounded-md">›</span>
+                    @endif
+                </div>
                 @endif
             </div>
         </div>
-
     </div>
 @endsection
 

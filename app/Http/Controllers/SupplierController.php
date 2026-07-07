@@ -4,36 +4,65 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SupplierController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Supplier::query()
-            ->orderBy('id_supplier', 'desc');
+        // ===========================
+        // DATA SUPPLIER
+        // ===========================
+        $suppliers = collect(
+            Supplier::orderBy('id_supplier', 'desc')->get()
+        );
 
+        // ===========================
+        // FILTER PENCARIAN
+        // ===========================
         if ($request->filled('search')) {
 
-            $keyword = trim($request->search);
+            $search = strtolower(trim($request->search));
 
-            $query->where(function ($q) use ($keyword) {
-                $q->where('nama_supplier', 'like', "%{$keyword}%")
-                    ->orWhere('no_kontak', 'like', "%{$keyword}%")
-                    ->orWhere('email', 'like', "%{$keyword}%")
-                    ->orWhere('kota', 'like', "%{$keyword}%");
-            });
+            $suppliers = $suppliers
+                ->filter(function ($item) use ($search) {
+                    return str_contains(strtolower($item->nama_supplier), $search) ||
+                        str_contains(strtolower($item->no_kontak), $search) ||
+                        str_contains(strtolower($item->email), $search) ||
+                        str_contains(strtolower($item->kota), $search);
+                })
+                ->values();
         }
 
-        $suppliers = $query
-            ->paginate(10)
-            ->withQueryString();
+        // ===========================
+        // PAGINATION
+        // ===========================
+        $perPage = 10;
+        $page = $request->get('page', 1);
+
+        $items = $suppliers
+            ->slice(($page - 1) * $perPage, $perPage)
+            ->values();
+
+        $suppliers = new LengthAwarePaginator(
+            $items,
+            $suppliers->count(),
+            $perPage,
+            $page,
+            [
+                'path'  => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
 
         return view('pages.kelola_supplier', compact('suppliers'));
     }
 
+    // ===========================
+    // TAMBAH SUPPLIER
+    // ===========================
     public function store(Request $request)
     {
-
         // Hanya admin yang boleh menambah supplier
         if (session('role') !== 'admin') {
             return redirect()->back()
@@ -80,9 +109,11 @@ class SupplierController extends Controller
             ->with('success', 'Supplier berhasil ditambahkan.');
     }
 
+    // ===========================
+    // UPDATE SUPPLIER
+    // ===========================
     public function update(Request $request, $id)
     {
-
         // Hanya admin yang boleh mengubah supplier
         if (session('role') !== 'admin') {
             return redirect()->back()
@@ -90,8 +121,8 @@ class SupplierController extends Controller
         }
 
         $request->merge([
-            '_form_mode' => 'edit',
-            'id_supplier' => $id
+            '_form_mode'  => 'edit',
+            'id_supplier' => $id,
         ]);
 
         $supplier = Supplier::findOrFail($id);
@@ -123,9 +154,11 @@ class SupplierController extends Controller
             ->with('success', 'Supplier berhasil diperbarui.');
     }
 
+    // ===========================
+    // HAPUS SUPPLIER
+    // ===========================
     public function destroy($id)
     {
-
         // Hanya admin yang boleh menghapus supplier
         if (session('role') !== 'admin') {
             return redirect()->back()

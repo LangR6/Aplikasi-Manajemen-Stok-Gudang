@@ -42,7 +42,7 @@ class AuthController extends Controller
             ]);
 
             // ===== FLAG STOK MENIPIS UNTUK ADMIN =====
-            if (Auth::user()->role === 'admin') {
+            if (Auth::user()->role === 'admin' || Auth::user()->role === 'manajer') {
                 session(['show_stok_menipis' => true]);
             }
 
