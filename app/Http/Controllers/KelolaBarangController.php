@@ -7,6 +7,7 @@ use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
 use App\Models\Kategori;
 use App\Models\Supplier;
+use App\Events\NotificationSent;
 use Illuminate\Http\Request;
 
 class KelolaBarangController extends Controller
@@ -364,6 +365,17 @@ class KelolaBarangController extends Controller
 
         // kurangi stok
         $barang->decrement('stok', $request->jumlah);
+
+        // cek kondisi stok kritis, lalu broadcast notifikasi real-time
+        if ($barang->stok <= 5) {
+            foreach (['admin', 'manajer'] as $role) {
+                event(new NotificationSent(
+                    namaBarang: $barang->nama_barang,
+                    sisaStok: $barang->stok,
+                    roleTujuan: $role
+                ));
+            }
+        }
 
         session()->forget(['_last_modal', '_last_kode', '_last_nama', '_last_kategori', '_last_stok']);
 
