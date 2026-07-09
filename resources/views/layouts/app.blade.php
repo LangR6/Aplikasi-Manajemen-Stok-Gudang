@@ -17,9 +17,9 @@
 <body class="bg-[#EFEFEF] font-[Poppins]">
 
     @if (!session('role'))
-        <script>
-            window.location.href = "{{ route('login') }}";
-        </script>
+    <script>
+        window.location.href = "{{ route('login') }}";
+    </script>
     @endif
 
     <!-- Overlay Sidebar Mobile -->
@@ -92,23 +92,29 @@
     @stack('scripts')
 
     <div x-data="{
-        show: false,
-        namaBarang: '',
-        sisaStok: 0,
+    show: false,
+    namaBarang: '',
+    sisaStok: 0,
+    _hideTimer: null,
 
-        init() {
-            const role = '{{ session('role') }}';
+    init() {
+        const role = '{{ session('role') }}';
+        const username = '{{ session('username') }}';
 
-            window.Echo.channel('gudang-notification.role.' + role)
-                .listen('.stok.menipis', (data) => {
-                    this.namaBarang = data.nama_barang;
-                    this.sisaStok = data.sisa_stok;
-                    this.show = true;
+        window.Echo.channel('gudang-notification.role.' + role)
+            .listen('.stok.menipis', (data) => {
+                // skip kalau yang menerima adalah pelaku aksi itu sendiri
+                if (data.pelaku === username) return;
 
-                    setTimeout(() => this.show = false, 5000);
-                });
+                this.namaBarang = data.nama_barang;
+                this.sisaStok = data.sisa_stok;
+                this.show = true;
+
+                clearTimeout(this._hideTimer);
+                this._hideTimer = setTimeout(() => this.show = false, 5000);
+            });
         }
-    }" class="fixed top-4 right-4 z-50">
+    }" class="fixed top-4 right-4 z-[9999]">
         <div x-show="show" x-cloak x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
             x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 translate-y-0"

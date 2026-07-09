@@ -1,5 +1,5 @@
 <div id="logoutModal"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]">
+    class="fixed inset-0 z-80 hidden items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]">
     <div class="w-full max-w-md scale-95 rounded-2xl bg-white p-8 text-center shadow-2xl transition-all duration-200"
         id="logoutModalCard">
 

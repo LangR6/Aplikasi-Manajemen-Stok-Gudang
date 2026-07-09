@@ -15,12 +15,14 @@ class NotificationSent implements ShouldBroadcastNow
     public string $namaBarang;
     public int $sisaStok;
     public string $roleTujuan;
+    public ?string $pelaku;
 
-    public function __construct(string $namaBarang, int $sisaStok, string $roleTujuan)
+    public function __construct(string $namaBarang, int $sisaStok, string $roleTujuan, ?string $pelaku = null)
     {
         $this->namaBarang = $namaBarang;
         $this->sisaStok   = $sisaStok;
         $this->roleTujuan = $roleTujuan;
+        $this->pelaku     = $pelaku;
     }
 
     public function broadcastOn(): Channel
@@ -39,6 +41,7 @@ class NotificationSent implements ShouldBroadcastNow
             'nama_barang' => $this->namaBarang,
             'sisa_stok'   => $this->sisaStok,
             'role_tujuan' => $this->roleTujuan,
+            'pelaku'      => $this->pelaku,
         ];
     }
 }

@@ -372,7 +372,8 @@ class KelolaBarangController extends Controller
                 event(new NotificationSent(
                     namaBarang: $barang->nama_barang,
                     sisaStok: $barang->stok,
-                    roleTujuan: $role
+                    roleTujuan: $role,
+                    pelaku: session('username')
                 ));
             }
         }
