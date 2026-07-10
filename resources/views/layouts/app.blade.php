@@ -10,6 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
 
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
@@ -17,9 +23,9 @@
 <body class="bg-[#EFEFEF] font-[Poppins]">
 
     @if (!session('role'))
-    <script>
-        window.location.href = "{{ route('login') }}";
-    </script>
+        <script>
+            window.location.href = "{{ route('login') }}";
+        </script>
     @endif
 
     <!-- Overlay Sidebar Mobile -->
@@ -92,27 +98,27 @@
     @stack('scripts')
 
     <div x-data="{
-    show: false,
-    namaBarang: '',
-    sisaStok: 0,
-    _hideTimer: null,
+        show: false,
+        namaBarang: '',
+        sisaStok: 0,
+        _hideTimer: null,
 
-    init() {
-        const role = '{{ session('role') }}';
-        const username = '{{ session('username') }}';
+        init() {
+            const role = '{{ session('role') }}';
+            const username = '{{ session('username') }}';
 
-        window.Echo.channel('gudang-notification.role.' + role)
-            .listen('.stok.menipis', (data) => {
-                // skip kalau yang menerima adalah pelaku aksi itu sendiri
-                if (data.pelaku === username) return;
+            window.Echo.channel('gudang-notification.role.' + role)
+                .listen('.stok.menipis', (data) => {
+                    // skip kalau yang menerima adalah pelaku aksi itu sendiri
+                    if (data.pelaku === username) return;
 
-                this.namaBarang = data.nama_barang;
-                this.sisaStok = data.sisa_stok;
-                this.show = true;
+                    this.namaBarang = data.nama_barang;
+                    this.sisaStok = data.sisa_stok;
+                    this.show = true;
 
-                clearTimeout(this._hideTimer);
-                this._hideTimer = setTimeout(() => this.show = false, 5000);
-            });
+                    clearTimeout(this._hideTimer);
+                    this._hideTimer = setTimeout(() => this.show = false, 5000);
+                });
         }
     }" class="fixed top-4 right-4 z-[9999]">
         <div x-show="show" x-cloak x-transition:enter="transition ease-out duration-300"
